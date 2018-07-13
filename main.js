@@ -29,18 +29,6 @@ function hideIconWidth(btnId) {
   $(btnId).prev().width(0)
 }
 
-function makeButtonWaiting(btnEl) {
-  setButton(btnEl, '...', 'Newsit is checking source...')
-}
-
-function makeButtonFailed(btnEl, linkName) {
-  setTimeout(() => {
-    console.log('Failed: ' + linkName)
-    setButton(btnEl, '-', 'Newsit found nothing ' + linkName)
-    hideIconWidth(btnEl)
-  }, 100)
-}
-
 function setButton(btnEl, text, tooltip, href) {
   $(btnEl).html(text);
   changeButtonSize(btnEl, text)
@@ -50,6 +38,18 @@ function setButton(btnEl, text, tooltip, href) {
     $(btnEl).addClass('newsit_btnlink');
   else 
     $(btnEl).removeClass('newsit_btnlink');
+}
+
+function makeButtonWaiting(btnEl) {
+  setButton(btnEl, '...', 'Newsit is checking source...')
+}
+
+function makeButtonFailed(btnEl, linkName) {
+  setTimeout(() => {
+    setButton(btnEl, '-', 'Newsit found nothing on ' + linkName)
+    $(btnEl).css('opacity', 0.4);
+    hideIconWidth(btnEl)
+  }, 100)
 }
 
 function findHn(location) {
@@ -182,6 +182,14 @@ function addContainer() {
   });
 }
 
-addContainer()
-findHn(location)
-findReddit(location)
+$(() => {
+  chrome.storage.sync.get({
+    isEnabled: true,
+  }, function(items) {
+    if (items.isEnabled != true)
+      return;
+    addContainer();
+    findHn(location);
+    findReddit(location);
+  });
+});

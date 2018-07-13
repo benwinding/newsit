@@ -1,10 +1,23 @@
+function setIsEnabled(isEnabled) {
+  chrome.storage.sync.set({
+    isEnabled: isEnabled
+  })
+  const iconPath = isEnabled ? 'images/icon.png' : 'images/icon-grey.png';
+  chrome.browserAction.setIcon({
+    path: iconPath
+  }); 
+}
+
 // Saves options to chrome.storage
 function save_options() {
   let placementValue = $('#placement').val();
   let sizeValue = $('#size').val();
+  let isEnabledValue = $('#isEnabled').val() == 1;
+  setIsEnabled(isEnabledValue)
   chrome.storage.sync.set({
     placement: placementValue,
-    btnsize: sizeValue
+    btnsize: sizeValue,
+    isEnabled: isEnabledValue
   }, function() {
     // Update status to let user know options were saved.
     $('#status').fadeIn()
@@ -30,12 +43,14 @@ function restore_options() {
   // Use default value color = 'red' and likesColor = true.
   chrome.storage.sync.get({
     placement: 'br',
-    btnsize: '1'
+    btnsize: '1',
+    isEnabled: true,
   }, function(items) {
     $('#placement').val(items.placement);
     $('#size').val(items.btnsize).change();
+    $('#isEnabled').val(items.isEnabled).change();
+    setIsEnabled(isEnabled)
     setSliderOutput(items.btnsize);
-    // $('#size').val(this.value);
   });
 }
 document.addEventListener('DOMContentLoaded', () => {
@@ -43,12 +58,11 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#size').rangeslider({
     polyfill: false
   })
-
-  const h = $('.newsit_r').height();
-  $('.newsit_icon').height(h)
-  $(document).on('input', 'input[type="range"]', function(e) {
+  $('#isEnabled').rangeslider({
+    polyfill: false
+  })
+  $(document).on('input', '#size', function(e) {
     setSliderOutput(e.currentTarget.value);
   });
 });
-document.getElementById('save').addEventListener('click',
-    save_options);
+document.getElementById('save').addEventListener('click', save_options);
