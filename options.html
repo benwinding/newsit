@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Newsit Options</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="stylesheet" href="libs/bootstrap/css/bootstrap.min.css">
+    <script src="libs/jquery.js"></script>
+    <script src="libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="libs/rangeslider/rangeslider.css">
+    <script src="libs/rangeslider/rangeslider.min.js"></script>
+  </head>
+  <body>
+    <div class="container bg-light p-5">
+      <div class="row">
+        <div class="col-md-3 offset-md-2">
+          <a href="https://benwinding.com" target="_blank">
+            <img src="images/icon.svg" style="width: 90px;">
+          </a>
+        </div>
+        <div class="col-md-2">
+          <h1 style="color: #a2a2a2; text-align: right;"> Settings</h1>
+        </div>
+      </div>
+      <div class="container p-2"></div>
+      <div class="row">
+        <div class="col-md-8 offset-md-2">
+          <div class="form-group">
+            <label for="placement">Links Position</label>
+            <select class="form-control" id="placement">
+              <option value="br">Bottom Right</option>
+              <option value="bl">Bottom Left</option>
+              <option value="tr">Top Right</option>
+              <option value="tl">Top Left</option>
+              <option value="none">No Placement in Window</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4 offset-md-2">
+          <label for="size">Links Size</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4 offset-md-2 col-6">
+          <div class="form-group">
+            <div class="row">
+            </div>
+            <input
+              id="size"
+              type="range"
+              min="0.2"
+              max="2"
+              step="0.05"
+            >
+          </div>
+        </div>
+        <div class="col-md-4 col-6">
+          <output></output>
+          <div class="row"></div>
+          <output></output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2 offset-md-2">
+          <button type="button" class="btn btn-info" id="save">Save</button>
+        </div>
+        <div class="col-md-6 col-10" >
+          <div class="float-right">
+            <img id="btnsPreview" src="https://i.imgur.com/dVvDrfN.png">
+          </div>
+        </div>
+      </div>
+      <div class="container p-2"></div>
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="alert alert-success collapse" role="alert" id="status">
+            <strong>Saved</strong>
+            <p>Newsit settings saved locally!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="options.js"></script>
+  </body>
+</html>
