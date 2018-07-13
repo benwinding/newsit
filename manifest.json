@@ -5,7 +5,7 @@
   "name": "Newsit: Hacker News and Reddit Links",
   "short_name": "Newsit",
   "description": "Find Reddit or Hacker News discussions on the current page!",
-  "version": "0.1",
+  "version": "0.2",
   "icons": { 
     "16": "images/favicon-16x16.png",
     "32": "images/favicon-32x32.png",
