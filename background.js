@@ -6,6 +6,8 @@ function setIcon(isEnabled) {
   chrome.browserAction.setIcon({
     path: iconPath
   });
+  const iconText = isEnabled ? 'ON' : '';
+  chrome.browserAction.setBadgeText({ text:iconText });
 }
 
 function onClickIcon() {
