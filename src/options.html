@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Newsit Settings</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  </head>
+  <body>
+    <div class="columns" id="app">
+      <div class="column">
+        <section class="section">
+          <div class="level-item">
+            <a href="https://newsit.benwinding.com" target="_blank">
+              <img src="img/icon.svg" style="width: 90px;">
+            </a>
+          </div>
+          <div class="level-item">
+            <span class="icon">
+              <i class="fa fa-gear"></i>
+            </span>
+            <h1 class="title">Settings</h1>
+          </div>
+        </section>
+        <hr>
+        <section class="section">
+          <!-- form starts here -->
+          <section class="form">
+            <div class="field">
+              <div class="control">
+                <label class="checkbox">
+                  <input type="checkbox" v-model="formBtnsEnabled">
+                  Run automatically on page load
+                </label>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Links Location</label>
+              <div class="control">
+                <div class="select">
+                  <select v-model="formBtnsLocation">
+                    <option disabled value="">Nothing selected</option>
+                    <option v-for="option in options.formBtnsLocation" v-bind:value="option.value">
+                      {{ option.text }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Link Size</label>
+              <div class="control">
+                <input type="range" v-model="formBtnsSize"
+                  min="0.2"
+                  max="2"
+                  step="0.05"
+                >
+              </div>
+              {{formBtnsSize}}
+            </div>
+            <div>
+              <img id="btnsPreview" src="https://i.imgur.com/dVvDrfN.png" v-bind:style="{height: btnSizePx + 'px'}">
+            </div>
+          </section>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>
