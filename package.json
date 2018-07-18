@@ -1,0 +1,34 @@
+{
+  "name": "Newsit",
+  "version": "0.24",
+  "description": "Find Reddit or Hacker News discussions on the current page!",
+  "scripts": {
+    "build-chrome": "node utils/build-chrome.js",
+    "start-chrome": "node utils/webserver-chrome.js",
+    "build-firefox": "node utils/build-firefox.js",
+    "start-firefox": "node utils/webserver-firefox.js"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^0.1.17",
+    "copy-webpack-plugin": "^4.2.0",
+    "css-loader": "^0.28.11",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "file-loader": "^0.11.2",
+    "fs-extra": "^0.30.0",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "2.30.1",
+    "node-sass": "^4.9.2",
+    "postcss-loader": "^2.1.6",
+    "sass-loader": "^7.0.3",
+    "style-loader": "^0.21.0",
+    "webpack": "^3.12",
+    "webpack-dev-server": "^2.11.1",
+    "write-file-webpack-plugin": "3.4.2"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "bulma": "^0.7.1",
+    "jquery": "^3.3.1",
+    "vue": "^2.5.16"
+  }
+}

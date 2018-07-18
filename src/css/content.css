@@ -57,7 +57,7 @@
   font-size:1em; 
   margin:0px;
   border:0;
-  transition: all 2s;
+  transition: width 2s;
   display: inline-block;
   font-family: monospace;
   overflow: hidden;
@@ -72,6 +72,7 @@
 
 #newsit_charTest {
   display: inline-block;
+  width: unset !important;
   height: 0;
   margin: 0;
   padding: 0;
@@ -93,6 +94,8 @@
 
 .newsit_icon {
   height: 0.1em;
+  margin: 0;
+  padding: 0;
 }
 
 .ui-tooltip {
