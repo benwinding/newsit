@@ -3,7 +3,8 @@
   "version": "0.3",
   "description": "Find Reddit or Hacker News discussions on the current page!",
   "scripts": {
-    "zip": "node utils/zip-chrome.js && node utils/zip-firefox.js",
+    "zip": "node utils/zip-chrome.js && node utils/zip-firefox.js && yarn zip-src",
+    "zip-src": "git archive -o build-src.zip HEAD",
     "build": "yarn build-chrome && yarn build-firefox",
     "build-chrome": "node utils/build-chrome.js",
     "start-chrome": "node utils/webserver-chrome.js",

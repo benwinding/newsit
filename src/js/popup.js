@@ -71,7 +71,7 @@ sys.storage.sync.get({
       onClickCheckNow: function(e) {
         // Called when the user clicks on the browser action.
         sys.tabs.executeScript({
-          file: 'tabinject.bundle.js'
+          file: 'runintab.bundle.js'
         });
         const a = this;
         a.isLoadingBtn = true;

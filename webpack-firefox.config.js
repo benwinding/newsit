@@ -28,7 +28,7 @@ var options = {
     popup: path.join(__dirname, "src", "js", "popup.js"),
     options: path.join(__dirname, "src", "js", "options.js"),
     background: path.join(__dirname, "src", "js", "background.js"),
-    tabinject: path.join(__dirname, "src", "js", "tabinject.js")
+    runintab: path.join(__dirname, "src", "js", "runintab.js")
   },
   output: {
     path: path.join(__dirname, "build-firefox"),
