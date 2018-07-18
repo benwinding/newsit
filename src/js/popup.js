@@ -68,7 +68,14 @@ sys.storage.sync.get({
     },
     methods: {
       onClickCheckNow: function(e) {
-        shared.log('Checking now!')
+        sys.storage.sync.set({
+          hasClickedCheckNow: true,
+        });
+        setTimeout(() => {
+          sys.storage.sync.set({
+            hasClickedCheckNow: false,
+          });
+        }, 100);
       }
     }
   })

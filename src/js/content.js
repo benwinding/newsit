@@ -60,7 +60,13 @@ function makeButtonFound(btnId, link, numComments, whichSource) {
   setButton(btnId, commentString, 'Newsit found a discussion at ' + whichSource, link);
 }
 
+function isContainerAdded() {
+  return $('body').find('newsit_container').length != 0;
+}
+
 function addContainer() {
+  if (isContainerAdded())
+    return;
   sys.storage.sync.get({
     placement: 'br',
     btnsize: '1'
@@ -88,6 +94,19 @@ function addContainer() {
   });
 }
 
+function runCheckApis() {
+  addContainer();
+  makeButtonWaiting('newsit_tdReddit');
+  makeButtonWaiting('newsit_tdHNews');
+  resizeIconHeights();
+  apis.findHn(location)
+    .then((res) => makeButtonFound(btnIdHNews, res.link, res.comments, 'Hacker News'))
+    .catch(() => makeButtonFailed(btnIdHNews, 'Hacker News'));
+  apis.findReddit(location)
+    .then((res) => makeButtonFound(btnIdReddit, res.link, res.comments, 'Reddit'))
+    .catch(() => makeButtonFailed(btnIdReddit, 'Reddit'));
+}
+
 function onChangedBtnSize(changes, namespace) {
   var btnSizeChange = changes['btnsize'];
   if (btnSizeChange == undefined)
@@ -104,20 +123,35 @@ function onChangedBtnSize(changes, namespace) {
   resizeIconHeights();
 }
 
-$(() => {
+function onChangedBtnPlacement(changes, namespace) {
+  var placementChange = changes['placement'];
+  if (placementChange == undefined)
+    return
+  const placementNew = placementChange.newValue;
+  $('#newsit_container').attr('class', `newsit_location_${placementNew}`)
+}
+
+function onClickCheckNow(changes, namespace) {
+  var hasClickChange = changes['hasClickedCheckNow'];
+  if (hasClickChange == undefined)
+    return
+  const hasClickNew = hasClickChange.newValue;
+  if (hasClickNew == false)
+    return
+  runCheckApis();
+}
+
+function onPageLoad() {
   sys.storage.sync.get({
     isEnabled: true,
   }, (items) => {
     if (items.isEnabled != true)
       return;
-    addContainer();
-    apis.findHn(location)
-      .then((res) => makeButtonFound(btnIdHNews, res.link, res.comments, 'Hacker News'))
-      .catch(() => makeButtonFailed(btnIdHNews, 'Hacker News'));
-    apis.findReddit(location)
-      .then((res) => makeButtonFound(btnIdReddit, res.link, res.comments, 'Reddit'))
-      .catch(() => makeButtonFailed(btnIdReddit, 'Reddit'));
+    runCheckApis();
   });
-});
+}
 
+$(onPageLoad);
 sys.storage.onChanged.addListener(onChangedBtnSize);
+sys.storage.onChanged.addListener(onClickCheckNow);
+sys.storage.onChanged.addListener(onChangedBtnPlacement);

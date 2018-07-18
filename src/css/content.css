@@ -94,6 +94,8 @@
 
 .newsit_icon {
   height: 0.1em;
+  margin: 0;
+  padding: 0;
 }
 
 .ui-tooltip {

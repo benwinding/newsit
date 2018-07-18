@@ -34,7 +34,7 @@ function findReddit(location) {
     }
     let commentIcon = post.find("i.icon.icon-comment");
     let commentTextArr = commentIcon.next().text().split(" ");
-    let num_of_comments = commentTextArr.length == 2 ? commentTextArr[0] : 0;
+    let num_of_comments = commentTextArr.length > 1 ? commentTextArr[0] : 0;
 
     let postTitles = post.find('span')
     if (postTitles.length == 0) {
