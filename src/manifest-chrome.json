@@ -3,6 +3,7 @@
   "author": "Ben Winding",
   "name": "Newsit: Hacker News and Reddit Links",
   "short_name": "Newsit",
+  "homepage_url": "https://newsit.benwinding.com/",
   "options_page": "options.html",
   "content_scripts": [{
     "matches": ["<all_urls>"],
