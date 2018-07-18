@@ -14,6 +14,10 @@ var secretsPath = path.join(__dirname, ("secrets." + env.NODE_ENV + ".js"));
 
 var fileExtensions = ["jpg", "jpeg", "png", "gif", "eot", "otf", "svg", "ttf", "woff", "woff2"];
 
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const extractCSS = new ExtractTextPlugin('stylesheets/[name].css');
+const extractSCSS = new ExtractTextPlugin('stylesheets/[name].scss');
+
 if (fileSystem.existsSync(secretsPath)) {
   alias["secrets"] = secretsPath;
 }
@@ -29,14 +33,15 @@ var options = {
     filename: "[name].bundle.js"
   },
   module: {
-    rules: [
-    {
-      test: /\.scss$/,
-      loaders: ['style-loader', 'css-loader', 'sass-loader']
-    }, {
+    rules: [{
       test: /\.css$/,
-      loader: "style-loader!css-loader",
-      exclude: /node_modules/
+      use: extractCSS.extract(['css-loader', 'postcss-loader'])
+    }, {
+      test: /\.scss$/,
+      use: extractSCSS.extract({
+        fallback: 'style-loader',
+        use: ['css-loader', 'sass-loader']
+      })
     }, {
       test: new RegExp('\.(' + fileExtensions.join('|') + ')$'),
       loader: "file-loader?name=[name].[ext]",
@@ -59,6 +64,8 @@ var options = {
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify(env.NODE_ENV)
     }),
+    extractCSS,
+    extractSCSS,
     new CopyWebpackPlugin([{
       from: "src/manifest.json",
       transform: function(content, path) {
