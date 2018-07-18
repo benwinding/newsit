@@ -12,8 +12,8 @@ Vue.config.productionTip = false;
 
 sys.storage.sync.get({
   isEnabled: true,
-  btnsize: 1,
-  placement: '',
+  btnsize: 0.8,
+  placement: 'br',
 }, function(items) {
   new Vue({
     el: '#app',
@@ -35,7 +35,8 @@ sys.storage.sync.get({
           value: 'tl',
           text: 'Top Left'
         }, ]
-      }
+      },
+      isLoadingBtn: false
     },
     computed: {
       btnSizePx: function() {
@@ -68,14 +69,15 @@ sys.storage.sync.get({
     },
     methods: {
       onClickCheckNow: function(e) {
-        sys.storage.sync.set({
-          hasClickedCheckNow: true,
+        // Called when the user clicks on the browser action.
+        sys.tabs.executeScript({
+          file: 'tabinject.bundle.js'
         });
-        setTimeout(() => {
-          sys.storage.sync.set({
-            hasClickedCheckNow: false,
-          });
-        }, 100);
+        const a = this;
+        a.isLoadingBtn = true;
+        setTimeout(function() {
+          a.isLoadingBtn = false;
+        }, 1000);
       }
     }
   })

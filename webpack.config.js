@@ -27,7 +27,8 @@ var options = {
     content: path.join(__dirname, "src", "js", "content.js"),
     popup: path.join(__dirname, "src", "js", "popup.js"),
     options: path.join(__dirname, "src", "js", "options.js"),
-    background: path.join(__dirname, "src", "js", "background.js")
+    background: path.join(__dirname, "src", "js", "background.js"),
+    tabinject: path.join(__dirname, "src", "js", "tabinject.js")
   },
   output: {
     path: path.join(__dirname, "build"),

@@ -29,7 +29,11 @@ function resizeIconHeights() {
 }
 
 function hideIconWidth(btnId) {
-  getBtn(btnId).prev().width(0)
+  getBtn(btnId).prev().attr('width', 0)
+}
+
+function showIconWidth(btnId) {
+  getBtn(btnId).prev().attr('width', 'unset')
 }
 
 function setButton(btnId, text, tooltip, href) {
@@ -44,6 +48,8 @@ function setButton(btnId, text, tooltip, href) {
 }
 
 function makeButtonWaiting(btnId) {
+  getBtn(btnId).css('opacity', 1);
+  showIconWidth(btnId);
   setButton(btnId, '...', 'Newsit is checking source...')
 }
 
@@ -61,7 +67,7 @@ function makeButtonFound(btnId, link, numComments, whichSource) {
 }
 
 function isContainerAdded() {
-  return $('body').find('newsit_container').length != 0;
+  return $('body').find('#newsit_container').length != 0;
 }
 
 function addContainer() {
@@ -105,6 +111,7 @@ function runCheckApis() {
   apis.findReddit(location)
     .then((res) => makeButtonFound(btnIdReddit, res.link, res.comments, 'Reddit'))
     .catch(() => makeButtonFailed(btnIdReddit, 'Reddit'));
+  resizeIconHeights();
 }
 
 function onChangedBtnSize(changes, namespace) {
@@ -112,15 +119,17 @@ function onChangedBtnSize(changes, namespace) {
   if (btnSizeChange == undefined)
     return
   const btnSizeNew = btnSizeChange.newValue;
+  $('.newsit_icon').height(1)
   $('.newsit_btn').css('font-size', btnSizeNew+'em');
-  $('.newsit_icon').height(0.1)
   $('.newsit_btn').map((index, domEl) => {
     let el = $(domEl)
     const text = el.text();
     const id = el.attr('id');
     changeButtonSize(id, text);
   })
-  resizeIconHeights();
+  setTimeout(() => {
+    resizeIconHeights();
+  }, 200)
 }
 
 function onChangedBtnPlacement(changes, namespace) {
@@ -129,16 +138,6 @@ function onChangedBtnPlacement(changes, namespace) {
     return
   const placementNew = placementChange.newValue;
   $('#newsit_container').attr('class', `newsit_location_${placementNew}`)
-}
-
-function onClickCheckNow(changes, namespace) {
-  var hasClickChange = changes['hasClickedCheckNow'];
-  if (hasClickChange == undefined)
-    return
-  const hasClickNew = hasClickChange.newValue;
-  if (hasClickNew == false)
-    return
-  runCheckApis();
 }
 
 function onPageLoad() {
@@ -153,5 +152,8 @@ function onPageLoad() {
 
 $(onPageLoad);
 sys.storage.onChanged.addListener(onChangedBtnSize);
-sys.storage.onChanged.addListener(onClickCheckNow);
 sys.storage.onChanged.addListener(onChangedBtnPlacement);
+
+module.exports = {
+  runCheckApis: runCheckApis
+}

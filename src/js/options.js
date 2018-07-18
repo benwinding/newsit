@@ -12,8 +12,8 @@ Vue.config.productionTip = false;
 
 sys.storage.sync.get({
   isEnabled: true,
-  btnsize: 1,
-  placement: '',
+  btnsize: 0.8,
+  placement: 'br',
 }, function(items) {
   new Vue({
     el: '#app',
