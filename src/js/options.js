@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import '../img/favicon-128x128.png'
 import '../img/favicon-32x32.png'
+import '../img/icon.png'
+import '../img/icon-grey.png'
 import '../img/icon.svg'
 
 const core = require('./shared/core.js')

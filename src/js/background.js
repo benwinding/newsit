@@ -6,7 +6,7 @@ function onChangeIconState(changes, namespace) {
   if (isEnabledChange == undefined)
     return
   const isEnabled = isEnabledChange.newValue;
-  const iconPath = isEnabled ? 'images/icon.png' : 'images/icon-grey.png';
+  const iconPath = isEnabled ? 'icon.png' : 'icon-grey.png';
   sys.browserAction.setIcon({
     path: iconPath
   });

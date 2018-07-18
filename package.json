@@ -1,10 +1,12 @@
 {
-  "name": "newsit",
+  "name": "Newsit",
   "version": "0.24",
-  "description": "A boilerplate to chrome extension with webpack",
+  "description": "Find Reddit or Hacker News discussions on the current page!",
   "scripts": {
-    "build": "node utils/build.js",
-    "start": "node utils/webserver.js"
+    "build-chrome": "node utils/build-chrome.js",
+    "start-chrome": "node utils/webserver-chrome.js",
+    "build-firefox": "node utils/build-firefox.js",
+    "start-firefox": "node utils/webserver-firefox.js"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^0.1.17",
