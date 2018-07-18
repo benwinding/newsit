@@ -1,8 +1,6 @@
-var $ = require("jquery");
-
 require('../css/content.css');
-const core = require('./shared/core.js')
-const apis = require('./shared/apis.js')
+const core = require('./shared/core.js');
+const apis = require('./shared/apis.js');
 const sys = core.getBrowser();
 
 const btnIdReddit = 'newsit_tdReddit'
@@ -90,6 +88,22 @@ function addContainer() {
   });
 }
 
+function onChangedBtnSize(changes, namespace) {
+  var btnSizeChange = changes['btnsize'];
+  if (btnSizeChange == undefined)
+    return
+  const btnSizeNew = btnSizeChange.newValue;
+  $('.newsit_btn').css('font-size', btnSizeNew+'em');
+  $('.newsit_icon').height(0.1)
+  $('.newsit_btn').map((index, domEl) => {
+    let el = $(domEl)
+    const text = el.text();
+    const id = el.attr('id');
+    changeButtonSize(id, text);
+  })
+  resizeIconHeights();
+}
+
 $(() => {
   sys.storage.sync.get({
     isEnabled: true,
@@ -105,3 +119,5 @@ $(() => {
       .catch(() => makeButtonFailed(btnIdReddit, 'Reddit'));
   });
 });
+
+sys.storage.onChanged.addListener(onChangedBtnSize);

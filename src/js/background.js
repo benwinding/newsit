@@ -2,10 +2,10 @@ const core = require('./shared/core.js');
 const sys = core.getBrowser();
 
 function onChangeIconState(changes, namespace) {
-  var storageChange = changes['isEnabled'];
-  if (storageChange == undefined)
+  var isEnabledChange = changes['isEnabled'];
+  if (isEnabledChange == undefined)
     return
-  const isEnabled = storageChange.newValue;
+  const isEnabled = isEnabledChange.newValue;
   const iconPath = isEnabled ? 'images/icon.png' : 'images/icon-grey.png';
   sys.browserAction.setIcon({
     path: iconPath
@@ -15,11 +15,10 @@ function onChangeIconState(changes, namespace) {
 }
 
 function onStartUp() {
-  core.log('running onStartUp')
-  sys.storage.sync.get({isEnabled: true}, () => {
-    core.setIconState(isEnabled);
+  sys.storage.sync.get({isEnabled: true}, (list) => {
+    core.setIconState(list['isEnabled']);
   })
 }
 
 sys.storage.onChanged.addListener(onChangeIconState);
-sys.runtime.onInstalled.addListener(onStartUp)
+onStartUp();

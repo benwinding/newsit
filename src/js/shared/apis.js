@@ -1,5 +1,4 @@
 const axios = require('axios');
-var $ = require("jquery");
 
 function stripUrl(urlString) {
   const url = new URL(urlString);
@@ -13,13 +12,13 @@ function isMatchTwoUrls(url1, url2) {
 // Returns a promise of the links
 function findReddit(location) {
   const inithost = location.host;
-  const omitlist = ["news.ycombinator.com"];
+  const omitlist = ["news.ycombinator.com", "reddit.com"];
   if (omitlist.indexOf(inithost) >= 0) {
     return Promise.reject('Not going to search Reddit on Reddit');
   }
   let initurl = location.href;
-  let search_url = stripUrl(initurl)
-  let requestUrl = "https://reddit.com/" + search_url
+  let search_url = encodeURIComponent("url:"+initurl)
+  let requestUrl = "https://www.reddit.com/search?q="+search_url
 
   return axios({
     url: requestUrl,
@@ -28,14 +27,22 @@ function findReddit(location) {
   })
   .then((response) => {
     let html = $($.parseHTML(response.data))
-    let postContent = html.find("div[data-test-id='post-content']")
-    if (postContent.length == 0) {
+    let post = html.find('.Post')
+    // let postContent = html.find("div[data-test-id='post-content']")
+    if (post.length == 0) {
       return Promise.reject('No post found');
     }
-    let commentIcon = postContent.find("i.icon.icon-comment");
+    let commentIcon = post.find("i.icon.icon-comment");
     let commentTextArr = commentIcon.next().text().split(" ");
     let num_of_comments = commentTextArr.length == 2 ? commentTextArr[0] : 0;
-    return {link: requestUrl, comments: num_of_comments}
+
+    let postTitles = post.find('span')
+    if (postTitles.length == 0) {
+      return Promise.reject("Couldn't find postTitle");
+    }
+    let postLink = postTitles[0].firstChild
+    postLink.hostname = 'reddit.com'
+    return {link: postLink.href, comments: num_of_comments}
   }).catch((err) => {
     return Promise.reject(err);
   }) 

@@ -91,7 +91,11 @@ var options = {
       filename: "options.html",
       chunks: ["options"]
     }),
-    new WriteFilePlugin()
+    new WriteFilePlugin(),
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery'
+    })
   ]
 };
 
