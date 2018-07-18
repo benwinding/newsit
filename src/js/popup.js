@@ -3,8 +3,8 @@ import '../img/favicon-128x128.png'
 import '../img/favicon-32x32.png'
 import '../img/icon.svg'
 
-const shared = require('./shared/shared.js')
-const sys = shared.getBrowser();
+const core = require('./shared/core.js')
+const sys = core.getBrowser();
 
 require('../css/options.scss');
 

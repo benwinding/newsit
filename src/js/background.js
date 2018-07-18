@@ -1,5 +1,5 @@
-const shared = require('./shared/shared.js');
-const sys = shared.getBrowser();
+const core = require('./shared/core.js');
+const sys = core.getBrowser();
 
 function onChangeIconState(changes, namespace) {
   var storageChange = changes['isEnabled'];
@@ -15,9 +15,9 @@ function onChangeIconState(changes, namespace) {
 }
 
 function onStartUp() {
-  shared.log('running onStartUp')
+  core.log('running onStartUp')
   sys.storage.sync.get({isEnabled: true}, () => {
-    shared.setIconState(isEnabled);
+    core.setIconState(isEnabled);
   })
 }
 

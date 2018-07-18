@@ -3,13 +3,14 @@ import '../img/favicon-128x128.png'
 import '../img/favicon-32x32.png'
 import '../img/icon.svg'
 
-const shared = require('./shared/shared.js')
+const core = require('./shared/core.js')
+const sys = core.getBrowser();
 
 require('../css/options.scss');
 
 Vue.config.productionTip = false;
 
-shared.getBrowser().storage.sync.get({
+sys.storage.sync.get({
   isEnabled: true,
   btnsize: 1,
   placement: '',
@@ -47,19 +48,19 @@ shared.getBrowser().storage.sync.get({
     },
     watch: {
       formBtnsEnabled: function(val, oldVal) {
-        shared.getBrowser().storage.sync.set({
+        sys.storage.sync.set({
           isEnabled: val,
         });
         console.log('formBtnsEnabled changed to: ', val);
       },
       formBtnsSize: function(val, oldVal) {
-        shared.getBrowser().storage.sync.set({
+        sys.storage.sync.set({
           btnsize: val,
         });
         console.log('formBtnsSize changed to: ', val);
       },
       formBtnsLocation: function(val, oldVal) {
-        shared.getBrowser().storage.sync.set({
+        sys.storage.sync.set({
           placement: val,
         });
         console.log('formBtnsLocation changed to: ', val);
