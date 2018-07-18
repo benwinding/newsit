@@ -9,23 +9,12 @@ function setIconState(isEnabled) {
   })
 }
 
-function onChangeIconState(changes, namespace) {
-  var storageChange = changes['isEnabled'];
-  if (storageChange == undefined)
-    return
-  const isEnabled = storageChange.newValue;
-  const iconPath = isEnabled ? 'images/icon.png' : 'images/icon-grey.png';
-  getBrowser().browserAction.setIcon({
-    path: iconPath
-  });
-  const iconText = isEnabled ? 'ON' : '';
-  getBrowser().browserAction.setBadgeText({ text:iconText });
+function log(text) {
+  console.log(text);
 }
-
-getBrowser().storage.onChanged.addListener(onChangeIconState);
 
 module.exports = {
   getBrowser: getBrowser,
   setIconState: setIconState,
-  onChangeIconState: onChangeIconState
+  log: log
 }

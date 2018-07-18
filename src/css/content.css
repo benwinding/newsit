@@ -1,0 +1,100 @@
+#newsit_container {
+  z-index:10000;
+  position: fixed;
+}
+
+/* LOCATIONS */
+.newsit_location_br {
+  right: 0px;
+  bottom: 0px;
+}
+.newsit_location_bl {
+  left: 0px;
+  bottom: 0px;
+}
+.newsit_location_tr {
+  right: 0px;
+  top: 0px;
+}
+.newsit_location_tl {
+  left: 0px;
+  top: 0px;
+}
+
+.newsit_location_tl .newsit_btn,
+.newsit_location_bl .newsit_btn {
+  float: left;
+}
+.newsit_location_tr .newsit_btn,
+.newsit_location_br .newsit_btn {
+  float: right;
+}
+
+.newsit_location_tl .newsit_icon,
+.newsit_location_bl .newsit_icon {
+  float: left;
+}
+.newsit_location_tr .newsit_icon,
+.newsit_location_br .newsit_icon {
+  float: right;
+}
+
+/* BUTTONS */
+
+#newsit_table table,
+#newsit_table tbody,
+#newsit_table tr,
+#newsit_table td,
+#newsit_table {
+  padding:0px;
+  margin:0px;
+  border:0;
+  border-spacing:0px;
+}
+
+.newsit_btn {
+  padding:5px;
+  font-size:1em; 
+  margin:0px;
+  border:0;
+  transition: all 2s;
+  display: inline-block;
+  font-family: monospace;
+  overflow: hidden;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.newsit_btnlink {
+  cursor: pointer;
+  text-decoration:underline;
+}
+
+#newsit_charTest {
+  display: inline-block;
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+#newsit_tdHNews,
+#newsit_tdHNews > a
+{
+  background-color:#FD6F1D;
+  color:#fff;
+}
+
+#newsit_tdReddit,
+#newsit_tdReddit > a
+{
+  background-color:#AAAAAA;
+  color:#fff;
+}
+
+.newsit_icon {
+  height: 0.1em;
+}
+
+.ui-tooltip {
+  z-index: 10001;
+}

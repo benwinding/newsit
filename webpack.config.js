@@ -24,6 +24,7 @@ if (fileSystem.existsSync(secretsPath)) {
 
 var options = {
   entry: {
+    content: path.join(__dirname, "src", "js", "content.js"),
     popup: path.join(__dirname, "src", "js", "popup.js"),
     options: path.join(__dirname, "src", "js", "options.js"),
     background: path.join(__dirname, "src", "js", "background.js")
@@ -35,7 +36,10 @@ var options = {
   module: {
     rules: [{
       test: /\.css$/,
-      use: extractCSS.extract(['css-loader', 'postcss-loader'])
+      use: extractSCSS.extract({
+        fallback: 'style-loader',
+        use: ['css-loader']
+      })
     }, {
       test: /\.scss$/,
       use: extractSCSS.extract({
