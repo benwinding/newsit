@@ -7,33 +7,50 @@ const btnIdReddit = 'newsit_tdReddit'
 const btnIdHNews = 'newsit_tdHNews'
 
 function makeCommentString(count) {
-  if (count == "1")
-    return count + " Comment"
+  let countNum = parseInt(count)
+  if (!countNum)
+    countNum = 0;
+  if (countNum == 1)
+    return countNum + " Comment"
   else
-    return count + " Comments"
+    return countNum + " Comments"
 }
 
 function getBtn(btnId) {
   return $('#'+btnId);
 }
 
+function setImportant(el, cssProp, cssValue) {
+  let style = el.style
+  if (!style)
+    return
+  style.removeProperty(cssProp);
+  style.setProperty(cssProp, cssValue, 'important');
+}
+
 function changeButtonSize(btnId, text) {
   const charWidth = $('#newsit_charTest').width();
   let textCount = text.length * charWidth;
-  getBtn(btnId).width(textCount)
+  getBtn(btnId).each((index, el) => {
+    setImportant(el, 'width', textCount+'px')
+  })
 }
 
 function resizeIconHeights() {
   const h = $('.newsit_r').height();
-  $('.newsit_icon').height(h)
+  $('.newsit_icon').each((index, el) => {
+    setImportant(el, 'height', h+'px')
+  })
 }
 
 function hideIconWidth(btnId) {
-  getBtn(btnId).prev().attr('width', 0)
+  let el = getBtn(btnId).prev()
+  setImportant(el, 'width', 0)
 }
 
 function showIconWidth(btnId) {
-  getBtn(btnId).prev().attr('width', 'unset')
+  let el = getBtn(btnId).prev()
+  el.css('width', 'unset');
 }
 
 function setButton(btnId, text, tooltip, href) {
@@ -48,7 +65,7 @@ function setButton(btnId, text, tooltip, href) {
 }
 
 function makeButtonWaiting(btnId) {
-  getBtn(btnId).css('opacity', 1);
+  getBtn(btnId).css('opacity', "1 !important");
   showIconWidth(btnId);
   setButton(btnId, '...', 'Newsit is checking source...')
 }
@@ -56,7 +73,7 @@ function makeButtonWaiting(btnId) {
 function makeButtonFailed(btnId, whichSource) {
   setTimeout(() => {
     setButton(btnId, '-', 'Newsit found nothing on ' + whichSource)
-    getBtn(btnId).css('opacity', 0.4);
+    getBtn(btnId).css('opacity', "0.4 !important");
     hideIconWidth(btnId)
   }, 100)
 }
@@ -93,7 +110,7 @@ function addContainer() {
       </div>
     `
     $('body').append(containerHtml);
-    $('.newsit_btn').css('font-size',items.btnsize+'em');
+    $('.newsit_btn').css('font-size',items.btnsize+'em !important');
     makeButtonWaiting('newsit_tdReddit');
     makeButtonWaiting('newsit_tdHNews');
     resizeIconHeights();
@@ -104,13 +121,19 @@ function runCheckApis() {
   addContainer();
   makeButtonWaiting('newsit_tdReddit');
   makeButtonWaiting('newsit_tdHNews');
-  resizeIconHeights();
+  // resizeIconHeights();
   apis.findHn(location)
     .then((res) => makeButtonFound(btnIdHNews, res.link, res.comments, 'Hacker News'))
-    .catch(() => makeButtonFailed(btnIdHNews, 'Hacker News'));
+    .catch((err) => {
+      console.log(err)
+      makeButtonFailed(btnIdHNews, 'Hacker News')
+    });
   apis.findReddit(location)
     .then((res) => makeButtonFound(btnIdReddit, res.link, res.comments, 'Reddit'))
-    .catch(() => makeButtonFailed(btnIdReddit, 'Reddit'));
+    .catch((err) => {
+      console.log(err)
+      makeButtonFailed(btnIdReddit, 'Reddit')
+    });
   resizeIconHeights();
 }
 
@@ -120,7 +143,7 @@ function onChangedBtnSize(changes, namespace) {
     return
   const btnSizeNew = btnSizeChange.newValue;
   $('.newsit_icon').height(1)
-  $('.newsit_btn').css('font-size', btnSizeNew+'em');
+  $('.newsit_btn').css('font-size', btnSizeNew+'em !important');
   $('.newsit_btn').map((index, domEl) => {
     let el = $(domEl)
     const text = el.text();

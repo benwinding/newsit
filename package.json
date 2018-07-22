@@ -1,6 +1,6 @@
 {
   "name": "Newsit",
-  "version": "1.0",
+  "version": "1.0.2",
   "description": "Find Reddit or Hacker News discussions on the current page!",
   "scripts": {
     "zip": "node utils/zip-chrome.js && node utils/zip-firefox.js && yarn zip-src",
