@@ -70,9 +70,17 @@ sys.storage.sync.get({
     methods: {
       onClickCheckNow: function(e) {
         // Called when the user clicks on the browser action.
-        sys.tabs.executeScript({
-          file: 'runintab.bundle.js'
-        });
+        sys.tabs.query({
+          active: true,
+          windowType: "normal",
+          currentWindow: true
+        }, function(d) {
+          let tabId = d[0].id;
+          const request = { 
+            action: 'check'
+          }
+          sys.tabs.sendMessage(tabId, request)
+        })
         const a = this;
         a.isLoadingBtn = true;
         setTimeout(function() {

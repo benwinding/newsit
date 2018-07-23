@@ -10,7 +10,8 @@ function isMatchTwoUrls(url1, url2) {
 }
 
 // Returns a promise of the links
-function findReddit(location) {
+function findReddit(urlString) {
+  const location = new URL(urlString);
   const inithost = location.host;
   const omitlist = ["news.ycombinator.com", "reddit.com"];
   if (omitlist.indexOf(inithost) >= 0) {
@@ -48,7 +49,8 @@ function findReddit(location) {
   }) 
 }
 
-function findHn(location) {
+function findHn(urlString) {
+  const location = new URL(urlString);
   const inithost = location.host;
   const omitlist = ["news.ycombinator.com"];
   if (omitlist.indexOf(inithost) >= 0) {

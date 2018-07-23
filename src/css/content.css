@@ -64,6 +64,7 @@
   overflow: hidden !important;
   white-space: nowrap !important;
   cursor: default !important;
+  text-decoration:none !important;
 }
 
 .newsit_btnlink {
@@ -97,6 +98,10 @@
   height: 0.1em !important;
   margin: 0 !important;
   padding: 0 !important;
+}
+
+.newsit_icon_hidden {
+  width: 0 !important;
 }
 
 .ui-tooltip {

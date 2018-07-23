@@ -20,8 +20,19 @@ function getBtn(btnId) {
   return $('#'+btnId);
 }
 
-function setImportant(el, cssProp, cssValue) {
+function removeStyle(el, cssProp) {
   let style = el.style
+  if (!style)
+    return
+  style.removeProperty(cssProp);
+}
+
+function setImportant(el, cssProp, cssValue) {
+  let style
+  if (el.length)
+    style = el[0].style
+  else
+    style = el.style;
   if (!style)
     return
   style.removeProperty(cssProp);
@@ -30,7 +41,7 @@ function setImportant(el, cssProp, cssValue) {
 
 function changeButtonSize(btnId, text) {
   const charWidth = $('#newsit_charTest').width();
-  let textCount = text.length * charWidth;
+  let textCount = text.length * charWidth + 10;
   getBtn(btnId).each((index, el) => {
     setImportant(el, 'width', textCount+'px')
   })
@@ -44,13 +55,14 @@ function resizeIconHeights() {
 }
 
 function hideIconWidth(btnId) {
-  let el = getBtn(btnId).prev()
-  setImportant(el, 'width', 0)
+  let icon = getBtn(btnId).prev()
+  icon.addClass('newsit_icon_hidden')
 }
 
 function showIconWidth(btnId) {
-  let el = getBtn(btnId).prev()
-  el.css('width', 'unset');
+  let icon = getBtn(btnId).prev()
+  icon.removeClass('newsit_icon_hidden')
+  removeStyle(icon, 'width');
 }
 
 function setButton(btnId, text, tooltip, href) {
@@ -65,7 +77,8 @@ function setButton(btnId, text, tooltip, href) {
 }
 
 function makeButtonWaiting(btnId) {
-  getBtn(btnId).css('opacity', "1 !important");
+  let el = getBtn(btnId);
+  setImportant(el, 'opacity', '1.0')
   showIconWidth(btnId);
   setButton(btnId, '...', 'Newsit is checking source...')
 }
@@ -73,7 +86,8 @@ function makeButtonWaiting(btnId) {
 function makeButtonFailed(btnId, whichSource) {
   setTimeout(() => {
     setButton(btnId, '-', 'Newsit found nothing on ' + whichSource)
-    getBtn(btnId).css('opacity', "0.4 !important");
+    let el = getBtn(btnId);
+    setImportant(el, 'opacity', '0.4')
     hideIconWidth(btnId)
   }, 100)
 }
@@ -117,18 +131,18 @@ function addContainer() {
   });
 }
 
-function runCheckApis() {
+function runCheckApis(urlString) {
   addContainer();
   makeButtonWaiting('newsit_tdReddit');
   makeButtonWaiting('newsit_tdHNews');
   // resizeIconHeights();
-  apis.findHn(location)
+  apis.findHn(urlString)
     .then((res) => makeButtonFound(btnIdHNews, res.link, res.comments, 'Hacker News'))
     .catch((err) => {
       console.log(err)
       makeButtonFailed(btnIdHNews, 'Hacker News')
     });
-  apis.findReddit(location)
+  apis.findReddit(urlString)
     .then((res) => makeButtonFound(btnIdReddit, res.link, res.comments, 'Reddit'))
     .catch((err) => {
       console.log(err)
@@ -169,13 +183,24 @@ function onPageLoad() {
   }, (items) => {
     if (items.isEnabled != true)
       return;
-    runCheckApis();
+    let urlString = location.href;
+    runCheckApis(urlString);
   });
+}
+
+function onMessageRecieved(request, sender, sendResponse) {
+  // listen for messages sent from background.js
+  if (request.action != 'check')
+    return
+  const urlString = request.url || location.href;
+  console.debug('URL CHANGED: ' + urlString) // new url is now in content scripts!
+  runCheckApis(urlString);
 }
 
 $(onPageLoad);
 sys.storage.onChanged.addListener(onChangedBtnSize);
 sys.storage.onChanged.addListener(onChangedBtnPlacement);
+sys.runtime.onMessage.addListener(onMessageRecieved);
 
 module.exports = {
   runCheckApis: runCheckApis

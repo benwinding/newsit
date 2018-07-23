@@ -20,5 +20,16 @@ function onStartUp() {
   })
 }
 
+function onTabChange  (tabId, changeInfo, tab) {
+  // read changeInfo data and do something with it (like read the url)
+  if (changeInfo.url) {
+    const request = { 
+      action: 'check',
+      url: changeInfo.url 
+    }
+    sys.tabs.sendMessage(tabId, request)
+  }
+}
 sys.storage.onChanged.addListener(onChangeIconState);
+sys.tabs.onUpdated.addListener(onTabChange);
 onStartUp();
