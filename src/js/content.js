@@ -1,9 +1,4 @@
-require('../css/content.css');
-const core = require('./shared/core.js');
-const apis = require('./shared/apis.js');
-const sys = core.getBrowser();
-
-import * as hlpr from './shared/btn-helpers.js'
+var sys = core.getBrowser();
 
 function runCheckApis(urlString) {
   hlpr.addContainer();
@@ -65,5 +60,3 @@ $(onPageLoad);
 sys.storage.onChanged.addListener(onChangedBtnSize);
 sys.storage.onChanged.addListener(onChangedBtnPlacement);
 sys.runtime.onMessage.addListener(onMessageRecieved);
-
-export default runCheckApis

@@ -1,14 +1,6 @@
-import Vue from 'vue'
-import '../img/favicon-128x128.png'
-import '../img/favicon-32x32.png'
-import '../img/icon.svg'
-
-const core = require('./shared/core.js')
-const sys = core.getBrowser();
-
-require('../css/options.scss');
-
 Vue.config.productionTip = false;
+
+sys = core.getBrowser();
 
 sys.storage.sync.get({
   isEnabled: true,

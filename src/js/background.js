@@ -1,5 +1,4 @@
-const core = require('./shared/core.js');
-const sys = core.getBrowser();
+var sys = core.getBrowser();
 
 function onChangeIconState(changes, namespace) {
   var isEnabledChange = changes['isEnabled'];
