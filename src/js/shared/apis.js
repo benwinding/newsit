@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from '../../../node_modules/axios/dist/axios.min.js'
 
 function stripUrl(urlString) {
   const url = new URL(urlString);
@@ -15,7 +15,7 @@ function findReddit(urlString) {
   const inithost = location.host;
   const omitlist = ["news.ycombinator.com", "reddit.com"];
   if (omitlist.indexOf(inithost) >= 0) {
-    return Promise.reject('Not going to search Reddit on Reddit');
+    return Promise.reject('Reddit API: Not going to search Reddit on Reddit');
   }
   let initurl = location.href;
   let search_url = encodeURIComponent("url:"+initurl)
@@ -31,7 +31,7 @@ function findReddit(urlString) {
     let post = html.find('.Post')
     // let postContent = html.find("div[data-test-id='post-content']")
     if (post.length == 0) {
-      return Promise.reject('No post found');
+      return Promise.reject('Reddit API: No post found');
     }
     let commentIcon = post.find("i.icon.icon-comment");
     let commentTextArr = commentIcon.next().text().split(" ");
@@ -39,7 +39,7 @@ function findReddit(urlString) {
 
     let postTitles = post.find('span')
     if (postTitles.length == 0) {
-      return Promise.reject("Couldn't find postTitle");
+      return Promise.reject('Reddit API: Couldn\'t find postTitle');
     }
     let postLink = postTitles[0].firstChild
     postLink.hostname = 'reddit.com'
@@ -52,9 +52,9 @@ function findReddit(urlString) {
 function findHn(urlString) {
   const location = new URL(urlString);
   const inithost = location.host;
-  const omitlist = ["news.ycombinator.com"];
+  const omitlist = ['news.ycombinator.com'];
   if (omitlist.indexOf(inithost) >= 0) {
-    return Promise.reject('Not going to search Hacker News on Hacker News');
+    return Promise.reject('Hacker News API: Not going to search domain: Hacker News');
   }
   let initurl = location.href;
   let search_url = stripUrl(initurl)
@@ -67,7 +67,7 @@ function findHn(urlString) {
   }).then((response) => {
     let data = response.data
     if (data["nbHits"] == 0) {
-      return Promise.reject('No urls found');
+      return Promise.reject('Hacker News API: No urls found');
     }
     let allhits = data["hits"];
     let num_of_comments = 0;
@@ -79,7 +79,7 @@ function findHn(urlString) {
       }
     }
     if (result_id == null) {
-      return Promise.reject('No url matches found');
+      return Promise.reject('Hacker News API: No url matches found');
     }
     const linkUrl = `https://news.ycombinator.com/item?id=${result_id}`
     return {link: linkUrl, comments: num_of_comments}
@@ -88,7 +88,7 @@ function findHn(urlString) {
   })
 }
 
-module.exports = {
-  findHn: findHn,
-  findReddit: findReddit
+export {
+  findHn,
+  findReddit
 }
