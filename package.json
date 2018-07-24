@@ -5,13 +5,12 @@
   "scripts": {
     "zip": "yarn zip-chrome && yarn zip-firefox && yarn zip-src",
     "zip-src": "git archive -o build-src.zip HEAD",
-    "build": "yarn build-chrome && yarn build-firefox",
-    "build-chrome": "TARGET=chrome && gulp build",
-    "start-chrome": "TARGET=chrome && gulp watch",
-    "zip-chrome": "TARGET=chrome && gulp zip",
-    "build-firefox": "TARGET=firefox && gulp build",
-    "start-firefox": "TARGET=firefox && gulp watch",
-    "zip-firefox": "TARGET=firefox && gulp zip"
+    "build-chrome": "TARGET=chrome gulp build",
+    "start-chrome": "TARGET=chrome gulp watch",
+    "zip-chrome": "TARGET=chrome gulp zip",
+    "build-firefox": "TARGET=firefox gulp build",
+    "start-firefox": "TARGET=firefox gulp watch",
+    "zip-firefox": "TARGET=firefox gulp zip"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

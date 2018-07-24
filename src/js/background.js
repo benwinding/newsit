@@ -5,7 +5,7 @@ function onChangeIconState(changes, namespace) {
   if (isEnabledChange == undefined)
     return
   const isEnabled = isEnabledChange.newValue;
-  const iconPath = isEnabled ? 'icon.png' : 'icon-grey.png';
+  const iconPath = isEnabled ? 'img/icon.png' : 'img/icon-grey.png';
   sys.browserAction.setIcon({
     path: iconPath
   });
@@ -19,7 +19,7 @@ function onStartUp() {
   })
 }
 
-function onTabChange  (tabId, changeInfo, tab) {
+function onTabChange(tabId, changeInfo, tab) {
   // read changeInfo data and do something with it (like read the url)
   if (changeInfo.url) {
     const request = { 

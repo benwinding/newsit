@@ -21,7 +21,7 @@
   }],
   "background": {
     "scripts": [
-      "js/shared/apis.js",
+      "js/shared/core.js",
       "js/background.js"
     ]
   },

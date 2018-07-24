@@ -5,7 +5,7 @@ var core = (function () {
   }
 
   function setIconState(isEnabled) {
-    getBrowser().storage.sync.set({
+    this.getBrowser().storage.sync.set({
       isEnabled: isEnabled
     })
   }

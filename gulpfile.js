@@ -7,16 +7,16 @@ const jsonTransform = require('gulp-json-transform');
 const rename = require('gulp-rename');
 const zip = require('gulp-zip');
 
-const target = process.env.TARGET_BROWSER || 'chrome';
+const target = process.env.TARGET || 'chrome';
 
-console.log('TARGET_BROWSER=' + target);
+console.log('TARGET=' + target);
 
 const conf = {
   vendorPaths: [
     './node_modules/axios/dist/axios.min.js',
     './node_modules/jquery/dist/jquery.min.js',
     './node_modules/bulma/css/bulma.min.css',
-    './node_modules/vue/dist/vue.runtime.min.js',
+    './node_modules/vue/dist/vue.min.js',
     './node_modules/requirejs/require.js',
   ],
   src: {
