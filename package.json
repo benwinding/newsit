@@ -3,14 +3,11 @@
   "version": "1.1.0",
   "description": "Find Reddit or Hacker News discussions on the current page!",
   "scripts": {
-    "zip": "yarn zip-chrome && yarn zip-firefox && yarn zip-src",
     "zip-src": "git archive -o build-src.zip HEAD",
     "build-chrome": "TARGET=chrome gulp build",
     "start-chrome": "TARGET=chrome gulp watch",
-    "zip-chrome": "TARGET=chrome gulp zip",
     "build-firefox": "TARGET=firefox gulp build",
-    "start-firefox": "TARGET=firefox gulp watch",
-    "zip-firefox": "TARGET=firefox gulp zip"
+    "start-firefox": "TARGET=firefox gulp watch"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
