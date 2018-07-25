@@ -17,7 +17,6 @@ const conf = {
     './node_modules/jquery/dist/jquery.min.js',
     './node_modules/bulma/css/bulma.min.css',
     './node_modules/vue/dist/vue.min.js',
-    './node_modules/requirejs/require.js',
   ],
   src: {
     scripts: ['./src/js/**/*.js'],

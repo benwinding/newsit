@@ -18,7 +18,7 @@ var apis = (function() {
     }
     let initurl = location.href;
     let search_url = encodeURIComponent("url:" + initurl)
-    let requestUrl = "https://www.reddit.com/search?q=" + search_url
+    let requestUrl = "https://old.reddit.com/search?sort=top&q=" + search_url
 
     return axios({
         url: requestUrl,
@@ -27,23 +27,17 @@ var apis = (function() {
       })
       .then((response) => {
         let html = $($.parseHTML(response.data))
-        let post = html.find('.Post')
-        // let postContent = html.find("div[data-test-id='post-content']")
-        if (post.length == 0) {
-          return Promise.reject('Reddit API: No post found');
+        let searchResultsComments = html.find('a.search-comments')
+        if (searchResultsComments.length == 0) {
+          return Promise.reject('Reddit API: No results found');
         }
-        let commentIcon = post.find("i.icon.icon-comment");
-        let commentTextArr = commentIcon.next().text().split(" ");
+        let firstCommentsLink = searchResultsComments[0]
+        let commentTextArr = firstCommentsLink.text.split(" ");
         let num_of_comments = commentTextArr.length > 1 ? commentTextArr[0] : 0;
 
-        let postTitles = post.find('span')
-        if (postTitles.length == 0) {
-          return Promise.reject('Reddit API: Couldn\'t find postTitle');
-        }
-        let postLink = postTitles[0].firstChild
-        postLink.hostname = 'reddit.com'
+        firstCommentsLink.hostname = 'reddit.com'
         return {
-          link: postLink.href,
+          link: firstCommentsLink.href,
           comments: num_of_comments
         }
       }).catch((err) => {

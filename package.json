@@ -1,19 +1,17 @@
 {
   "name": "Newsit",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Find Reddit or Hacker News discussions on the current page!",
   "scripts": {
+    "build": "yarn build-firefox && yarn build-chrome && yarn zip-src",
     "zip-src": "git archive -o build-src.zip HEAD",
     "build-chrome": "TARGET=chrome gulp build",
-    "start-chrome": "TARGET=chrome gulp watch",
     "build-firefox": "TARGET=firefox gulp build",
-    "start-firefox": "TARGET=firefox gulp watch"
+    "watch-chrome": "TARGET=chrome gulp watch",
+    "watch-firefox": "TARGET=firefox gulp watch"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-es2015": "^6.24.1",
     "del": "^3.0.0",
     "file-loader": "^0.11.2",
     "fs-extra": "^0.30.0",
@@ -23,8 +21,7 @@
     "gulp-json-transform": "^0.4.5",
     "gulp-rename": "^1.4.0",
     "gulp-sequence": "^1.0.0",
-    "gulp-zip": "^4.1.0",
-    "requirejs": "^2.3.5"
+    "gulp-zip": "^4.1.0"
   },
   "dependencies": {
     "axios": "^0.18.0",
