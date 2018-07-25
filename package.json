@@ -5,6 +5,7 @@
   "scripts": {
     "build": "yarn build-firefox && yarn build-chrome && yarn zip-src",
     "zip-src": "git archive -o build-src.zip HEAD",
+    "clean": "rm -rf ./build-*",
     "build-chrome": "TARGET=chrome gulp build",
     "build-firefox": "TARGET=firefox gulp build",
     "watch-chrome": "TARGET=chrome gulp watch",

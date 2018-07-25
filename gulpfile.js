@@ -8,6 +8,7 @@ const rename = require('gulp-rename');
 const zip = require('gulp-zip');
 
 const target = process.env.TARGET || 'chrome';
+const version = process.env.npm_package_version;
 
 console.log('TARGET=' + target);
 
@@ -27,7 +28,7 @@ const conf = {
   },
   output: {
     dir: `./build-${target}`,
-    zipFile: `./build-${target}.zip`,
+    zipFile: `./build-${target}-${version}.zip`,
   }
 };
 
@@ -38,9 +39,6 @@ gulp.task('clean', function() {
 // Code Tasks
 gulp.task('scripts', function() {
   return gulp.src(conf.src.scripts)
-    // .pipe(babel({
-    //   presets: ['env']
-    // }))
     .pipe(gulp.dest(conf.output.dir + '/js'));
 });
 
