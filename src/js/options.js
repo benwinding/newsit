@@ -29,12 +29,17 @@ core.getStorage({
             text: 'Top Left'
           }, ]
         },
+        version: 0,
         hosts: []
       },
       created: function() {
         store.getBlackListedHosts()
           .then((hosts) => {
             this.hosts = hosts;
+          })
+        store.getVersion()
+          .then((version) => {
+            this.version = version;
           })
       },
       computed: {

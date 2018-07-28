@@ -54,6 +54,7 @@ core.getStorage({
             text: 'Top Left'
           }, ]
         },
+        version: 0,
         formCurrentSiteEnabled: true,
         isLoadingBtn: false
       },
@@ -63,6 +64,10 @@ core.getStorage({
         getIsHostBlackListed()
           .then((isBlackListed) => {
             a.formCurrentSiteEnabled = isBlackListed;
+          })
+        store.getVersion()
+          .then((version) => {
+            this.version = version;
           })
       },
       computed: {

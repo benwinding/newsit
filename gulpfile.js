@@ -6,11 +6,15 @@ const imagemin = require('gulp-imagemin');
 const jsonTransform = require('gulp-json-transform');
 const rename = require('gulp-rename');
 const zip = require('gulp-zip');
+const inject = require('gulp-inject-string');
 
 const target = process.env.TARGET || 'chrome';
 const version = process.env.npm_package_version;
+const isProduction = process.env.IS_PRODUCTION || false;
 
-console.log('TARGET=' + target);
+console.log('       VERSION=' + version);
+console.log('        TARGET=' + target);
+console.log(' IS_PRODUCTION=' + isProduction);
 
 const conf = {
   vendorPaths: [
@@ -20,6 +24,7 @@ const conf = {
     './node_modules/vue/dist/vue.min.js',
   ],
   src: {
+    core: ['./src/js/shared/core.js'],
     scripts: ['./src/js/**/*.js'],
     html: ['./src/**/*.html'],
     css: ['./src/css/*.css'],
@@ -40,6 +45,12 @@ gulp.task('clean', function() {
 gulp.task('scripts', function() {
   return gulp.src(conf.src.scripts)
     .pipe(gulp.dest(conf.output.dir + '/js'));
+});
+
+gulp.task('isProduction', function() {
+  return gulp.src(conf.src.core)
+    .pipe(inject.prepend(`const IS_PRODUCTION = ${isProduction}; // <-- generated \n\n`))
+    .pipe(gulp.dest(conf.output.dir + '/js/shared'));
 });
 
 gulp.task('images', function() {
@@ -78,12 +89,16 @@ gulp.task('vendor', function() {
     .pipe(gulp.dest(conf.output.dir + '/vendor'));
 })
 
-gulp.task('copy-code', ['html', 'images', 'scripts', 'manifest', 'vendor', 'css'])
+gulp.task('copy-code', gulpSequence('scripts', 'isProduction', ['html', 'images', 'manifest', 'vendor', 'css']))
 
 gulp.task('watch', ['copy-code'], function() {
   gulp.watch(conf.src.html, ['html']);
   gulp.watch(conf.src.css, ['css']);
-  gulp.watch(conf.src.scripts, ['scripts']);
+  gulp.watch(conf.src.scripts, (event) => {
+    gulpSequence('scripts', 'isProduction')((err) => {
+      if (err) console.log(err)
+    })
+  })
   gulp.watch(conf.src.images, ['images']);
   gulp.watch(conf.src.manifest, ['manifest']);
 });
@@ -95,6 +110,5 @@ gulp.task('zip', function() {
 });
 
 gulp.task('build', gulpSequence('clean', 'copy-code', 'zip'))
-// gulp.task('build', gulpSequence('vendor'))
 
 gulp.task('default', ['build']);

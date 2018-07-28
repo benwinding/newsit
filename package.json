@@ -6,8 +6,8 @@
     "build": "yarn build-firefox && yarn build-chrome && yarn zip-src",
     "zip-src": "git archive -o build-src.zip HEAD",
     "clean": "rm -rf ./build-*",
-    "build-chrome": "TARGET=chrome gulp build",
-    "build-firefox": "TARGET=firefox gulp build",
+    "build-chrome": "IS_PRODUCTION=true TARGET=chrome gulp build",
+    "build-firefox": "IS_PRODUCTION=true TARGET=firefox gulp build",
     "watch-chrome": "TARGET=chrome gulp watch",
     "watch-firefox": "TARGET=firefox gulp watch"
   },
@@ -19,6 +19,7 @@
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.1",
     "gulp-imagemin": "^4.1.0",
+    "gulp-inject-string": "^1.1.1",
     "gulp-json-transform": "^0.4.5",
     "gulp-rename": "^1.4.0",
     "gulp-sequence": "^1.0.0",

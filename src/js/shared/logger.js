@@ -14,17 +14,23 @@ var logger = (function() {
   }
 
   function log(context, input) {
-    if (isProduction())
-      return
-    const text = convertToString(input)
-    console.log(`%c Newsit (${context}) ${text}`, "background-color:Orange");
+    isProduction()
+      .then((isProduction) => {
+        if (isProduction)
+          return
+        const text = convertToString(input)
+        console.log(`%c Newsit (${context}) ${text}`, "background-color:Orange");
+      })
   }
 
   function err(context, input) {
-    if (isProduction())
-      return
-    const text = convertToString(input)
-    console.log(`%c Newsit (${context}) ${text}`, "color:White; background-color:Red");
+    isProduction()
+      .then((isProduction) => {
+        if (isProduction)
+          return
+        const text = convertToString(input)
+        console.log(`%c Newsit (${context}) ${text}`, "color:White; background-color:Red");
+      })
   }
 
   return {

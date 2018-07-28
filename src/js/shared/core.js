@@ -13,8 +13,13 @@ var core = (function() {
   }
 
   function isProduction() {
-    const manifest = getBrowser().runtime.getManifest();
-    return ('update_url' in manifest);
+    return new Promise((resolve, reject) => {
+      // Check build time variable, (see gullpfile.js)
+      if (IS_PRODUCTION)
+        resolve(true)
+      else
+        resolve(false)
+    })
   }
 
   function sendMessageIconEnabled(isEnabled, tabId) {

@@ -4,6 +4,14 @@ var store = (function() {
 
   // QUERIES
 
+  function getVersion() {
+    return new Promise((resolve, reject) => {
+      sys.management.getSelf((ext) => {
+        resolve(ext.version)
+      })
+    })
+  }
+
   function getBlackListedHosts() {
     return core.getStorage({
         blackListed: [],
@@ -146,6 +154,7 @@ var store = (function() {
     getCurrentTabUrl: getCurrentTabUrl,
     getCurrentTabId: getCurrentTabId,
     getTabUrl: getTabUrl,
+    getVersion: getVersion,
     isNotBlackListed: isNotBlackListed,
     isEnabled: isEnabled,
     addHostToBlackList: addHostToBlackList,
