@@ -52,11 +52,11 @@ core.getStorage({
         },
         formBtnsSize: function(val, oldVal) {
           store.setBtnSize(val);
-          logger.log('formBtnsSize changed to: ', val);
+          logger.logOptions('formBtnsSize changed to: ', val);
         },
         formBtnsLocation: function(val, oldVal) {
           store.setBtnPlacement(val);
-          logger.log('formBtnsLocation changed to: ', val);
+          logger.logOptions('formBtnsLocation changed to: ', val);
         }
       },
       methods: {

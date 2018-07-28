@@ -53,7 +53,7 @@ var apis = (function() {
       return Promise.reject('Hacker News API: Not going to search domain: Hacker News');
     }
     let initurl = location.href;
-    let search_url = stripUrl(initurl)
+    let search_url = encodeURIComponent(stripUrl(initurl))
 
     let requestUrl = "https://hn.algolia.com/api/v1/search?query=" + search_url + "&restrictSearchableAttributes=url"
     return axios({
