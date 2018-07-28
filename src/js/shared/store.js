@@ -121,8 +121,10 @@ var store = (function() {
       .then((hosts) => {
         if (!Array.isArray(hosts))
           hosts = []
-        if (isBlackListed)
-          hosts.push(host);
+        if (isBlackListed) {
+          if (!hosts.includes(host))
+            hosts.push(host);
+        }
         else
           hosts = hosts.filter(e => e !== host);
         setStorage({
