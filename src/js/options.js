@@ -55,7 +55,7 @@ core.getStorage({
           logger.log('formBtnsSize changed to: ', val);
         },
         formBtnsLocation: function(val, oldVal) {
-          store.setBtnLocation(val);
+          store.setBtnPlacement(val);
           logger.log('formBtnsLocation changed to: ', val);
         }
       },

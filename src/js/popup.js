@@ -26,13 +26,14 @@ function addHostToBlackList(url) {
     .then((tabId) => core.sendMessageIconEnabled(false, tabId))
 }
 
+var vueInstance;
 core.getStorage({
     isEnabled: true,
     btnsize: 0.8,
     placement: 'br',
   })
   .then((items) => {
-    new Vue({
+    vueInstance = new Vue({
       el: '#app',
       data: {
         formBtnsEnabled: items.isEnabled,
@@ -83,7 +84,7 @@ core.getStorage({
           logger.logPopup('formBtnsSize changed to: ' + val);
         },
         formBtnsLocation: function(val, oldVal) {
-          store.setBtnLocation(val)
+          store.setBtnPlacement(val)
           logger.logPopup('formBtnsLocation changed to: ' + val);
         },
         formCurrentSiteEnabled: function(val, oldVal) {
