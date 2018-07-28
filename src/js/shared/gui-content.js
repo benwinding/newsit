@@ -125,14 +125,19 @@ var hlpr = (function() {
     container.attr('class', `newsit_location_${btnPlacement}`);
   }
 
+  function removeContainer() {
+    $('#newsit_container').remove();    
+  }
+
   function addContainer() {
     if (isContainerAdded())
       return;
-    sys.storage.sync.get({
-      placement: 'br',
-      btnsize: '1'
-    }, function(items) {
-      const containerHtml = `
+    core.getStorage({
+        placement: 'br',
+        btnsize: '1'
+      })
+      .then((items) => {
+        const containerHtml = `
       <div id='newsit_container' class='newsit_location_${items.placement}'>
         <table id='newsit_table'>
           <tr><td class="newsit_r">
@@ -147,17 +152,18 @@ var hlpr = (function() {
         <div id="newsit_charTest" class="newsit_btn">A</div>
       </div>
     `
-      $('body').append(containerHtml);
-      setButtonSize(items.btnsize);
-      setButtonPlacement(items.placement);
-      makeButtonWaiting('newsit_tdReddit');
-      makeButtonWaiting('newsit_tdHNews');
-      resizeIconHeights();
-    });
+        $('body').append(containerHtml);
+        setButtonSize(items.btnsize);
+        setButtonPlacement(items.placement);
+        makeButtonWaiting('newsit_tdReddit');
+        makeButtonWaiting('newsit_tdHNews');
+        resizeIconHeights();
+      });
   }
 
   return {
     addContainer: addContainer,
+    removeContainer: removeContainer,
     makeButtonWaiting: makeButtonWaiting,
     makeButtonFound: makeButtonFound,
     makeButtonFailed: makeButtonFailed,

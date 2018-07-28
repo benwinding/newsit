@@ -44,6 +44,14 @@
             <div class="field">
               <div class="control">
                 <label class="checkbox">
+                  <input type="checkbox" v-model="formCurrentSiteEnabled">
+                  Enabled on this website
+                </label>
+              </div>
+            </div>
+            <div class="field">
+              <div class="control">
+                <label class="checkbox">
                   <input type="checkbox" v-model="formBtnsEnabled">
                   Run automatically on page load
                 </label>
@@ -79,6 +87,9 @@
     </div>
     <script type="text/javascript" src="vendor/vue.min.js"></script>
     <script type="text/javascript" src="js/shared/core.js"></script>
+    <script type="text/javascript" src="js/shared/store.js"></script>
+    <script type="text/javascript" src="js/shared/gui-global.js"></script>
+    <script type="text/javascript" src="js/shared/logger.js"></script>
     <script type="text/javascript" src="js/popup.js"></script>
   </body>
 </html>

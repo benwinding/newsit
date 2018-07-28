@@ -16,15 +16,20 @@
     "js": [
       "vendor/axios.min.js",
       "vendor/jquery.min.js",
+      "js/shared/logger.js",
       "js/shared/core.js",
+      "js/shared/store.js",
       "js/shared/apis.js",
-      "js/shared/btn-helpers.js",
+      "js/shared/gui-content.js",
       "js/content.js"
     ]
   }],
   "background": {
     "scripts": [
+      "js/shared/logger.js",
       "js/shared/core.js",
+      "js/shared/store.js",
+      "js/shared/gui-global.js",
       "js/background.js"
     ]
   },

@@ -1,22 +1,33 @@
-var core = (function () {
+var core = (function() {
   function getBrowser() {
     const newsit_browser = typeof chrome !== "undefined" ? chrome : browser;
     return newsit_browser;
   }
 
-  function setIconState(isEnabled) {
-    this.getBrowser().storage.sync.set({
-      isEnabled: isEnabled
-    })
+  function getStorage(values) {
+    return new Promise((resolve, reject) => {
+      getBrowser().storage.sync.get(values, (items) => {
+        resolve(items);
+      })
+    });
   }
 
-  function log(text) {
-    console.log(text);
+  function isProduction() {
+    const manifest = getBrowser().runtime.getManifest();
+    return ('update_url' in manifest);
+  }
+
+  function sendMessageIconEnabled(isEnabled, tabId) {
+    let message = {iconIsEnabled: isEnabled}
+    if (tabId)
+      message.tabId = tabId;
+    getBrowser().runtime.sendMessage(message);
   }
 
   return {
     getBrowser: getBrowser,
-    setIconState: setIconState,
-    log: log
+    getStorage: getStorage,
+    isProduction: isProduction,
+    sendMessageIconEnabled: sendMessageIconEnabled,
   }
 }())

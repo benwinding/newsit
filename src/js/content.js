@@ -1,24 +1,34 @@
 var sys = core.getBrowser();
 
-function runCheckApis(urlString) {
+function beforeCheck() {
   hlpr.addContainer();
   hlpr.makeButtonWaiting('newsit_tdReddit');
   hlpr.makeButtonWaiting('newsit_tdHNews');
   hlpr.resizeIconHeights();
+}
+
+function afterCheck() {
+  hlpr.resizeIconHeights();
+}
+
+function runCheckApis(urlString) {
+  beforeCheck();
   apis.findHn(urlString)
     .then((res) => hlpr.makeButtonFound(hlpr.btnIdHNews, res.link, res.comments, 'Hacker News'))
     .catch((err) => {
-      console.log(err)
+      logger.errContent(err);
       hlpr.makeButtonFailed(hlpr.btnIdHNews, 'Hacker News')
     });
   apis.findReddit(urlString)
     .then((res) => hlpr.makeButtonFound(hlpr.btnIdReddit, res.link, res.comments, 'Reddit'))
     .catch((err) => {
-      console.log(err)
+      logger.errContent(err);
       hlpr.makeButtonFailed(hlpr.btnIdReddit, 'Reddit')
     });
-  hlpr.resizeIconHeights();
+  afterCheck();
 }
+
+// GUI LISTENERS
 
 function onChangedBtnSize(changes, namespace) {
   var btnSizeChange = changes['btnsize'];
@@ -36,27 +46,48 @@ function onChangedBtnPlacement(changes, namespace) {
   hlpr.setButtonPlacement(placementNew);
 }
 
+// EVENT LISTENERS
+
 function onPageLoad() {
-  sys.storage.sync.get({
-    isEnabled: true,
-  }, (items) => {
-    if (items.isEnabled != true)
-      return;
-    let urlString = location.href;
-    runCheckApis(urlString);
-  });
+  let urlString = location.href;
+  logger.logContent("onPageLoad: " + urlString)
+  store.isEnabled()
+    .then(() => store.isNotBlackListed(urlString))
+    .then(() => {
+      runCheckApis(urlString);
+      core.sendMessageIconEnabled(true);
+    }).catch((err) => {
+      logger.errContent(err)
+      core.sendMessageIconEnabled(false);
+    })
 }
 
-function onMessageRecieved(request, sender, sendResponse) {
-  // listen for messages sent from background.js
+function onTabNowActive(request) {
+  if (request.action != 'nowActive')
+    return
+  let urlString = location.href;
+  store.isEnabled()
+    .then(() => store.isNotBlackListed(urlString))
+    .then(() => {
+      runCheckApis(urlString)
+    })
+    .catch((err) => { 
+      logger.errContent(err)
+      hlpr.removeContainer();
+    })
+}
+
+function onCheck(request) {
   if (request.action != 'check')
     return
   const urlString = request.url || location.href;
-  console.debug('URL CHANGED: ' + urlString) // new url is now in content scripts!
   runCheckApis(urlString);
 }
 
-$(onPageLoad);
 sys.storage.onChanged.addListener(onChangedBtnSize);
 sys.storage.onChanged.addListener(onChangedBtnPlacement);
-sys.runtime.onMessage.addListener(onMessageRecieved);
+
+sys.runtime.onMessage.addListener(onTabNowActive);
+sys.runtime.onMessage.addListener(onCheck);
+
+$(onPageLoad);
