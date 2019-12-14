@@ -3,7 +3,7 @@ Vue.config.productionTip = false;
 sys = core.getBrowser();
 
 core.getStorage({
-    isEnabled: true,
+    isEnabled: false,
     btnsize: 0.8,
     placement: 'br',
   })
