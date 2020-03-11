@@ -83,11 +83,22 @@ var hlpr = (function() {
 
   function makeButtonFailed(btnId, whichSource) {
     setTimeout(() => {
-      setButton(btnId, '-', 'Newsit found nothing on ' + whichSource)
+      const submitLink = getSubmitLink(whichSource)
+      setButton(btnId, '-', 'Newsit found nothing on ' + whichSource, submitLink)
       let el = getBtn(btnId);
       setImportant(el, 'opacity', '0.4')
       hideIconWidth(btnId)
     }, 100)
+  }
+
+  function getSubmitLink(whichSource) {
+    const title = encodeURI(document.title);
+    const link = encodeURI(document.location.href);
+    if (whichSource.includes('eddit')) {
+      return `https://reddit.com/submit?title=${title}&url=${link}`
+    } else {
+      return `https://news.ycombinator.com/submitlink?t=${title}&u=${link}`
+    }
   }
 
   function makeButtonFound(btnId, link, numComments, whichSource) {
