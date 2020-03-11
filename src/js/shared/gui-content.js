@@ -84,9 +84,9 @@ var hlpr = (function() {
   function makeButtonFailed(btnId, whichSource) {
     setTimeout(() => {
       const submitLink = getSubmitLink(whichSource)
-      setButton(btnId, '-', 'Newsit found nothing on ' + whichSource, submitLink)
+      setButton(btnId, '+', 'Newsit found nothing on ' + whichSource, submitLink)
       let el = getBtn(btnId);
-      setImportant(el, 'opacity', '0.4')
+      setImportant(el, 'opacity', '1.0')
       hideIconWidth(btnId)
     }, 100)
   }
