@@ -3,15 +3,15 @@ const webpack = require("webpack");
 
 const isProd = !!process.env.IS_PRODUCTION;
 
-console.log('webpack IS_PRODUCTION='+ isProd)
+console.log("webpack IS_PRODUCTION=" + isProd);
 
 module.exports = [
   {
     entry: {
-      "background": "./src/js/background.js",
-      "content": "./src/js/content.js",
-      "options": "./src/js/options.js",
-      "popup": "./src/js/popup.js",
+      background: "./src/js/background.js",
+      content: "./src/js/content.js",
+      options: "./src/js/options.js",
+      popup: "./src/js/popup.js",
     },
     output: {
       filename: "[name].js",
@@ -19,30 +19,21 @@ module.exports = [
       libraryTarget: "umd",
     },
     externals: {
-      quill: "Quill"
+      quill: "Quill",
     },
     devtool: isProd ? undefined : "inline-source-map",
     plugins: [
       new webpack.DefinePlugin({
-        'process.env':{
-          'IS_PRODUCTION': isProd
-        }
-      })
+        "process.env": {
+          IS_PRODUCTION: isProd,
+        },
+      }),
     ],
     module: {
-      rules: [       
-        // {
-        //   test: /\.js$/,
-        //   exclude: /node_modules/,
-        //   use: {
-        //     loader: "babel-loader"
-        //   }
-        // }
-      ]
+      rules: [],
     },
-    
     optimization: {
-      minimize: false
+      minimize: false,
     },
-  }
+  },
 ];

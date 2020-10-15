@@ -3,7 +3,7 @@
   "version": "1.2.5",
   "description": "Find Reddit or Hacker News discussions on the current page!",
   "scripts": {
-    "build": "yarn build-firefox && yarn build-chrome && yarn zip-src",
+    "build": "yarn build-webpack && yarn build-firefox && yarn build-chrome && yarn zip-src",
     "zip-src": "git archive -o build-src.zip HEAD",
     "clean": "rm -rf ./build*",
     "build-webpack": "IS_PRODUCTION=true webpack --config ./webpack.config.js",
