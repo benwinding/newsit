@@ -1,48 +1,30 @@
-var logger = (function() {
-  function isProduction() {
-    return core == null ? true : core.isProduction();
-  }
+export const logger = {
+  MakeLogger: (prefix) => MakeLogger(prefix),
+};
 
-  function convertToString(input) {
-    if (typeof input == null)
-      return "null";
-    if (typeof input !== "object")
-      return input;
-    if (input.constructor.toString().includes('Error'))
-      return input.toString();
-    return JSON.stringify(input);
-  }
+function isProduction() {
+  return core == null ? true : core.isProduction();
+}
 
-  function log(context, input) {
-    isProduction()
-      .then((isProduction) => {
-        if (isProduction)
-          return
-        const text = convertToString(input)
-        console.log(`%c Newsit (${context}) ${text}`, "background-color:Orange");
-      })
+function MakeLogger(prefixString) {
+  function prefixString() {
+    return `</> newsit: ${prefixString} `;
   }
-
-  function err(context, input) {
-    isProduction()
-      .then((isProduction) => {
-        if (isProduction)
-          return
-        const text = convertToString(input)
-        console.log(`%c Newsit (${context}) ${text}`, "color:White; background-color:Red");
-      })
-  }
-
   return {
-    logContent: (input) => log('content.js', input),
-    errContent: (input) => err('content.js', input),
-    logBackground: (input) => log('background.js', input),
-    errBackground: (input) => err('background.js', input),
-    logOptions: (input) => log('options.js', input),
-    errOptions: (input) => err('options.js', input),
-    logPopup: (input) => log('popup.js', input),
-    errPopup: (input) => err('popup.js', input),
-    logGui: (input) => log('gui-global.js', input),
-    logMemory: (input) => log('content.js', input),
+    get log() {
+      if (isProduction()) {
+        return (...any) => {};
+      }
+      const boundLogFn = console.log.bind(console, prefixString());
+      return boundLogFn;
+    },
+    get error() {
+      const boundLogFn = console.error.bind(console, prefixString());
+      return boundLogFn;
+    },
+    get warn() {
+      const boundLogFn = console.warn.bind(console, prefixString());
+      return boundLogFn;
+    },
   }
-}())
+};

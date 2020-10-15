@@ -18,7 +18,6 @@ console.log(' IS_PRODUCTION=' + isProduction);
 
 const conf = {
   vendorPaths: [
-    './node_modules/axios/dist/axios.min.js',
     './node_modules/jquery/dist/jquery.min.js',
     './node_modules/bulma/css/bulma.min.css',
     './node_modules/vue/dist/vue.min.js',

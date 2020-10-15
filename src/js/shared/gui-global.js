@@ -1,35 +1,33 @@
-var sys = core.getBrowser();
+import { core } from "./core";
 
-var gui = (function() {
+const sys = core.getBrowser();
+const logg = core.logger.MakeLogger("gui-global.js");
 
-  function setIconColour(isColour, tabId) {
-    const iconPath = isColour ? 'img/icon.png' : 'img/icon-grey.png';
-    logger.logGui(`tab: ${tabId}, changing icon to: ${iconPath}`)
-    let options = {};
-    options.path = iconPath;
-    if (tabId)
-      options.tabId = tabId;
-    sys.browserAction.setIcon(options);
-  }
+export const gui = {
+  setIconColour: setIconColour,
+  setIconText: setIconText,
+  setIcon: setIcon,
+};
 
-  function setIconText(isEnabled, tabId) {
-    const iconText = isEnabled ? 'ON' : '';
-    logger.logGui(`tab: ${tabId}, changing icon text to: ${iconText}`)
-    let options = {};
-    options.text = iconText;
-    if (tabId)
-      options.tabId = tabId;
-    sys.browserAction.setBadgeText(options);
-  }
+function setIconColour(isColour, tabId) {
+  const iconPath = isColour ? "img/icon.png" : "img/icon-grey.png";
+  logg.log(`tab: ${tabId}, changing icon to: ${iconPath}`);
+  let options = {};
+  options.path = iconPath;
+  if (tabId) options.tabId = tabId;
+  sys.browserAction.setIcon(options);
+}
 
-  function setIcon(state, tabId) {
-    setIconColour(state, tabId);
-    setIconText(state, tabId);
-  }
+function setIconText(isEnabled, tabId) {
+  const iconText = isEnabled ? "ON" : "";
+  logg.log(`tab: ${tabId}, changing icon text to: ${iconText}`);
+  let options = {};
+  options.text = iconText;
+  if (tabId) options.tabId = tabId;
+  sys.browserAction.setBadgeText(options);
+}
 
-  return {
-    setIconColour: setIconColour,
-    setIconText: setIconText,
-    setIcon: setIcon,
-  }
-}())
+function setIcon(state, tabId) {
+  setIconColour(state, tabId);
+  setIconText(state, tabId);
+}

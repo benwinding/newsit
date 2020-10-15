@@ -14,7 +14,6 @@ Find the discussion around the page you're looking at. Newsit can find the top v
 
 This is a collection of weird js libraries:
 
-- `axios` 
 - `bulma` 
 - `jquery` 
 - `vue` 
