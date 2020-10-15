@@ -80,7 +80,7 @@ function findHn(urlString) {
       "Hacker News API: Not going to search domain: Hacker News"
     );
   }
-  const searchUrl = location.href;
+  const searchUrl = getCurrentUrl();
   const queryString = `query=${encodeURIComponent(
     searchUrl
   )}&restrictSearchableAttributes=url`;
@@ -95,9 +95,11 @@ function findHn(urlString) {
       let allhits = data["hits"];
       let num_of_comments = 0;
       let result_id = null;
+      const thisUrl = document.location.href;
       for (let hit of allhits) {
+        const hitUrl = hit["url"];
         if (
-          isMatchTwoUrls(hit["url"], initurl) &&
+          isMatchTwoUrls(hitUrl, thisUrl) &&
           hit["num_comments"] >= num_of_comments
         ) {
           num_of_comments = hit["num_comments"];

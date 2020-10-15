@@ -5,7 +5,8 @@
   "scripts": {
     "build": "yarn build-firefox && yarn build-chrome && yarn zip-src",
     "zip-src": "git archive -o build-src.zip HEAD",
-    "clean": "rm -rf ./build-*",
+    "clean": "rm -rf ./build*",
+    "build-webpack": "IS_PRODUCTION=true webpack --config ./webpack.config.js",
     "build-chrome": "IS_PRODUCTION=true TARGET=chrome gulp build",
     "build-firefox": "IS_PRODUCTION=true TARGET=firefox gulp build",
     "watch-chrome": "TARGET=chrome gulp watch",

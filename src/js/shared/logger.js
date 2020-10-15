@@ -3,7 +3,7 @@ export const logger = {
 };
 
 function isProduction() {
-  return core == null ? true : core.isProduction();
+  return process.env.IS_PRODUCTION;
 }
 
 function MakeLogger(prefixString) {

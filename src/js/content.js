@@ -1,4 +1,5 @@
 import { core, sys } from "./shared/core";
+import { apis } from "./shared/apis";
 import { store } from "./shared/store";
 import { hlpr } from "./shared/gui-content";
 
@@ -29,7 +30,7 @@ import { hlpr } from "./shared/gui-content";
         )
       )
       .catch((err) => {
-        logg.errContent(err);
+        logg.error(err);
         hlpr.makeButtonFailed(hlpr.btnIdHNews, "Hacker News");
       });
     apis
@@ -38,7 +39,7 @@ import { hlpr } from "./shared/gui-content";
         hlpr.makeButtonFound(hlpr.btnIdReddit, res.link, res.comments, "Reddit")
       )
       .catch((err) => {
-        logg.errContent(err);
+        logg.error(err);
         hlpr.makeButtonFailed(hlpr.btnIdReddit, "Reddit");
       });
     afterCheck();
@@ -73,7 +74,7 @@ import { hlpr } from "./shared/gui-content";
         core.sendMessageIconEnabled(true);
       })
       .catch((err) => {
-        logg.errContent(err);
+        logg.error(err);
         core.sendMessageIconEnabled(false);
       });
   }
@@ -88,7 +89,7 @@ import { hlpr } from "./shared/gui-content";
         runCheckApis(urlString);
       })
       .catch((err) => {
-        logg.errContent(err);
+        logg.error(err);
         hlpr.removeContainer();
       });
   }

@@ -5,7 +5,7 @@ import { store } from "./shared/store";
 // ACTIONS
 {
   const logg = core.logger.MakeLogger("background.js");
-  
+
   function sendCheckCommand(tabId, url) {
     const request = {
       action: "check",
@@ -31,7 +31,7 @@ import { store } from "./shared/store";
   function onChangeEnabled(changes) {
     if (changes["isEnabled"] == null) return;
     const isEnabled = changes["isEnabled"].newValue;
-    logg.log(`tab: ALL, onChangeEnabled: ${isEnabled}`);
+    logg.log(`onIconEnabled: tab=ALL, isEnabled=${isEnabled}`);
     setIcon(isEnabled);
   }
 
@@ -41,7 +41,7 @@ import { store } from "./shared/store";
     let tabId;
     if (request.tabId) tabId = request.tabId;
     else tabId = sender.tab.id;
-    logg.log(`tab: ${tabId}, onIconEnabled: ${isEnabled}`);
+    logg.log(`onIconEnabled: tab=${tabId}, isEnabled=${isEnabled}`);
     setIcon(isEnabled, tabId);
   }
 
@@ -51,7 +51,7 @@ import { store } from "./shared/store";
       .then((list) => {
         setIcon(list["isEnabled"]);
       })
-      .catch((err) => logg.error(err));
+      .catch((err) => logg.log('onStartUp', err));
   }
 
   function onTabChangeUrl(tabId, changeInfo, tab) {
@@ -62,12 +62,12 @@ import { store } from "./shared/store";
       .then(() => {
         sendCheckCommand(tabId, changeInfo.url);
       })
-      .catch((err) => logg.error(err));
+      .catch((err) => logg.log('onTabChangeUrl', err));
   }
 
   function onTabChangeActive(activeInfo) {
     const tabId = activeInfo.tabId;
-    logg.log(`tab: ${tabId}, is the new ActiveTab`);
+    logg.log(`onTabChangeActive, tab: ${tabId}, is the new ActiveTab`);
     store
       .isEnabled()
       .then(() => store.getTabUrl(tabId))
@@ -78,7 +78,7 @@ import { store } from "./shared/store";
       })
       .catch((err) => {
         setIcon(false, tabId);
-        logg.log(err);
+        logg.log('onTabChangeActive', err);
       });
   }
 
@@ -95,7 +95,7 @@ import { store } from "./shared/store";
       .then((data) => {
         sendCallback(data);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => log.error('makeRequest', error));
   }
 
   function onRequestBackgroundHN(request, sender, sendResponse) {
@@ -113,14 +113,13 @@ import { store } from "./shared/store";
     makeRequest(requestUrl, false, sendResponse);
     return true; // Will respond asynchronously.
   }
-  
+
   sys.tabs.onUpdated.addListener(onTabChangeUrl);
   sys.tabs.onActivated.addListener(onTabChangeActive);
   sys.storage.onChanged.addListener(onChangeEnabled);
   sys.runtime.onMessage.addListener(onIconEnabled);
   sys.runtime.onMessage.addListener(onRequestBackgroundHN);
   sys.runtime.onMessage.addListener(onRequestBackgroundReddit);
+
+  onStartUp();
 }
-
-
-onStartUp();

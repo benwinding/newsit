@@ -1,13 +1,13 @@
 import { core } from "./core";
 
-const sys = core.getBrowser();
-const logg = core.logger.MakeLogger("gui-global.js");
-
 export const gui = {
   setIconColour: setIconColour,
   setIconText: setIconText,
   setIcon: setIcon,
 };
+
+const sys = core.getBrowser();
+const logg = core.logger.MakeLogger("gui-global.js");
 
 function setIconColour(isColour, tabId) {
   const iconPath = isColour ? "img/icon.png" : "img/icon-grey.png";

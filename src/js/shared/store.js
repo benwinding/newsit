@@ -1,8 +1,5 @@
 import { core } from "./core";
 
-const sys = core.getBrowser();
-const logg = core.logger.MakeLogger("store.js");
-
 export const store = {
   getBlackListedHosts: getBlackListedHosts,
   getCurrentTabUrl: getCurrentTabUrl,
@@ -17,6 +14,9 @@ export const store = {
   setBtnSize: setBtnSize,
   setEnabledAll: setEnabledAll,
 };
+
+const sys = core.getBrowser();
+const logg = core.logger.MakeLogger("store.js");
 
 // QUERIES
 

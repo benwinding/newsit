@@ -30,6 +30,9 @@ const conf = {
     images: './src/img/**/*',
     manifest: `./src/manifest-${target}.json`,
   },
+  webpack: {
+    build: './build/**/*.js'
+  },
   output: {
     dir: `./build-${target}`,
     zipFile: `./build-${target}-${version}.zip`,
@@ -41,16 +44,16 @@ gulp.task('clean', function() {
 });
 
 // Code Tasks
-gulp.task('scripts', function() {
-  return gulp.src(conf.src.scripts)
-    .pipe(gulp.dest(conf.output.dir + '/js'));
-});
+// gulp.task('scripts', function() {
+//   return gulp.src(conf.src.scripts)
+//     .pipe(gulp.dest(conf.output.dir + '/js'));
+// });
 
-gulp.task('isProduction', function() {
-  return gulp.src(conf.src.core)
-    .pipe(inject.prepend(`const IS_PRODUCTION = ${isProduction}; // <-- generated \n\n`))
-    .pipe(gulp.dest(conf.output.dir + '/js/shared'));
-});
+// gulp.task('isProduction', function() {
+//   return gulp.src(conf.src.core)
+//     .pipe(inject.prepend(`const IS_PRODUCTION = ${isProduction}; // <-- generated \n\n`))
+//     .pipe(gulp.dest(conf.output.dir + '/js/shared'));
+// });
 
 gulp.task('images', function() {
   return gulp.src(conf.src.images)
@@ -88,16 +91,21 @@ gulp.task('vendor', function() {
     .pipe(gulp.dest(conf.output.dir + '/vendor'));
 })
 
-gulp.task('copy-code', gulpSequence('scripts', 'isProduction', ['html', 'images', 'manifest', 'vendor', 'css']))
+gulp.task('copy-webpack-build', function() {
+  return gulp.src(conf.webpack.build)
+    .pipe(gulp.dest(conf.output.dir + '/js'));
+})
+
+gulp.task('copy-code', gulpSequence('copy-webpack-build', ['html', 'images', 'manifest', 'vendor', 'css']))
 
 gulp.task('watch', ['copy-code'], function() {
   gulp.watch(conf.src.html, ['html']);
   gulp.watch(conf.src.css, ['css']);
-  gulp.watch(conf.src.scripts, (event) => {
-    gulpSequence('scripts', 'isProduction')((err) => {
-      if (err) console.log(err)
-    })
-  })
+  // gulp.watch(conf.src.scripts, (event) => {
+    // gulpSequence('scripts', 'isProduction')((err) => {
+    //   if (err) console.log(err)
+    // })
+  // })
   gulp.watch(conf.src.images, ['images']);
   gulp.watch(conf.src.manifest, ['manifest']);
 });

@@ -1,3 +1,5 @@
+import { core } from './core';
+
 const btnIdReddit = "newsit_tdReddit";
 const btnIdHNews = "newsit_tdHNews";
 

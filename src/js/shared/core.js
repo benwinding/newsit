@@ -3,7 +3,7 @@ import { logger } from "./logger";
 export const core = {
   getBrowser: getBrowser,
   getStorage: getStorage,
-  isProduction: isProduction,
+  isProduction: process.env.IS_PRODUCTION,
   sendMessageIconEnabled: sendMessageIconEnabled,
   logger: logger,
 };
@@ -20,14 +20,6 @@ function getStorage(values) {
     getBrowser().storage.sync.get(values, (items) => {
       resolve(items);
     });
-  });
-}
-
-function isProduction() {
-  return new Promise((resolve, reject) => {
-    // Check build time variable, (see gullpfile.js)
-    if (IS_PRODUCTION) resolve(true);
-    else resolve(false);
   });
 }
 

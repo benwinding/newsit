@@ -1,6 +1,9 @@
 const path = require("path");
+const webpack = require("webpack");
 
-const isProd = process.argv.includes("production");
+const isProd = !!process.env.IS_PRODUCTION;
+
+console.log('webpack IS_PRODUCTION='+ isProd)
 
 module.exports = [
   {
@@ -18,9 +21,16 @@ module.exports = [
     externals: {
       quill: "Quill"
     },
-    // devtool: isProd ? undefined : "inline-source-map",
+    devtool: isProd ? undefined : "inline-source-map",
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env':{
+          'IS_PRODUCTION': isProd
+        }
+      })
+    ],
     module: {
-      rules: [
+      rules: [       
         // {
         //   test: /\.js$/,
         //   exclude: /node_modules/,
@@ -30,6 +40,7 @@ module.exports = [
         // }
       ]
     },
+    
     optimization: {
       minimize: false
     },
