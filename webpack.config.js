@@ -11,7 +11,7 @@ module.exports = [
       background: "./src/js/background.js",
       content: "./src/js/content.js",
       options: "./src/js/options.js",
-      popup: "./src/js/popup.js",
+      popup: "./src/js/popup.jsx",
     },
     output: {
       filename: "[name].js",
@@ -30,7 +30,18 @@ module.exports = [
       }),
     ],
     module: {
-      rules: [],
+      rules: [
+        {
+          test: /\.jsx?$/,
+          exclude: /node_modules/,
+          use: {
+            loader: "babel-loader",
+          },
+        },
+      ],
+    },
+    resolve: {
+      extensions: [".js", ".jsx"],
     },
     optimization: {
       minimize: false,

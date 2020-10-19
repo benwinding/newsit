@@ -19,6 +19,8 @@ const conf = {
     "./node_modules/jquery/dist/jquery.min.js",
     "./node_modules/bulma/css/bulma.min.css",
     "./node_modules/vue/dist/vue.min.js",
+    "./node_modules/react/umd/react.development.js",
+    "./node_modules/react-dom/umd/react-dom.development.js",
   ],
   src: {
     core: ["./src/js/shared/core.js"],
