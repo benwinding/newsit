@@ -22,5 +22,6 @@
   "icons": {
     "128": "img/favicon-128x128.png"
   },
-  "permissions": ["storage", "tabs", "<all_urls>"]
+  "permissions": ["storage", "tabs", "<all_urls>"],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

@@ -4,6 +4,10 @@ import { store } from "./shared/store";
 
 const logg = core.logger.MakeLogger("content.js");
 
+// store.getBlackListedHosts().then((hosts) => {
+//   logg.log({hosts})
+// });
+
 core
   .getStorage({
     isEnabled: false,

@@ -9,11 +9,12 @@
     "build-webpack": "IS_PRODUCTION=true webpack --config ./webpack.config.js",
     "build-chrome": "IS_PRODUCTION=true TARGET=chrome gulp build",
     "build-firefox": "IS_PRODUCTION=true TARGET=firefox gulp build",
+    "watch-webpack": "IS_PRODUCTION=true webpack --config ./webpack.config.js --watch",
     "watch-chrome": "TARGET=chrome gulp watch",
     "watch-firefox": "TARGET=firefox gulp watch"
   },
   "dependencies": {
-    "bulma": "^0.7.1",
+    "bulma": "^0.9.0",
     "jquery": "^3.3.1",
     "react": "16.14.0",
     "react-dom": "16.14.0",
@@ -23,8 +24,8 @@
     "babel-core": "^6.26.3",
     "babel-loader": "7.x",
     "babel-preset-env": "^1.7.0",
-    "babel-preset-stage-2": "^6.24.1",
     "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
     "del": "^3.0.0",
     "file-loader": "^0.11.2",
     "fs-extra": "^0.30.0",

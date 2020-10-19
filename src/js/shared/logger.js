@@ -8,13 +8,13 @@ function isProduction() {
 
 function MakeLogger(prefixString) {
   function prefixString() {
-    return `</> newsit: ${prefixString} `;
+    return `> newsit: ${prefixString} `;
   }
   return {
     get log() {
-      if (isProduction()) {
-        return (...any) => {};
-      }
+      // if (isProduction()) {
+      //   return (...any) => {};
+      // }
       const boundLogFn = console.log.bind(console, prefixString());
       return boundLogFn;
     },

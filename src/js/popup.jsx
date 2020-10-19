@@ -1,18 +1,113 @@
 import { core } from "./shared/core";
-import { store } from "./shared/store";
+import * as store from "./shared/store";
 const logg = core.logger.MakeLogger("content.js");
+
+async function getIsBlackListed() {
+  const thisUrl = await store.getCurrentTabUrl();
+  const isBlackListed = await store.isBlackListed(thisUrl);
+  return isBlackListed;
+}
+
+async function setHostBlacklisted(url, isBlackListed) {
+  await store.setHost(url, isBlackListed);
+  const tabId = await store.getCurrentTabId();
+  const isAllEnabled = await store.isEnabled();
+  const iconOn = isAllEnabled && !isBlackListed;
+  core.sendMessageIconEnabled(iconOn, tabId);
+}
+
+const formBtnsLocation = [
+  {
+    value: "br",
+    text: "Bottom Right",
+  },
+  {
+    value: "bl",
+    text: "Bottom Left",
+  },
+  {
+    value: "tr",
+    text: "Top Right",
+  },
+  {
+    value: "tl",
+    text: "Top Left",
+  },
+];
+
+const calculateBtnSize = (val) => {
+  const max = 129;
+  const min = 19;
+  const scaled = (val - 0.2) * 38 + 2 * 14;
+  return scaled;
+};
 
 // let version = 0;
 export function MyComp(props) {
-  const [version, setVersion] = React.useState(0);
+  const [version, setVersion] = React.useState(null);
+  const [hasSiteEnabled, setHasSiteEnabled] = React.useState(false);
+  const [hasRunAutomatic, setHasRunAutomatic] = React.useState(false);
+  const [btnsLocation, setBtnsLocation] = React.useState("br");
+  const [formBtnsSize, setFormBtnsSize] = React.useState(1);
+  const [btnSizePx, setBtnSizePx] = React.useState(calculateBtnSize(1));
+  const [currentUrl, setCurrentUrl] = React.useState("");
+  const [currentTabId, setCurrentTabId] = React.useState("");
 
   React.useEffect(() => {
     let isMounted = true;
+    core
+      .getStorage({
+        isEnabled: true,
+        btnsize: 0.8,
+        placement: "br",
+      })
+      .then((vals) => {
+        if (!isMounted) return;
+        setHasRunAutomatic(vals.isEnabled);
+        setFormBtnsSize(vals.btnsize);
+        setBtnSizePx(calculateBtnSize(vals.btnsize));
+        setBtnsLocation(vals.placement);
+      });
+    store.getCurrentTabUrl().then((currentUrl) => {
+      isMounted && setCurrentUrl(currentUrl);
+    });
+    store.getCurrentTabId().then((tabId) => {
+      isMounted && setCurrentTabId(tabId);
+    });
     store.getVersion().then((version) => {
+      logg.log({ version });
       isMounted && setVersion(version);
     });
+    getIsBlackListed().then((isBlackListed) => {
+      const siteIsEnabled = !isBlackListed;
+      logg.log({ siteIsEnabled });
+      isMounted && setHasSiteEnabled(siteIsEnabled);
+    });
     return () => (isMounted = false);
-  }, [version]);
+  }, []);
+
+  const siteEnabledChanged = (e) => {
+    const checked = e.nativeEvent.target.checked;
+    const isBlackListed = !checked;
+    setHostBlacklisted(currentUrl, isBlackListed);
+    setHasSiteEnabled(checked);
+  };
+  const runAutomaticChanged = (e) => {
+    const allEnabled = e.nativeEvent.target.checked;
+    setHasRunAutomatic(allEnabled);
+    store.setEnabledAll(allEnabled);
+    const iconOn = allEnabled && hasSiteEnabled;
+    core.sendMessageIconEnabled(iconOn, currentTabId);
+  };
+  const onBtnsLocationChanged = (e) => {
+    const value = e.nativeEvent.target.value;
+    setBtnsLocation(value);
+  };
+  const onFormBtnsSize = (e) => {
+    const value = e.nativeEvent.target.value;
+    setFormBtnsSize(value);
+    setBtnSizePx(calculateBtnSize(value));
+  };
 
   return (
     <div className="column">
@@ -20,7 +115,7 @@ export function MyComp(props) {
         <div id="newsit-header" className="hero-body">
           <div className="container">
             <a href="https://newsit.benwinding.com" target="_blank">
-              <img src="img/icon.svg" style={{width: "90px"}} />
+              <img src="img/icon.svg" style={{ width: "90px" }} />
             </a>
             <p className="is-pulled-right">version: {version}</p>
           </div>
@@ -36,16 +131,24 @@ export function MyComp(props) {
           <div className="field">
             <div className="control">
               <label className="checkbox">
-                <input type="checkbox" v-model="formCurrentSiteEnabled" />
-                Enabled on this website
+                <input
+                  type="checkbox"
+                  checked={hasSiteEnabled}
+                  onChange={siteEnabledChanged}
+                />
+                <span className="ml-2">Enabled on this website</span>
               </label>
             </div>
           </div>
           <div className="field">
             <div className="control">
               <label className="checkbox">
-                <input type="checkbox" v-model="formBtnsEnabled" />
-                Run automatically on page load
+                <input
+                  type="checkbox"
+                  checked={hasRunAutomatic}
+                  onChange={runAutomaticChanged}
+                />
+                <span className="ml-2">Run automatically on page load</span>
               </label>
             </div>
           </div>
@@ -53,11 +156,17 @@ export function MyComp(props) {
             <label className="label">Links Location</label>
             <div className="control">
               <div className="select">
-                <select v-model="formBtnsLocation">
+                <select value={btnsLocation} onChange={onBtnsLocationChanged}>
                   <option disabled value="">
                     Nothing selected
                   </option>
-                  <option>{/* {{ option.text }} */}</option>
+                  {formBtnsLocation.map((item) => {
+                    return (
+                      <option value={item.value} key={item.value}>
+                        {item.text}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
             </div>
@@ -67,10 +176,19 @@ export function MyComp(props) {
             <div className="control">
               <input
                 type="range"
-                v-model="formBtnsSize"
+                value={formBtnsSize}
+                onChange={onFormBtnsSize}
                 min="0.2"
                 max="2"
                 step="0.05"
+              />
+              <span>{formBtnsSize}</span>
+            </div>
+            <div>
+              <img
+                id="btnsPreview"
+                src="https://i.imgur.com/dVvDrfN.png"
+                style={{ height: btnSizePx + "px" }}
               />
             </div>
           </div>
@@ -90,39 +208,9 @@ import { store } from "./shared/store";
 
 {
 
-  function getIsHostBlackListed() {
-    return new Promise((resolve, reject) => {
-      store
-        .getCurrentTabUrl()
-        .then((thisUrl) => store.isNotBlackListed(thisUrl))
-        .then(() => resolve(true))
-        .catch((err) => {
-          logg.errPopup(err);
-          resolve(false);
-        });
-    });
-  }
 
-  function removeHostFromBlackList(url) {
-    store.removeHostFromBlackList(url);
-    store
-      .getCurrentTabId()
-      .then((tabId) => core.sendMessageIconEnabled(true, tabId));
-  }
 
-  function addHostToBlackList(url) {
-    store.addHostToBlackList(url);
-    store
-      .getCurrentTabId()
-      .then((tabId) => core.sendMessageIconEnabled(false, tabId));
-  }
 
-  core
-    .getStorage({
-      isEnabled: true,
-      btnsize: 0.8,
-      placement: "br",
-    })
     .then((items) => {
       new Vue({
         el: "#app",
@@ -157,7 +245,7 @@ import { store } from "./shared/store";
         created: function () {
           // `this` points to the vm instance
           let a = this;
-          getIsHostBlackListed().then((isBlackListed) => {
+          getIsNotBlackListed().then((isBlackListed) => {
             a.formCurrentSiteEnabled = isBlackListed;
           });
           store.getVersion().then((version) => {

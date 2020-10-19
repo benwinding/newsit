@@ -103,11 +103,12 @@ gulp.task(
   ])
 );
 
-gulp.task("watch", ["copy-code"], function () {
+gulp.task("watch", ['copy-code'], function () {
   gulp.watch(conf.src.html, ["html"]);
   gulp.watch(conf.src.css, ["css"]);
   gulp.watch(conf.src.images, ["images"]);
   gulp.watch(conf.src.manifest, ["manifest"]);
+  gulp.watch(conf.webpack.build, ["copy-webpack-build"]);
 });
 
 gulp.task("zip", function () {

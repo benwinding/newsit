@@ -1,18 +1,18 @@
 import { core } from "./core";
 
 export const store = {
-  getBlackListedHosts: getBlackListedHosts,
-  getCurrentTabUrl: getCurrentTabUrl,
-  getCurrentTabId: getCurrentTabId,
-  getTabUrl: getTabUrl,
-  getVersion: getVersion,
-  isNotBlackListed: isNotBlackListed,
-  isEnabled: isEnabled,
-  addHostToBlackList: addHostToBlackList,
-  removeHostFromBlackList: removeHostFromBlackList,
-  setBtnPlacement: setBtnPlacement,
-  setBtnSize: setBtnSize,
-  setEnabledAll: setEnabledAll,
+  getBlackListedHosts,
+  getCurrentTabUrl,
+  getCurrentTabId,
+  getTabUrl,
+  getVersion,
+  isNotBlackListed,
+  isEnabled,
+  addHostToBlackList,
+  removeHostFromBlackList,
+  setBtnPlacement,
+  setBtnSize,
+  setEnabledAll,
 };
 
 const sys = core.getBrowser();
@@ -20,7 +20,7 @@ const logg = core.logger.MakeLogger("store.js");
 
 // QUERIES
 
-function getVersion() {
+export function getVersion() {
   return new Promise((resolve, reject) => {
     sys.management.getSelf((ext) => {
       resolve(ext.version);
@@ -28,15 +28,14 @@ function getVersion() {
   });
 }
 
-function getBlackListedHosts() {
-  return core
-    .getStorage({
-      blackListed: [],
-    })
-    .then((items) => items.blackListed);
+export async function getBlackListedHosts() {
+  const items = await core.getStorage({
+    blackListed: [],
+  });
+  return items.blackListed;
 }
 
-function getCurrentTabUrl() {
+export function getCurrentTabUrl() {
   return new Promise((resolve, reject) => {
     sys.tabs.query(
       {
@@ -53,7 +52,7 @@ function getCurrentTabUrl() {
   });
 }
 
-function getCurrentTabId() {
+export function getCurrentTabId() {
   return new Promise((resolve, reject) => {
     sys.tabs.query(
       {
@@ -70,7 +69,7 @@ function getCurrentTabId() {
   });
 }
 
-function getTabUrl(tabId) {
+export function getTabUrl(tabId) {
   return new Promise((resolve, reject) => {
     sys.tabs.get(tabId, (tab) => {
       const thisUrl = tab.url;
@@ -79,60 +78,52 @@ function getTabUrl(tabId) {
   });
 }
 
-function isEnabled() {
-  return new Promise((resolve, reject) => {
-    core
-      .getStorage({
-        isEnabled: true,
-      })
-      .then((items) => {
-        if (items.isEnabled) resolve();
-        else reject("Not enabled on ALL sites");
-      });
-  });
+export async function isEnabled() {
+  const items = await core.getStorage({ isEnabled: true });
+  return items.isEnabled;
 }
 
-function isNotBlackListed(urlString) {
+export async function isNotBlackListed(urlString) {
+  const isBlackListed = await isBlackListed(urlString);
+  return !isBlackListed;
+}
+
+export async function isBlackListed(urlString) {
   const host = new URL(urlString).host;
-  return new Promise((resolve, reject) => {
-    getBlackListedHosts().then((hosts) => {
-      if (!Array.isArray(hosts)) hosts = [];
-      if (hosts.indexOf(host) > -1) reject("Not enabled on THIS site");
-      else resolve();
-    });
-  });
+  const hosts = await getBlackListedHosts();
+  const hostsSafe = Array.isArray(hosts) ? hosts : [];
+  const isBlackListed = hostsSafe.indexOf(host) > -1;
+  return isBlackListed;
 }
 
 // COMMANDS
 
-function setStorage(values) {
-  return new Promise((resolve, reject) => {
-    sys.storage.sync.set(values);
-  });
+export async function setStorage(values) {
+  return sys.storage.sync.set(values);
 }
 
-function setEnabledAll(state) {
+export function setEnabledAll(state) {
   logg.log(`setEnabledAll: ${state}`);
   setStorage({
     isEnabled: state,
   });
 }
 
-function setBtnSize(state) {
+export function setBtnSize(state) {
   logg.log(`setBtnSize: ${state}`);
   setStorage({
     btnsize: state,
   });
 }
 
-function setBtnPlacement(state) {
+export function setBtnPlacement(state) {
   logg.log(`setBtnPlacement: ${state}`);
   setStorage({
     placement: state,
   });
 }
 
-function getHostFromUrl(urlString) {
+export function getHostFromUrl(urlString) {
   let host;
   try {
     host = new URL(urlString).host;
@@ -142,23 +133,27 @@ function getHostFromUrl(urlString) {
   return host;
 }
 
-function setHost(urlString, isBlackListed) {
+export async function setHost(urlString, isBlackListed) {
   const host = getHostFromUrl(urlString);
-  store.getBlackListedHosts().then((hosts) => {
-    if (!Array.isArray(hosts)) hosts = [];
-    if (isBlackListed) {
-      if (!hosts.includes(host)) hosts.push(host);
-    } else hosts = hosts.filter((e) => e !== host);
-    setStorage({
-      blackListed: hosts,
-    });
+  const hosts = await store.getBlackListedHosts();
+  const hostsSafe = Array.isArray(hosts) ? hosts : [];
+  if (isBlackListed) {
+    if (!hostsSafe.includes(host)) {
+      hostsSafe.push(host);
+    }
+  }
+  const hostsFiltered = !isBlackListed
+    ? hostsSafe.filter((e) => e !== host)
+    : hostsSafe;
+  await setStorage({
+    blackListed: hostsFiltered,
   });
 }
 
-function addHostToBlackList(urlString) {
-  setHost(urlString, true);
+export async function addHostToBlackList(urlString) {
+  return setHost(urlString, true);
 }
 
-function removeHostFromBlackList(urlString) {
-  setHost(urlString, false);
+export async function removeHostFromBlackList(urlString) {
+  return setHost(urlString, false);
 }
