@@ -1,34 +1,40 @@
 {
   "name": "Newsit",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Find Reddit or Hacker News discussions on the current page!",
   "scripts": {
-    "build": "yarn build-firefox && yarn build-chrome && yarn zip-src",
+    "build": "yarn build-webpack && yarn build-firefox && yarn build-chrome && yarn zip-src",
     "zip-src": "git archive -o build-src.zip HEAD",
-    "clean": "rm -rf ./build-*",
+    "clean": "rm -rf ./build*",
+    "build-webpack": "IS_PRODUCTION=true webpack --config ./webpack.config.js",
     "build-chrome": "IS_PRODUCTION=true TARGET=chrome gulp build",
     "build-firefox": "IS_PRODUCTION=true TARGET=firefox gulp build",
     "watch-chrome": "TARGET=chrome gulp watch",
     "watch-firefox": "TARGET=firefox gulp watch"
   },
+  "dependencies": {
+    "bulma": "^0.7.1",
+    "jquery": "^3.3.1",
+    "vue": "^2.5.16"
+  },
   "devDependencies": {
     "babel-core": "^6.26.3",
+    "babel-loader": "^7",
     "del": "^3.0.0",
     "file-loader": "^0.11.2",
     "fs-extra": "^0.30.0",
-    "gulp": "^3.9.1",
     "gulp-babel": "^7.0.1",
     "gulp-imagemin": "^4.1.0",
     "gulp-inject-string": "^1.1.1",
     "gulp-json-transform": "^0.4.5",
     "gulp-rename": "^1.4.0",
     "gulp-sequence": "^1.0.0",
-    "gulp-zip": "^4.1.0"
+    "gulp-zip": "^4.1.0",
+    "gulp": "^3.9.1",
+    "webpack-cli": "3",
+    "webpack": "4"
   },
-  "dependencies": {
-    "axios": "^0.18.0",
-    "bulma": "^0.7.1",
-    "jquery": "^3.3.1",
-    "vue": "^2.5.16"
+  "engines": {
+    "node": "8.x"
   }
 }

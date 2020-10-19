@@ -8,30 +8,15 @@
     "page": "options.html",
     "browser_style": true
   },
-  "content_scripts": [{
-    "matches": ["<all_urls>"],
-    "css": [
-      "css/content.css"
-    ],
-    "js": [
-      "vendor/axios.min.js",
-      "vendor/jquery.min.js",
-      "js/shared/logger.js",
-      "js/shared/core.js",
-      "js/shared/store.js",
-      "js/shared/apis.js",
-      "js/shared/gui-content.js",
-      "js/content.js"
-    ]
-  }],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["css/content.css"],
+      "js": ["vendor/jquery.min.js", "js/content.js"]
+    }
+  ],
   "background": {
-    "scripts": [
-      "js/shared/logger.js",
-      "js/shared/core.js",
-      "js/shared/store.js",
-      "js/shared/gui-global.js",
-      "js/background.js"
-    ]
+    "scripts": ["js/background.js"]
   },
   "browser_action": {
     "default_popup": "popup.html",
@@ -41,15 +26,11 @@
     "128": "img/favicon-128x128.png",
     "32": "img/favicon-32x32.png"
   },
-  "permissions": [
-    "storage",
-    "tabs",
-    "<all_urls>"
-  ],
+  "permissions": ["storage", "tabs", "<all_urls>"],
   "applications": {
     "gecko": {
       "id": "benwinding@gmail.com"
     }
-  },  
+  },
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
