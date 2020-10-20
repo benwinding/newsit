@@ -1,19 +1,26 @@
-import { core } from "./shared/core";
-import * as store from "./shared/store";
-const logg = core.logger.MakeLogger("content.js");
+import React from "react";
+import ReactDOM from "react-dom";
+
+import { front } from "./browser/front";
+// import * as store from "./shared/store";
+// const logg = core.logger.MakeLogger("content.js");
 
 async function getIsBlackListed() {
-  const thisUrl = await store.getCurrentTabUrl();
-  const isBlackListed = await store.isBlackListed(thisUrl);
+  const thisUrl = await front.getCurrentTabUrl();
+  const isBlackListed = await front.isBlackListed(thisUrl);
   return isBlackListed;
 }
 
-async function setHostBlacklisted(url, isBlackListed) {
-  await store.setHost(url, isBlackListed);
-  const tabId = await store.getCurrentTabId();
-  const isAllEnabled = await store.isEnabled();
+async function setHostBlacklisted(url: string, isBlackListed: boolean) {
+  if (isBlackListed) {
+    await front.setHostDontRun(url);
+  } else {
+    await front.setHostRun(url);
+  }
+  // const tabId = await front.getCurrentTabId();
+  const isAllEnabled = await front.getIsAllEnabled();
   const iconOn = isAllEnabled && !isBlackListed;
-  core.sendMessageIconEnabled(iconOn, tabId);
+  front.sendMessage('change_icon_enable', iconOn);
 }
 
 const formBtnsLocation = [
@@ -35,7 +42,7 @@ const formBtnsLocation = [
   },
 ];
 
-const calculateBtnSize = (val) => {
+const calculateBtnSize = (val: number) => {
   const max = 129;
   const min = 19;
   const scaled = (val - 0.2) * 38 + 2 * 14;
@@ -43,7 +50,7 @@ const calculateBtnSize = (val) => {
 };
 
 // let version = 0;
-export function MyComp(props) {
+export function MyComp(props: any) {
   const [version, setVersion] = React.useState(null);
   const [hasSiteEnabled, setHasSiteEnabled] = React.useState(false);
   const [hasRunAutomatic, setHasRunAutomatic] = React.useState(false);
@@ -51,11 +58,11 @@ export function MyComp(props) {
   const [formBtnsSize, setFormBtnsSize] = React.useState(1);
   const [btnSizePx, setBtnSizePx] = React.useState(calculateBtnSize(1));
   const [currentUrl, setCurrentUrl] = React.useState("");
-  const [currentTabId, setCurrentTabId] = React.useState("");
+  const [currentTabId, setCurrentTabId] = React.useState(0);
 
   React.useEffect(() => {
     let isMounted = true;
-    core
+    front
       .getStorage({
         isEnabled: true,
         btnsize: 0.8,
@@ -68,43 +75,41 @@ export function MyComp(props) {
         setBtnSizePx(calculateBtnSize(vals.btnsize));
         setBtnsLocation(vals.placement);
       });
-    store.getCurrentTabUrl().then((currentUrl) => {
+    front.getCurrentTabUrl().then((currentUrl) => {
       isMounted && setCurrentUrl(currentUrl);
     });
-    store.getCurrentTabId().then((tabId) => {
+    front.getCurrentTabId().then((tabId) => {
       isMounted && setCurrentTabId(tabId);
     });
-    store.getVersion().then((version) => {
-      logg.log({ version });
+    front.getVersion().then((version: any) => {
       isMounted && setVersion(version);
     });
     getIsBlackListed().then((isBlackListed) => {
       const siteIsEnabled = !isBlackListed;
-      logg.log({ siteIsEnabled });
       isMounted && setHasSiteEnabled(siteIsEnabled);
     });
     return () => (isMounted = false);
   }, []);
 
-  const siteEnabledChanged = (e) => {
-    const checked = e.nativeEvent.target.checked;
+  const siteEnabledChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
     const isBlackListed = !checked;
     setHostBlacklisted(currentUrl, isBlackListed);
     setHasSiteEnabled(checked);
   };
-  const runAutomaticChanged = (e) => {
-    const allEnabled = e.nativeEvent.target.checked;
+  const runAutomaticChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const allEnabled = e.target.checked;
     setHasRunAutomatic(allEnabled);
-    store.setEnabledAll(allEnabled);
+    front.setEnabledAll(allEnabled);
     const iconOn = allEnabled && hasSiteEnabled;
-    core.sendMessageIconEnabled(iconOn, currentTabId);
+    front.sendMessage('change_icon_enable', iconOn);
   };
-  const onBtnsLocationChanged = (e) => {
-    const value = e.nativeEvent.target.value;
+  const onBtnsLocationChanged = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
     setBtnsLocation(value);
   };
-  const onFormBtnsSize = (e) => {
-    const value = e.nativeEvent.target.value;
+  const onFormBtnsSize = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = +e.target.value;
     setFormBtnsSize(value);
     setBtnSizePx(calculateBtnSize(value));
   };

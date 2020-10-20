@@ -8,10 +8,10 @@ console.log("webpack IS_PRODUCTION=" + isProd);
 module.exports = [
   {
     entry: {
-      // background: "./src/js/background.js",
+      background: "./src/js/background.ts",
       content: "./src/js/content.tsx",
-      // options: "./src/js/options.js",
-      // popup: "./src/js/popup.jsx",
+      options: "./src/js/options.js",
+      popup: "./src/js/popup.tsx",
     },
     output: {
       filename: "[name].js",

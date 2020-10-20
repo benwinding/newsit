@@ -13,6 +13,12 @@ console.log("       VERSION=" + version);
 console.log("        TARGET=" + target);
 console.log(" IS_PRODUCTION=" + isProduction);
 
+function getDevVersion() {
+  const versionPatch = parseInt((parseInt(new Date().getTime() / 1000) - 1603194242)/20);
+  const version = '1.2.' + versionPatch;
+  return version;
+}
+
 const conf = {
   vendorPaths: [
     "./node_modules/jquery/dist/jquery.min.js",
@@ -30,10 +36,10 @@ const conf = {
     manifest: `./src/manifest-${target}.json`,
   },
   webpack: {
-    build: "./build/**/*.js",
+    build: "./build/webpack/**/*.js",
   },
   output: {
-    dir: `./build-${target}`,
+    dir: `./build/${target}`,
     zipFile: `./build-${target}-${version}.zip`,
   },
 };
@@ -70,7 +76,7 @@ gulp.task("manifest", function () {
         return JSON.stringify(
           {
             description: process.env.npm_package_description,
-            version: process.env.npm_package_version,
+            version: isProduction ? process.env.npm_package_version : getDevVersion(),
             ...data,
           },
           null,
@@ -105,11 +111,11 @@ gulp.task(
 gulp.task(
   "watch",
   gulp.series("copy-code", function () {
-    gulp.watch(conf.src.html, ["html"]);
-    gulp.watch(conf.src.css, ["css"]);
-    gulp.watch(conf.src.images, ["images"]);
-    gulp.watch(conf.src.manifest, ["manifest"]);
-    gulp.watch(conf.webpack.build, ["copy-webpack-build"]);
+    gulp.watch(conf.src.html, gulp.series("html"));
+    gulp.watch(conf.src.css, gulp.series("css"));
+    gulp.watch(conf.src.images, gulp.series("images"));
+    gulp.watch(conf.src.manifest, gulp.series("manifest"));
+    gulp.watch(conf.webpack.build, gulp.series("copy-webpack-build"));
   })
 );
 

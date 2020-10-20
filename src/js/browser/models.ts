@@ -1,9 +1,11 @@
 export interface RootState {
   isEnabled: boolean;
   btnsize: number;
-  placement: string;
+  placement: PlacementType;
   blackListed: string[];
 }
+
+export type PlacementType = 'br' | 'bl' | 'tr' | 'tl';
 
 export interface MessageChannelObj {
   channel: MessageChannelType;

@@ -1,14 +1,91 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
+import { FrontApi } from "./browser/front";
+import { PlacementType } from "./browser/models";
 
-const root = document.createElement('div')
-document.appendChild(root)
+const root = document.createElement("div");
+document.body.appendChild(root);
 
-ReactDOM.render(
-  <h1>Hello, world!</h1>,
-  root
-);
+ReactDOM.render(<Container />, root);
 
+interface ButtonProps {
+  text: string;
+  link?: string;
+}
+
+const front = new FrontApi();
+
+function Container() {
+  const [location, setLocation] = useState(null as PlacementType);
+  const [reddit, setReddit] = useState({text: '...'} as ButtonProps);
+  const [hn, setHn] = useState({text: '...'} as ButtonProps);
+
+  useEffect(() => {
+    let mounted = true;
+    front.getStorage({ placement: "br" }).then((res) => {
+      if (mounted) {
+        setLocation(res.placement);
+      }
+    });
+    return () => (mounted = false);
+  }, []);
+
+  return (
+    <>
+      <Btns location={location} reddit={reddit} hn={hn} />
+    </>
+  );
+}
+
+function Btns(props: {
+  location: string;
+  reddit: ButtonProps;
+  hn: ButtonProps;
+}) {
+  const reddit = props.reddit;
+  const hn = props.reddit;
+  return (
+    <div id="newsit_container" className={"newsit_location_" + props.location}>
+      <table id="newsit_table">
+        <tr>
+          <td className="newsit_r">
+            <img
+              src="https://i.imgur.com/pXyqa4g.png"
+              className="newsit_icon"
+            />
+            <a
+              id="newsit_tdReddit"
+              className="newsit_btn"
+              target="_blank"
+              href={reddit && reddit.link}
+            >
+              {reddit && reddit.text}
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td className="newsit_r">
+            <img
+              src="https://i.imgur.com/XFmNHss.gif"
+              className="newsit_icon"
+            />
+            <a
+              id="newsit_tdHNews"
+              className="newsit_btn"
+              target="_blank"
+              href={hn && hn.link}
+            >
+              {hn && hn.text}
+            </a>
+          </td>
+        </tr>
+      </table>
+      <div id="newsit_charTest" className="newsit_btn">
+        A
+      </div>
+    </div>
+  );
+}
 
 // import React from "react";
 // import { BackApi } from './browser/back';
@@ -20,8 +97,6 @@ ReactDOM.render(
 // const back = new BackApi();
 
 // const containerId = "newsit_container";
-// const btnIdReddit = "newsit_tdReddit";
-// const btnIdHNews = "newsit_tdHNews";
 
 // function beforeCheck() {
 //   const containerHtml = `
@@ -57,7 +132,6 @@ ReactDOM.render(
 //   c.attr('class', positionClass);
 // }
 
-
 // function getBtn(btnId: string) {
 //   return $("#" + btnId);
 // }
@@ -76,15 +150,7 @@ ReactDOM.render(
 //   hlpr.resizeIconHeights();
 // }
 
-// function getSubmitLink(whichSource: string) {
-//   const title = encodeURI(document.title);
-//   const link = encodeURI(document.location.href);
-//   if (whichSource.includes("eddit")) {
-//     return `https://reddit.com/submit?title=${title}&url=${link}`;
-//   } else {
-//     return `https://news.ycombinator.com/submitlink?t=${title}&u=${link}`;
-//   }
-// }
+
 
 // function makeButtonFailed(btnId: string, whichSource: string) {
 //   const submitLink = getSubmitLink(whichSource);
@@ -180,7 +246,6 @@ ReactDOM.render(
 //   const urlString = request.url || location.href;
 //   runCheckApis(urlString);
 // }
-
 
 // back.onStorageChanged() sys.storage.onChanged.addListener(onChangedBtnSize);
 // sys.storage.onChanged.addListener(onChangedBtnPlacement);
