@@ -1,6 +1,5 @@
 const del = require("del");
 const gulp = require("gulp");
-const gulpSequence = require("gulp-sequence");
 const imagemin = require("gulp-imagemin");
 const jsonTransform = require("gulp-json-transform");
 const rename = require("gulp-rename");
@@ -94,7 +93,7 @@ gulp.task("copy-webpack-build", function () {
 
 gulp.task(
   "copy-code",
-  gulpSequence("copy-webpack-build", [
+  gulp.series("copy-webpack-build", [
     "html",
     "images",
     "manifest",
@@ -103,13 +102,16 @@ gulp.task(
   ])
 );
 
-gulp.task("watch", ['copy-code'], function () {
-  gulp.watch(conf.src.html, ["html"]);
-  gulp.watch(conf.src.css, ["css"]);
-  gulp.watch(conf.src.images, ["images"]);
-  gulp.watch(conf.src.manifest, ["manifest"]);
-  gulp.watch(conf.webpack.build, ["copy-webpack-build"]);
-});
+gulp.task(
+  "watch",
+  gulp.series("copy-code", function () {
+    gulp.watch(conf.src.html, ["html"]);
+    gulp.watch(conf.src.css, ["css"]);
+    gulp.watch(conf.src.images, ["images"]);
+    gulp.watch(conf.src.manifest, ["manifest"]);
+    gulp.watch(conf.webpack.build, ["copy-webpack-build"]);
+  })
+);
 
 gulp.task("zip", function () {
   return gulp
@@ -118,6 +120,6 @@ gulp.task("zip", function () {
     .pipe(gulp.dest("./"));
 });
 
-gulp.task("build", gulpSequence("clean", "copy-code", "zip"));
+gulp.task("build", gulp.series("clean", "copy-code", "zip"));
 
-gulp.task("default", ["build"]);
+gulp.task("default", gulp.series("build"));
