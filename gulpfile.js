@@ -14,8 +14,10 @@ console.log("        TARGET=" + target);
 console.log(" IS_PRODUCTION=" + isProduction);
 
 function getDevVersion() {
-  const versionPatch = parseInt((parseInt(new Date().getTime() / 1000) - 1603194242)/20);
-  const version = '1.2.' + versionPatch;
+  const versionPatch = parseInt(
+    (parseInt(new Date().getTime() / 1000) - 1603194242) / 20
+  );
+  const version = "1.2." + versionPatch;
   return version;
 }
 
@@ -36,7 +38,7 @@ const conf = {
     manifest: `./src/manifest-${target}.json`,
   },
   webpack: {
-    build: "./build/webpack/**/*.js",
+    build: "./build/webpack/**/*",
   },
   output: {
     dir: `./build/${target}`,
@@ -76,7 +78,9 @@ gulp.task("manifest", function () {
         return JSON.stringify(
           {
             description: process.env.npm_package_description,
-            version: isProduction ? process.env.npm_package_version : getDevVersion(),
+            version: isProduction
+              ? process.env.npm_package_version
+              : getDevVersion(),
             ...data,
           },
           null,
@@ -97,6 +101,14 @@ gulp.task("copy-webpack-build", function () {
   return gulp.src(conf.webpack.build).pipe(gulp.dest(conf.output.dir + "/js"));
 });
 
+var { exec } = require("child_process");
+gulp.task("webpack-compile-watch", function (done) {
+  var proc = exec("npm run watch-webpack");
+  proc.stdout.on("data", function (data) {
+    console.log(data);
+  });
+});
+
 gulp.task(
   "copy-code",
   gulp.series("copy-webpack-build", [
@@ -109,8 +121,8 @@ gulp.task(
 );
 
 gulp.task(
-  "watch",
-  gulp.series("copy-code", function () {
+  "watch-and-copy",
+  gulp.series("copy-code", function (done) {
     gulp.watch(conf.src.html, gulp.series("html"));
     gulp.watch(conf.src.css, gulp.series("css"));
     gulp.watch(conf.src.images, gulp.series("images"));
@@ -118,6 +130,8 @@ gulp.task(
     gulp.watch(conf.webpack.build, gulp.series("copy-webpack-build"));
   })
 );
+
+gulp.task("watch", gulp.parallel("webpack-compile-watch", "watch-and-copy"));
 
 gulp.task("zip", function () {
   return gulp

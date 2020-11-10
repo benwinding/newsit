@@ -1,7 +1,7 @@
 import { MessageChannelObj, MessageChannelType, RootState } from "./models";
 import { system } from "./browser";
 
-export class BackApi {
+export const MessageApi = {
   onStorageChanged(storageKey: keyof RootState, cb: (newValue: any) => void) {
     type StorageChanges = { [key: string]: chrome.storage.StorageChange };
     function listenerCallback(changes: StorageChanges) {
@@ -12,9 +12,26 @@ export class BackApi {
       });
     }
     system.storage.onChanged.addListener(listenerCallback);
-  }
-
-  onMessage(channel: MessageChannelType, cb: (data: any) => void) {
+  },
+  requestWithResponse<T>(channel: MessageChannelType, data?: {}): Promise<T> {
+    return new Promise((resolve) => {
+      const msg: MessageChannelObj = {
+        channel: channel,
+        data: data,
+      };
+      system.runtime.sendMessage(msg, (response) => {
+        resolve(response);
+      });
+    });
+  },
+  emitEvent<T>(channel: MessageChannelType, data: {}): void {
+    const msg: MessageChannelObj = {
+      channel: channel,
+      data: data,
+    };
+    system.runtime.sendMessage(msg);
+  },
+  subscribeTo(channel: MessageChannelType, cb: (data: any, tabId?: number) => Promise<any>) {
     function listenerCallback(
       request: MessageChannelObj,
       sender: chrome.runtime.MessageSender,
@@ -23,9 +40,12 @@ export class BackApi {
       if (request.channel !== channel) {
         return;
       }
-      sendResponse(request.data);
-      !!cb && cb(request.data);
+      const tabId = sender.tab && sender.tab.id;
+      cb(request.data, tabId).then((result) => {
+        sendResponse(result);
+      });
+      return true;
     }
     system.runtime.onMessage.addListener(listenerCallback);
-  }
-}
+  },
+};

@@ -1,124 +1,159 @@
-// import { system, logger, getStorage } from "./shared/core";
-// import { gui } from "./shared/gui-global";
-// import { store } from "./shared/store";
-
-// // ACTIONS
+// ACTIONS
 // const logg = logger.MakeLogger("background.js");
 
-// type MessageSender = chrome.runtime.MessageSender;
+import { system } from "./browser/browser";
+import { front } from "./browser/front";
+import { MessageApi } from "./browser/messages";
 
-// function sendCheckCommand(tabId: number, url: any) {
-//   const request = {
-//     action: "check",
-//     url: url,
-//   };
-//   system.tabs.sendMessage(tabId, request);
-// }
+type MessageSender = chrome.runtime.MessageSender;
 
-// function sendTabNowActiveCommand(tabId: number) {
-//   const request = {
-//     action: "nowActive",
-//   };
-//   system.tabs.sendMessage(tabId, request);
-// }
+function sendCheckCommand(tabId: number, url: any) {
+  const request = {
+    action: "check",
+    url: url,
+  };
+  system.tabs.sendMessage(tabId, request);
+}
 
-// function setIcon(state: boolean, tabId?: number) {
-//   gui.setIconColour(state, tabId);
-//   gui.setIconText(state, tabId);
-// }
+function sendTabNowActiveCommand(tabId: number) {
+  const request = {
+    action: "nowActive",
+  };
+  system.tabs.sendMessage(tabId, request);
+}
 
-// // LISTENERS
+function setIcon(state: boolean, tabId?: number) {
+  // gui.setIconColour(state, tabId);
+  // gui.setIconText(state, tabId);
+}
 
-// function onChangeEnabled(changes: { [x: string]: { newValue: any } }) {
-//   if (changes["isEnabled"] == null) return;
-//   const isEnabled = changes["isEnabled"].newValue;
-//   logg.log(`onIconEnabled: tab=ALL, isEnabled=${isEnabled}`);
-//   setIcon(isEnabled);
-// }
+// LISTENERS
 
-// function onIconEnabled(
-//   request: { iconIsEnabled: any; queryString: any },
-//   sender: MessageSender,
-//   sendResponse: (data: any) => void
-// ): boolean {
-//   if (request.iconIsEnabled == null) return;
-//   const isEnabled = request.iconIsEnabled;
-//   const tabId = sender.tab.id;
-//   logg.log(`onIconEnabled: tab=${tabId}, isEnabled=${isEnabled}`);
-//   setIcon(isEnabled, tabId);
-// }
+function onChangeEnabled(isEnabled: boolean) {
+  setIcon(isEnabled);
+}
 
-// function onTabChangeUrl(tabId: any, changeInfo: { url: any }, tab: any) {
-//   if (!changeInfo.url) return;
-//   logg.log(`tab: ${tabId}, url changed to: ${changeInfo.url}`);
-//   store
-//     .isEnabled()
-//     .then(() => {
-//       sendCheckCommand(tabId, changeInfo.url);
-//     })
-//     .catch((err) => logg.log("onTabChangeUrl", err));
-// }
+async function onIconEnabled(isEnabled: boolean, tabId: number) {
+  // logg.log(`onIconEnabled: tab=${tabId}, isEnabled=${isEnabled}`);
+  setIcon(isEnabled, tabId);
+}
 
-// async function onTabChangeActive(activeInfo: { tabId: any }) {
-//   const tabId = activeInfo.tabId;
-//   logg.log(`onTabChangeActive, tab: ${tabId}, is the new ActiveTab`);
-//   try {
-//     await store.isEnabled()
-//     const tabUrl = await store.getTabUrl(tabId)
-//     await store.isNotBlackListed(tabUrl)
-//     sendTabNowActiveCommand(tabId)
-//     setIcon(true, tabId);    
-//   } catch (error) {
-//     setIcon(false, tabId);
-//   }
-// }
+function onTabChangeUrl(tabId: any, changeInfo: { url: any }, tab: any) {
+  if (!changeInfo.url) return;
+  // logg.log(`tab: ${tabId}, url changed to: ${changeInfo.url}`);
+  // store
+  //   .isEnabled()
+  //   .then(() => {
+  //     sendCheckCommand(tabId, changeInfo.url);
+  //   })
+  // .catch((err) => logg.log("onTabChangeUrl", err));
+}
 
-// async function makeRequest(
-//   url: RequestInfo,
-//   isJson: boolean
-// ): Promise<string | any> {
-//   logg.log("makeRequest", { url, isJson });
-//   const res = await fetch(url);
-//   if (isJson) {
-//     return res.json();
-//   } else {
-//     return res.text();
-//   }
-// }
+async function onTabChangeActive(activeInfo: { tabId: any }) {
+  const tabId = activeInfo.tabId;
+  // logg.log(`onTabChangeActive, tab: ${tabId}, is the new ActiveTab`);
+  // try {
+  //   await front.isEnabled()
+  //   const tabUrl = await front.getTabUrl(tabId)
+  //   await front.isNotBlackListed(tabUrl)
+  //   sendTabNowActiveCommand(tabId)
+  //   setIcon(true, tabId);
+  // } catch (error) {
+  //   setIcon(false, tabId);
+  // }
+}
 
-// function onRequestBackgroundHN(
-//   request: { isHn: any; queryString: any },
-//   sender: MessageSender,
-//   sendResponse: (data: any) => void
-// ): boolean {
-//   if (!request.isHn) return;
-//   var queryString = request.queryString;
-//   const requestUrl = "https://hn.algolia.com/api/v1/search?" + queryString;
-//   makeRequest(requestUrl, true).then((data) => sendResponse(data));
-//   return true; // Will respond asynchronously.
-// }
+async function makeRequest(
+  url: RequestInfo,
+  isJson: boolean
+): Promise<string | any> {
+  // logg.log("makeRequest", { url, isJson });
+  const res = await fetch(url);
+  if (isJson) {
+    return res.json();
+  } else {
+    return res.text();
+  }
+}
 
-// function onRequestBackgroundReddit(
-//   request: { isReddit: any; queryString: any },
-//   sender: MessageSender,
-//   sendResponse: (data: any) => void
-// ) {
-//   if (!request.isReddit) return;
-//   var queryString = request.queryString;
-//   const requestUrl = "https://old.reddit.com/search?" + queryString;
-//   makeRequest(requestUrl, false).then((data) => sendResponse(data));
-//   return true; // Will respond asynchronously.
-// }
+async function onRequestBackgroundHN(data: string, tabId: number) {
+  const t = await front.getTab(tabId);
+  const searchUrl = t.url;
+  const blocked = await front.isBlackListed(searchUrl);
+  if (blocked) {
+    return;
+  }
+  const queryString = `query=${encodeURIComponent(
+    searchUrl
+  )}&restrictSearchableAttributes=url`;
+  const requestUrl = "https://hn.algolia.com/api/v1/search?" + queryString;
+  interface HnJsonRes {
+    nbHits: number,
+    hits: {
+      url: string,
+      num_comments: number,
+      objectID: string
+    }[]
+  }
+  const res: HnJsonRes = await makeRequest(requestUrl, true);
+  if (res.nbHits == 0) {
+    throw new Error("Hacker News API: No urls found");
+  }
+  let allhits = res.hits;
+  let num_of_comments = 0;
+  let result_id = null;
+  for (let hit of allhits) {
+    const hitUrl = hit.url;
+    if (
+      isMatchTwoUrls(hitUrl, searchUrl) &&
+      hit.num_comments >= num_of_comments
+    ) {
+      num_of_comments = hit.num_comments;
+      result_id = hit.objectID;
+    }
+  }
+  if (result_id == null) {
+    throw new Error("Hacker News API: No url matches found");
+  }
+  const linkUrl = `https://news.ycombinator.com/item?id=${result_id}`;
+  return {
+    link: linkUrl,
+    text: num_of_comments,
+  };
+}
 
-// system.tabs.onUpdated.addListener(onTabChangeUrl);
-// system.tabs.onActivated.addListener(onTabChangeActive);
+async function onRequestBackgroundReddit(data: string, tabId: number) {
+  const t = await front.getTab(tabId);
+  const searchUrl = t.url;
+  const blocked = await front.isBlackListed(searchUrl);
+  if (blocked) {
+    return;
+  }
+  const queryString = "sort=top&q=" + encodeURIComponent("url:" + searchUrl);
+  const requestUrl = "https://old.reddit.com/search?" + queryString;
+  const res = await makeRequest(requestUrl, false);
+  return res;
+}
+
+system.tabs.onUpdated.addListener(onTabChangeUrl);
+system.tabs.onActivated.addListener(onTabChangeActive);
 // system.storage.onChanged.addListener(onChangeEnabled);
-// system.runtime.onMessage.addListener(onIconEnabled);
-// system.runtime.onMessage.addListener(onRequestBackgroundHN);
-// system.runtime.onMessage.addListener(onRequestBackgroundReddit);
 
-// async function onStartUp() {
-//   const list = await getStorage({ isEnabled: true });
-//   setIcon(list["isEnabled"]);
-// }
-// onStartUp();
+MessageApi.subscribeTo("change_icon_enable", onIconEnabled);
+MessageApi.subscribeTo("request_hn", onRequestBackgroundHN);
+MessageApi.subscribeTo("request_reddit", onRequestBackgroundReddit);
+
+async function onStartUp() {
+  const list = await front.getStorage({ isEnabled: true });
+  setIcon(list["isEnabled"]);
+}
+onStartUp();
+
+function stripUrl(urlString: string) {
+  const url = new URL(urlString);
+  return url.host + url.pathname + url.search;
+}
+
+function isMatchTwoUrls(url1: string, url2: string) {
+  return stripUrl(url1) == stripUrl(url2);
+}

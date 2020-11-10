@@ -2,8 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import { front } from "./browser/front";
-// import * as store from "./shared/store";
-// const logg = core.logger.MakeLogger("content.js");
+import { MessageApi } from "./browser/messages";
 
 async function getIsBlackListed() {
   const thisUrl = await front.getCurrentTabUrl();
@@ -20,7 +19,7 @@ async function setHostBlacklisted(url: string, isBlackListed: boolean) {
   // const tabId = await front.getCurrentTabId();
   const isAllEnabled = await front.getIsAllEnabled();
   const iconOn = isAllEnabled && !isBlackListed;
-  front.sendMessage('change_icon_enable', iconOn);
+  MessageApi.emitEvent('change_icon_enable', iconOn);
 }
 
 const formBtnsLocation = [
@@ -102,7 +101,7 @@ export function MyComp(props: any) {
     setHasRunAutomatic(allEnabled);
     front.setEnabledAll(allEnabled);
     const iconOn = allEnabled && hasSiteEnabled;
-    front.sendMessage('change_icon_enable', iconOn);
+    MessageApi.emitEvent('change_icon_enable', iconOn);
   };
   const onBtnsLocationChanged = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -204,129 +203,3 @@ export function MyComp(props: any) {
 }
 
 ReactDOM.render(<MyComp />, document.getElementById("app"));
-
-/* 
-
-Vue.config.productionTip = false;
-import { core, sys } from "./shared/core";
-import { store } from "./shared/store";
-
-{
-
-
-
-
-    .then((items) => {
-      new Vue({
-        el: "#app",
-        data: {
-          formBtnsEnabled: items.isEnabled,
-          formBtnsSize: items.btnsize,
-          formBtnsLocation: items.placement,
-          options: {
-            formBtnsLocation: [
-              {
-                value: "br",
-                text: "Bottom Right",
-              },
-              {
-                value: "bl",
-                text: "Bottom Left",
-              },
-              {
-                value: "tr",
-                text: "Top Right",
-              },
-              {
-                value: "tl",
-                text: "Top Left",
-              },
-            ],
-          },
-          version: 0,
-          formCurrentSiteEnabled: true,
-          isLoadingBtn: false,
-        },
-        created: function () {
-          // `this` points to the vm instance
-          let a = this;
-          getIsNotBlackListed().then((isBlackListed) => {
-            a.formCurrentSiteEnabled = isBlackListed;
-          });
-          store.getVersion().then((version) => {
-            this.version = version;
-          });
-        },
-        computed: {
-          btnSizePx: function () {
-            const val = this.formBtnsSize;
-            const max = 129;
-            const min = 19;
-            const scaled = (val - 0.2) * 38 + 2 * 14;
-            return scaled;
-          },
-        },
-        watch: {
-          formBtnsEnabled: function (val, oldVal) {
-            store.setEnabledAll(val);
-            logg.log("formBtnsEnabled changed to: " + val);
-          },
-          formBtnsSize: function (val, oldVal) {
-            store.setBtnSize(val);
-            logg.log("formBtnsSize changed to: " + val);
-          },
-          formBtnsLocation: function (val, oldVal) {
-            store.setBtnPlacement(val);
-            logg.log("formBtnsLocation changed to: " + val);
-          },
-          formCurrentSiteEnabled: function (val, oldVal) {
-            store
-              .getCurrentTabUrl()
-              .then((thisUrl) => {
-                if (val) removeHostFromBlackList(thisUrl);
-                else addHostToBlackList(thisUrl);
-                let action = "nowActive";
-                this.messageCurrentTab({
-                  action: action,
-                });
-              })
-              .catch((err) => {
-                logg.error(err);
-              });
-          },
-        },
-        methods: {
-          messageCurrentTab: function (request) {
-            sys.tabs.query(
-              {
-                active: true,
-                windowType: "normal",
-                currentWindow: true,
-              },
-              function (d) {
-                let tabId = d[0].id;
-                logg.log(
-                  "Sending to tab with message, with request: " +
-                    JSON.stringify(request)
-                );
-                sys.tabs.sendMessage(tabId, request);
-              }
-            );
-          },
-          onClickCheckNow: function (e) {
-            // Called when the user clicks on the browser action.
-            this.messageCurrentTab({
-              action: "check",
-            });
-            const a = this;
-            a.isLoadingBtn = true;
-            setTimeout(function () {
-              a.isLoadingBtn = false;
-            }, 1000);
-          },
-        },
-      });
-    });
-}
-
-*/

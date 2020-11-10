@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import { MessageApi } from "./browser/messages";
 import { FrontApi } from "./browser/front";
 import { PlacementType } from "./browser/models";
 
@@ -17,16 +18,38 @@ const front = new FrontApi();
 
 function Container() {
   const [location, setLocation] = useState(null as PlacementType);
-  const [reddit, setReddit] = useState({text: '...'} as ButtonProps);
-  const [hn, setHn] = useState({text: '...'} as ButtonProps);
+  const [reddit, setReddit] = useState({ text: "..." } as ButtonProps);
+  const [hn, setHn] = useState({ text: "..." } as ButtonProps);
 
   useEffect(() => {
     let mounted = true;
+    console.log("content.tsx MOUNTED");
     front.getStorage({ placement: "br" }).then((res) => {
       if (mounted) {
         setLocation(res.placement);
       }
     });
+
+    async function getHn() {
+      return MessageApi.requestWithResponse<ButtonProps>("request_hn");
+    }
+
+    async function getReddit() {
+      return MessageApi.requestWithResponse<ButtonProps>("request_reddit");
+    }
+
+    getHn().then((res) => {
+      if (mounted) {
+        console.log("getHn", { res });
+        setHn(res);
+      }
+    }).catch(err => setHn({text: '-'}));
+    getReddit().then((res) => {
+      if (mounted) {
+        console.log("getReddit", { res });
+        setReddit(res);
+      }
+    }).catch(err => setReddit({text: '-'}));
     return () => (mounted = false);
   }, []);
 
@@ -42,8 +65,7 @@ function Btns(props: {
   reddit: ButtonProps;
   hn: ButtonProps;
 }) {
-  const reddit = props.reddit;
-  const hn = props.reddit;
+  const { reddit, hn } = props;
   return (
     <div id="newsit_container" className={"newsit_location_" + props.location}>
       <table id="newsit_table">
@@ -149,8 +171,6 @@ function Btns(props: {
 // function afterCheck() {
 //   hlpr.resizeIconHeights();
 // }
-
-
 
 // function makeButtonFailed(btnId: string, whichSource: string) {
 //   const submitLink = getSubmitLink(whichSource);

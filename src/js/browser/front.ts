@@ -1,22 +1,10 @@
-import { MessageChannelObj, MessageChannelType, RootState } from "./models";
+import { RootState } from "./models";
 import { system } from "./browser";
 // export { logger } from "../shared/logger";
 
 export class FrontApi {
-  async sendMessage<T>(channel: MessageChannelType, data: {}): Promise<T> {
-    return new Promise((resolve) => {
-      const msg: MessageChannelObj = {
-        channel: channel,
-        data: data,
-      };
-      system.runtime.sendMessage(msg, (response) => {
-        resolve(response);
-      });
-    });
-  }
-
   async getStorage<T extends Partial<RootState>>(defaultValues: T): Promise<T> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       system.storage.sync.get(defaultValues, (values) => {
         resolve(values as T);
       });
@@ -24,7 +12,7 @@ export class FrontApi {
   }
 
   async setStorage<T extends Partial<RootState>>(defaultValues: T): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       system.storage.sync.set(defaultValues, () => {
         resolve();
       });
@@ -33,7 +21,7 @@ export class FrontApi {
 
 
   async getCurrentTabUrl(): Promise<string> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       system.tabs.query(
         {
           active: true,
@@ -49,8 +37,14 @@ export class FrontApi {
     });
   }
 
+  async getTab(tabId: number): Promise<chrome.tabs.Tab> {
+    return new Promise((resolve) => {
+      system.tabs.get(tabId, (t) => resolve(t));
+    });
+  }
+
   async getCurrentTabId(): Promise<number>  {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       system.tabs.query(
         {
           active: true,
@@ -67,7 +61,7 @@ export class FrontApi {
   }
 
   getVersion() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       system.management.getSelf((ext) => {
         resolve(ext.version);
       });
