@@ -5,6 +5,7 @@ function browser(): typeof chrome {
 }
 
 export const system = browser();
+
 export async function getStorage<T>(values: T): Promise<T> {
   return new Promise((resolve, reject) => {
     system.storage.sync.get(values, (items) => {

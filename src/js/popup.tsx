@@ -3,6 +3,8 @@ import ReactDOM from "react-dom";
 
 import { front } from "./browser/front";
 import { MessageApi } from "./browser/messages";
+import { ButtonResult } from "./browser/models";
+import { useApi } from "./browser/react-utils";
 
 async function getIsBlackListed() {
   const thisUrl = await front.getCurrentTabUrl();
@@ -19,7 +21,7 @@ async function setHostBlacklisted(url: string, isBlackListed: boolean) {
   // const tabId = await front.getCurrentTabId();
   const isAllEnabled = await front.getIsAllEnabled();
   const iconOn = isAllEnabled && !isBlackListed;
-  MessageApi.emitEvent('change_icon_enable', iconOn);
+  MessageApi.emitEvent("change_icon_enable", iconOn);
 }
 
 const formBtnsLocation = [
@@ -48,6 +50,9 @@ const calculateBtnSize = (val: number) => {
   return scaled;
 };
 
+const setTimeoutAsyc = (ms: number) =>
+  new Promise((res) => setTimeout(res, ms));
+
 // let version = 0;
 export function MyComp(props: any) {
   const [version, setVersion] = React.useState(null);
@@ -57,7 +62,11 @@ export function MyComp(props: any) {
   const [formBtnsSize, setFormBtnsSize] = React.useState(1);
   const [btnSizePx, setBtnSizePx] = React.useState(calculateBtnSize(1));
   const [currentUrl, setCurrentUrl] = React.useState("");
-  const [currentTabId, setCurrentTabId] = React.useState(0);
+  const [result, fetchHn, loadingHn] = useApi<void>(async () => {
+    const tabId = await front.getCurrentTabId();
+    MessageApi.emitEventToTab("request_hn", tabId);
+    await setTimeoutAsyc(200);
+  }, null);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -77,9 +86,6 @@ export function MyComp(props: any) {
     front.getCurrentTabUrl().then((currentUrl) => {
       isMounted && setCurrentUrl(currentUrl);
     });
-    front.getCurrentTabId().then((tabId) => {
-      isMounted && setCurrentTabId(tabId);
-    });
     front.getVersion().then((version: any) => {
       isMounted && setVersion(version);
     });
@@ -96,14 +102,18 @@ export function MyComp(props: any) {
     setHostBlacklisted(currentUrl, isBlackListed);
     setHasSiteEnabled(checked);
   };
-  const runAutomaticChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const runAutomaticChanged = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const allEnabled = e.target.checked;
     setHasRunAutomatic(allEnabled);
     front.setEnabledAll(allEnabled);
     const iconOn = allEnabled && hasSiteEnabled;
-    MessageApi.emitEvent('change_icon_enable', iconOn);
+    MessageApi.emitEvent("change_icon_enable", iconOn);
   };
-  const onBtnsLocationChanged = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const onBtnsLocationChanged = async (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const value = e.target.value;
     setBtnsLocation(value);
   };
@@ -112,6 +122,10 @@ export function MyComp(props: any) {
     setFormBtnsSize(value);
     setBtnSizePx(calculateBtnSize(value));
   };
+
+  async function onClickCheck() {
+    return fetchHn()
+  }
 
   return (
     <div className="column">
@@ -129,7 +143,13 @@ export function MyComp(props: any) {
         <section className="form">
           <div className="field">
             <div className="control has-text-centered">
-              <button className="button is-info">Check Current Page</button>
+              <button
+                onClick={(e) => !loadingHn && onClickCheck()}
+                disabled={loadingHn}
+                className={"button is-info " + (loadingHn ? "is-loading" : "")}
+              >
+                Check Current Page
+              </button>
             </div>
           </div>
           <div className="field">
@@ -203,3 +223,4 @@ export function MyComp(props: any) {
 }
 
 ReactDOM.render(<MyComp />, document.getElementById("app"));
+

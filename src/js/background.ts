@@ -4,6 +4,7 @@
 import { system } from "./browser/browser";
 import { front } from "./browser/front";
 import { MessageApi } from "./browser/messages";
+import { ButtonResult } from "./browser/models";
 
 type MessageSender = chrome.runtime.MessageSender;
 
@@ -67,7 +68,7 @@ async function makeRequest(
   url: RequestInfo,
   isJson: boolean
 ): Promise<string | any> {
-  // logg.log("makeRequest", { url, isJson });
+  console.log("makeRequest", { url, isJson });
   const res = await fetch(url);
   if (isJson) {
     return res.json();
@@ -76,28 +77,34 @@ async function makeRequest(
   }
 }
 
-async function onRequestBackgroundHN(data: string, tabId: number) {
+async function onRequestBackgroundHN(tabId: number): Promise<ButtonResult> {
   const t = await front.getTab(tabId);
   const searchUrl = t.url;
   const blocked = await front.isBlackListed(searchUrl);
   if (blocked) {
-    return;
+    console.log("Hacker News API: Url blocked");
+    return {
+      text: "-",
+    };
   }
   const queryString = `query=${encodeURIComponent(
     searchUrl
   )}&restrictSearchableAttributes=url`;
   const requestUrl = "https://hn.algolia.com/api/v1/search?" + queryString;
   interface HnJsonRes {
-    nbHits: number,
+    nbHits: number;
     hits: {
-      url: string,
-      num_comments: number,
-      objectID: string
-    }[]
+      url: string;
+      num_comments: number;
+      objectID: string;
+    }[];
   }
   const res: HnJsonRes = await makeRequest(requestUrl, true);
   if (res.nbHits == 0) {
-    throw new Error("Hacker News API: No urls found");
+    console.log("Hacker News API: No urls found");
+    return {
+      text: "-",
+    };
   }
   let allhits = res.hits;
   let num_of_comments = 0;
@@ -113,35 +120,69 @@ async function onRequestBackgroundHN(data: string, tabId: number) {
     }
   }
   if (result_id == null) {
-    throw new Error("Hacker News API: No url matches found");
+    console.log("Hacker News API: No urls matches found");
+    return {
+      text: "-",
+    };
   }
   const linkUrl = `https://news.ycombinator.com/item?id=${result_id}`;
-  return {
+  const responseData = {
+    text: num_of_comments + "",
     link: linkUrl,
-    text: num_of_comments,
   };
+  return responseData;
 }
 
-async function onRequestBackgroundReddit(data: string, tabId: number) {
+async function onRequestBackgroundReddit(tabId: number): Promise<ButtonResult> {
   const t = await front.getTab(tabId);
   const searchUrl = t.url;
   const blocked = await front.isBlackListed(searchUrl);
   if (blocked) {
-    return;
+    console.log("Reddit API: Url blocked");
+    return {
+      text: '-'
+    };
   }
   const queryString = "sort=top&q=" + encodeURIComponent("url:" + searchUrl);
   const requestUrl = "https://old.reddit.com/search?" + queryString;
-  const res = await makeRequest(requestUrl, false);
-  return res;
+  const data = await makeRequest(requestUrl, false);
+  const html = document.createElement('html');
+  html.innerHTML = data;
+  // const html = $($.parseHTML(data));
+  const searchResultsComments = html.querySelectorAll("a.search-comments");
+  if (searchResultsComments.length == 0) {
+    console.log("Reddit API: No urls matches found");
+    return {
+      text: '-'
+    };
+  }
+  const firstCommentsLink = searchResultsComments[0] as any;
+  const commentTextArr = firstCommentsLink.text.split(" ");
+  const num_of_comments = commentTextArr.length > 1 ? commentTextArr[0] : 0;
+
+  firstCommentsLink.hostname = "reddit.com";
+  return {
+    link: firstCommentsLink.href,
+    text: num_of_comments + '',
+  };
 }
 
 system.tabs.onUpdated.addListener(onTabChangeUrl);
 system.tabs.onActivated.addListener(onTabChangeActive);
 // system.storage.onChanged.addListener(onChangeEnabled);
 
-MessageApi.subscribeTo("change_icon_enable", onIconEnabled);
-MessageApi.subscribeTo("request_hn", onRequestBackgroundHN);
-MessageApi.subscribeTo("request_reddit", onRequestBackgroundReddit);
+// MessageApi.onEvent("change_icon_enable", onIconEnabled);
+MessageApi.onEvent("request_hn", (d, s) =>
+  onRequestBackgroundHN(s.tab.id).then((res) =>
+    MessageApi.emitEventToTab("result_from_hn", s.tab.id, res)
+  )
+);
+MessageApi.onEvent("request_reddit", (d, s) =>
+  onRequestBackgroundReddit(s.tab.id).then((res) =>
+    MessageApi.emitEventToTab("result_from_reddit", s.tab.id, res)
+  )
+);
+// MessageApi.subscribeTo("request_reddit", onRequestBackgroundReddit);
 
 async function onStartUp() {
   const list = await front.getStorage({ isEnabled: true });

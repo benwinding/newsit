@@ -24,26 +24,34 @@ export const MessageApi = {
       });
     });
   },
-  emitEvent<T>(channel: MessageChannelType, data: {}): void {
+  emitEvent(channel: MessageChannelType, data?: {}): void {
     const msg: MessageChannelObj = {
       channel: channel,
       data: data,
     };
     system.runtime.sendMessage(msg);
   },
-  subscribeTo(channel: MessageChannelType, cb: (data: any, tabId?: number) => Promise<any>) {
+  emitEventToTab(channel: MessageChannelType, tabId: number, data?: {}): void {
+    const msg: MessageChannelObj = {
+      channel: channel,
+      data: data,
+    };
+    system.tabs.sendMessage(tabId, msg);
+  },
+  onEvent<T>(
+    channel: MessageChannelType,
+    cb: (data: T, sender?: chrome.runtime.MessageSender) => Promise<any> | any
+  ): void {
     function listenerCallback(
       request: MessageChannelObj,
       sender: chrome.runtime.MessageSender,
-      sendResponse: (data: any) => void
     ) {
-      if (request.channel !== channel) {
+      const sendingChannel = request && request.channel;
+      if (sendingChannel !== channel) {
         return;
       }
-      const tabId = sender.tab && sender.tab.id;
-      cb(request.data, tabId).then((result) => {
-        sendResponse(result);
-      });
+      console.log("onEvent: " + sendingChannel, { request });
+      cb(request.data, sender);
       return true;
     }
     system.runtime.onMessage.addListener(listenerCallback);
