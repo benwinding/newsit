@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./build/ts/",
     "lib": ["DOM", "ES2017"],
-    "types": ["jquery", "chrome"],
+    "types": ["jest", "jquery", "chrome"],
     "noImplicitAny": true,
     "module": "es6",
     "moduleResolution": "node",
@@ -10,5 +10,7 @@
     "target": "es5",
     "jsx": "react",
     "allowJs": true
-  }
+  },
+  "include": ["src"],
+  "exclude": ["**/*.spec.ts", "**/*.spec.tsx", "**/*.spec.js"]
 }

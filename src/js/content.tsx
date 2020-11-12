@@ -3,7 +3,6 @@ import ReactDOM from "react-dom";
 import { MessageApi } from "./browser/messages";
 import { FrontApi } from "./browser/front";
 import { ButtonResult, PlacementType } from "./browser/models";
-import { system } from "./browser/browser";
 
 const root = document.createElement("div");
 document.body.appendChild(root);
