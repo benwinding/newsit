@@ -1,8 +1,11 @@
 import { RootState } from "./models";
 import { system } from "./browser";
-// export { logger } from "../shared/logger";
 
 export class FrontApi {
+  getLocalAssetUrl(path: string): string {
+    return system.runtime.getURL(path);
+  }
+
   async getStorage<T extends Partial<RootState>>(defaultValues: T): Promise<T> {
     return new Promise((resolve) => {
       system.storage.sync.get(defaultValues, (values) => {
@@ -11,9 +14,9 @@ export class FrontApi {
     });
   }
 
-  async setStorage<T extends Partial<RootState>>(defaultValues: T): Promise<void> {
+  async setStorage<T extends Partial<RootState>>(newValues: T): Promise<void> {
     return new Promise((resolve) => {
-      system.storage.sync.set(defaultValues, () => {
+      system.storage.sync.set(newValues, () => {
         resolve();
       });
     });

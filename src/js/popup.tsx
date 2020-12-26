@@ -3,13 +3,28 @@ import ReactDOM from "react-dom";
 
 import { front } from "./browser/front";
 import { MessageApi } from "./browser/messages";
-import { ButtonResult } from "./browser/models";
+import { PlacementType } from "./browser/models";
 import { useApi } from "./browser/react-utils";
 
 async function getIsBlackListed() {
   const thisUrl = await front.getCurrentTabUrl();
   const isBlackListed = await front.isBlackListed(thisUrl);
   return isBlackListed;
+}
+
+export function debounce<T>(
+  fn: (v: T) => void,
+  delayMs: number
+): (v: T) => void {
+  let timeoutID = 0;
+  return function () {
+    clearTimeout(timeoutID);
+    var args = arguments;
+    var that = this;
+    timeoutID = setTimeout(function () {
+      fn.apply(that, args);
+    }, delayMs);
+  };
 }
 
 async function setHostBlacklisted(url: string, isBlackListed: boolean) {
@@ -43,24 +58,29 @@ const formBtnsLocation = [
   },
 ];
 
-const calculateBtnSize = (val: number) => {
-  const max = 129;
-  const min = 19;
-  const scaled = (val - 0.2) * 38 + 2 * 14;
-  return scaled;
-};
-
 const setTimeoutAsyc = (ms: number) =>
   new Promise((res) => setTimeout(res, ms));
+
+const debounceSetEnabled = debounce<boolean>(
+  (val) => front.setEnabledAll(val),
+  300
+);
+const debounceSetPlacement = debounce<PlacementType>(
+  (val) => front.setStorage({ placement: val }),
+  300
+);
+const debounceSetSize = debounce<number>(
+  (val) => front.setStorage({ btnsize: val }),
+  300
+);
 
 // let version = 0;
 export function MyComp(props: any) {
   const [version, setVersion] = React.useState(null);
   const [hasSiteEnabled, setHasSiteEnabled] = React.useState(false);
   const [hasRunAutomatic, setHasRunAutomatic] = React.useState(false);
-  const [btnsLocation, setBtnsLocation] = React.useState("br");
+  const [btnsLocation, setBtnsLocation] = React.useState("br" as PlacementType);
   const [formBtnsSize, setFormBtnsSize] = React.useState(1);
-  const [btnSizePx, setBtnSizePx] = React.useState(calculateBtnSize(1));
   const [currentUrl, setCurrentUrl] = React.useState("");
   const [result, fetchHn, loadingHn] = useApi<void>(async () => {
     const tabId = await front.getCurrentTabId();
@@ -80,7 +100,6 @@ export function MyComp(props: any) {
         if (!isMounted) return;
         setHasRunAutomatic(vals.isEnabled);
         setFormBtnsSize(vals.btnsize);
-        setBtnSizePx(calculateBtnSize(vals.btnsize));
         setBtnsLocation(vals.placement);
       });
     front.getCurrentTabUrl().then((currentUrl) => {
@@ -107,24 +126,27 @@ export function MyComp(props: any) {
   ) => {
     const allEnabled = e.target.checked;
     setHasRunAutomatic(allEnabled);
-    front.setEnabledAll(allEnabled);
+    debounceSetEnabled(allEnabled);
     const iconOn = allEnabled && hasSiteEnabled;
     MessageApi.emitEvent("change_icon_enable", iconOn);
   };
   const onBtnsLocationChanged = async (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const value = e.target.value;
+    const value = e.target.value as PlacementType;
     setBtnsLocation(value);
+    debounceSetPlacement(value);
   };
-  const onFormBtnsSize = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFormBtnsSizeChanged = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = +e.target.value;
     setFormBtnsSize(value);
-    setBtnSizePx(calculateBtnSize(value));
+    debounceSetSize(value);
   };
 
   async function onClickCheck() {
-    return fetchHn()
+    return fetchHn();
   }
 
   return (
@@ -201,7 +223,7 @@ export function MyComp(props: any) {
               <input
                 type="range"
                 value={formBtnsSize}
-                onChange={onFormBtnsSize}
+                onChange={onFormBtnsSizeChanged}
                 min="0.2"
                 max="2"
                 step="0.05"
@@ -212,7 +234,7 @@ export function MyComp(props: any) {
               <img
                 id="btnsPreview"
                 src="https://i.imgur.com/dVvDrfN.png"
-                style={{ height: btnSizePx + "px" }}
+                style={{ width: "100px", zoom: formBtnsSize }}
               />
             </div>
           </div>
@@ -223,4 +245,3 @@ export function MyComp(props: any) {
 }
 
 ReactDOM.render(<MyComp />, document.getElementById("app"));
-

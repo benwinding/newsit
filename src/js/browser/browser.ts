@@ -1,10 +1,10 @@
 // Get extension api Chrome or Firefox
-function browser(): typeof chrome {
-  const newsit_browser = window.chrome || (window as any)['browser'];
-  return newsit_browser;
+function getBrowserInstance(): typeof chrome {
+  const browserInstance = window.chrome || (window as any)['browser'];
+  return browserInstance;
 }
 
-export const system = browser();
+export const system = getBrowserInstance();
 
 export async function getStorage<T>(values: T): Promise<T> {
   return new Promise((resolve, reject) => {
