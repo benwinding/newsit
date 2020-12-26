@@ -80,17 +80,19 @@ function Container() {
       mounted && setPlacement(v);
     });
     MessageApi.onStorageChanged("btnsize", (v: number) => {
-      console.log("btnsize changed", v);
       mounted && setSize(v);
     });
     MessageApi.onEvent<ButtonResult>("result_from_hn", (res) => {
-      console.log("onEvent() hn", { res });
       mounted && setHn(res);
     });
     MessageApi.onEvent<ButtonResult>("result_from_reddit", (res) => {
-      console.log("onEvent() reddit", { res });
       mounted && setReddit(res);
     });
+    MessageApi.onEvent('tab_active', (d, s) => {
+      // Page Loaded Trigger
+      MessageApi.emitEvent("request_hn");
+      MessageApi.emitEvent("request_reddit");
+    })
 
     // Page Loaded Trigger
     MessageApi.emitEvent("request_hn");

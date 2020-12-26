@@ -11,22 +11,13 @@ import { MessageApi } from "./browser/messages";
 async function onTabChangeUrl(tabId: any, changeInfo: { url: any }, tab: any) {
   if (!changeInfo.url) return;
   console.log(`tab: ${tabId}, url changed to: ${changeInfo.url}`);
-  const isEnabled = await front.getIsAllEnabled();
-  if (!isEnabled) return;
-  const url = changeInfo.url;
-  const isBlackListed = await front.isBlackListed(url);
-  if (isBlackListed) return;
-  MessageApi.emitEvent("request_hn", url);
-  MessageApi.emitEvent("request_reddit", url);
+  MessageApi.emitEventToTab('tab_active', tabId);
 }
 
 async function onTabChangeActive(activeInfo: { tabId: any }) {
   const tabId = activeInfo.tabId;
   console.log(`onTabChangeActive, tab: ${tabId}, is the new ActiveTab`);
-  const result = await front.getStorage({ isEnabled: true });
-  if (!result.isEnabled) return;
-  MessageApi.emitEvent("request_hn");
-  MessageApi.emitEvent("request_reddit");
+  MessageApi.emitEventToTab('tab_active', tabId);
 }
 
 system.tabs.onUpdated.addListener(onTabChangeUrl);
