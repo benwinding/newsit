@@ -1,17 +1,23 @@
 import React, { CSSProperties, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { MessageApi } from "./browser/messages";
-import { FrontApi } from "./browser/front";
+import { front } from "./browser/front";
 import { ButtonResult, PlacementType } from "./browser/models";
 import { BtnItem } from "./shared/buttons";
 import { IFrame } from "./shared/IFrame";
+import { checkIsBlackListed } from "./shared/utils";
 
 const root = document.createElement("div");
 document.body.appendChild(root);
 
-ReactDOM.render(<Container />, root);
-
-const front = new FrontApi();
+const url = location.href;
+checkIsBlackListed(url).then((isBlackListed) => {
+  const iconEnabled = !isBlackListed;
+  MessageApi.emitEvent("change_icon_enable", iconEnabled);
+  if (!isBlackListed) {
+    ReactDOM.render(<Container />, root);
+  }
+})
 
 const LOADING = '...';
 
@@ -26,11 +32,6 @@ function Container() {
   const [hn, setHn] = useState({ text: LOADING } as ButtonResult);
   const [redditLogo, setRedditLogo] = React.useState("");
   const [hnLogo, setHnLogo] = React.useState("");
-
-  React.useEffect(() => {
-    setRedditLogo(front.getLocalAssetUrl("./img/reddit.png"));
-    setHnLogo(front.getLocalAssetUrl("./img/hn.png"));
-  }, []);
 
   React.useEffect(() => {
     const s: Partial<CSSProperties> = {};
@@ -58,10 +59,13 @@ function Container() {
         break;
     }
     setPlacementStyles(s);
-  }, [placement]);
+  }, [placement, size]);
 
   useEffect(() => {
     let mounted = true;
+
+    setRedditLogo(front.getLocalAssetUrl("./img/reddit.png"));
+    setHnLogo(front.getLocalAssetUrl("./img/hn.png"));
 
     // Initialize from storage
     front.getStorage({ placement: "br" }).then((res) => {

@@ -10,7 +10,7 @@ module.exports = [
     entry: {
       background: "./src/js/background.ts",
       content: "./src/js/content.tsx",
-      options: "./src/js/options.js",
+      options: "./src/js/options.tsx",
       popup: "./src/js/popup.tsx",
     },
     output: {

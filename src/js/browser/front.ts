@@ -2,6 +2,10 @@ import { RootState } from "./models";
 import { system } from "./browser";
 
 export class FrontApi {
+  gotoOptionsPage() {
+    return system.runtime.openOptionsPage();
+  }
+
   getLocalAssetUrl(path: string): string {
     return system.runtime.getURL(path);
   }
@@ -94,7 +98,8 @@ export class FrontApi {
     const host = new URL(urlString).host;
     const hosts = await this.getBlackListedHosts();
     const hostsSafe = Array.isArray(hosts) ? hosts : [];
-    const isBlackListed = hostsSafe.indexOf(host) > -1;
+    const hostsNoProtocol = hostsSafe.map(h => new URL(h).host);
+    const isBlackListed = hostsNoProtocol.indexOf(host) > -1;
     return isBlackListed;
   }
 
@@ -102,17 +107,19 @@ export class FrontApi {
     const items = await this.getStorage({
       blackListed: [],
     });
-    return items.blackListed;  
+    const hosts = items.blackListed;
+    console.log('getBlackListedHosts', {hosts});
+    return hosts;
   }
 
-  async setHostDontRun(hostToBlackList: string) {
+  async blackListAdd(hostToBlackList: string) {
     const hosts = await this.getBlackListedHosts();
     const hostsSafe = Array.isArray(hosts) ? hosts : [];
     hostsSafe.push(hostToBlackList);
     return this.setStorage({blackListed: hostsSafe});
   }
 
-  async setHostRun(hostToRemove: string) {
+  async blackListRemove(hostToRemove: string) {
     const hosts = await this.getBlackListedHosts();
     const hostsSafe = Array.isArray(hosts) ? hosts : [];
     const hostsNew = hostsSafe.filter(h => h !== hostToRemove);

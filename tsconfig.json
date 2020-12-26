@@ -6,6 +6,7 @@
     "noImplicitAny": true,
     "module": "es6",
     "moduleResolution": "node",
+    "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "target": "es5",
     "jsx": "react",
