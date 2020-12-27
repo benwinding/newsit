@@ -25,7 +25,7 @@ export function MyComp() {
         onClickCheck={() => fetchHn()}
         isLoading={loadingApi}
       />
-      <section className="section">
+      <section className="section py-1">
         <button
           onClick={() => front.gotoOptionsPage()}
           className="button"

@@ -110,7 +110,7 @@ export function SettingsForm(props: {
   };
 
   return (
-    <div className="section">
+    <div className="section py-1">
       <section className="form">
         {isPopupPage && (
           <>

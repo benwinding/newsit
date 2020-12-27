@@ -47,7 +47,7 @@ export function MyComp() {
       </section>
       <section className="hero is-light">
         <div className="container">
-          <div className="column is-6">{items}</div>
+          <div className="column is-12">{items}</div>
         </div>
       </section>
     </div>
