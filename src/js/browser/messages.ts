@@ -1,51 +1,48 @@
 import { MessageChannelObj, MessageChannelType, RootState } from "./models";
-import { system } from "./browser";
+import { getBrowserInstance } from "./browser";
+import { Runtime } from "webextension-polyfill-ts";
+
+const system = getBrowserInstance();
 
 export const MessageApi = {
-  onStorageChanged(storageKey: keyof RootState, cb: (newValue: any) => void) {
-    type StorageChanges = { [key: string]: chrome.storage.StorageChange };
-    function listenerCallback(changes: StorageChanges) {
-      Object.entries(changes).map(([key, val]) => {
-        if (key === storageKey) {
-          cb(val.newValue);
-        }
-      });
-    }
-    system.storage.onChanged.addListener(listenerCallback);
-  },
-  requestWithResponse<T>(channel: MessageChannelType, data?: {}): Promise<T> {
-    return new Promise((resolve) => {
-      const msg: MessageChannelObj = {
-        channel: channel,
-        data: data,
-      };
-      system.runtime.sendMessage(msg, (response) => {
-        resolve(response);
-      });
+  async requestWithResponse<T>(channel: MessageChannelType, data?: {}): Promise<T> {
+    const msg: MessageChannelObj = {
+      channel: channel,
+      data: data,
+    };
+    return system.runtime.sendMessage(msg).catch((err) => {
+      const tabClosed = err.message.includes("Receiving end does not exist.");
+      if (!tabClosed) {
+        console.error("requestWithResponse", err);
+      }
     });
   },
-  emitEvent(channel: MessageChannelType, data?: {}): void {
+  emitEvent(channel: MessageChannelType, data?: {}): Promise<any> {
     const msg: MessageChannelObj = {
       channel: channel,
       data: data,
     };
-    system.runtime.sendMessage(msg);
+    return system.runtime.sendMessage(msg);
   },
-  emitEventToTab(channel: MessageChannelType, tabId: number, data?: {}): void {
+  emitEventToTab(
+    channel: MessageChannelType,
+    tabId: number,
+    data?: {}
+  ): Promise<any> {
     const msg: MessageChannelObj = {
       channel: channel,
       data: data,
     };
-    system.tabs.sendMessage(tabId, msg);
+    return system.tabs.sendMessage(tabId, msg);
   },
   onEvent<T>(
     channel: MessageChannelType,
-    cb: (data: T, sender?: chrome.runtime.MessageSender) => Promise<any> | any
+    cb: (data: T, sender?: Runtime.MessageSender) => Promise<any> | any
   ): void {
-    function listenerCallback(
+    async function listenerCallback(
       request: MessageChannelObj,
-      sender: chrome.runtime.MessageSender,
-    ) {
+      sender: Runtime.MessageSender
+    ): Promise<any> {
       const sendingChannel = request && request.channel;
       if (sendingChannel !== channel) {
         return;

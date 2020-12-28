@@ -1,8 +1,11 @@
 import React from "react";
-import { front } from "../browser/front";
-import { MessageApi } from "../browser/messages";
+
 import { PlacementType } from "../browser/models";
 import { debounce } from "./utils";
+
+import { createSettingsFormController } from "./settings-form.controller";
+
+const sfc = createSettingsFormController();
 
 const formBtnsLocation = [
   {
@@ -24,29 +27,21 @@ const formBtnsLocation = [
 ];
 
 const debounceSetAllEnabled = debounce<boolean>(
-  (val) => front.setEnabledAll(val),
+  (val) => sfc.SetAllEnabled(val),
   300
 );
 const debounceSetPlacement = debounce<PlacementType>(
-  (val) => front.setStorage({ placement: val }),
+  (val) => sfc.SetPlacement(val),
   300
 );
 const debounceSetSize = debounce<number>(
-  (val) => front.setStorage({ btnsize: val }),
+  (val) => sfc.SetBtnSize(val),
   300
 );
-
-async function changeHostBlacklisted(isBlackListed: boolean) {
-  const url = await front.getCurrentTabUrl();
-  if (isBlackListed) {
-    await front.blackListAdd(url);
-  } else {
-    await front.blackListRemove(url);
-  }
-  const isAllEnabled = await front.getIsAllEnabled();
-  const iconOn = isAllEnabled && !isBlackListed;
-  MessageApi.emitEvent("change_icon_enable", iconOn);
-}
+const debounceSetBlackListed = debounce<boolean>(
+  (val) => sfc.SetBlackListed(val),
+  300
+);
 
 export function SettingsForm(props: {
   isPopupPage: boolean;
@@ -55,7 +50,9 @@ export function SettingsForm(props: {
 }) {
   const { onClickCheck, isLoading, isPopupPage } = props;
 
-  const [hasSiteEnabled, setHasSiteEnabled] = React.useState(false);
+  const [currentUrlBlackListed, setCurrentUrlBlacklisted] = React.useState(
+    false
+  );
   const [hasAllEnabled, setHasAllEnabled] = React.useState(false);
   const [btnsPlacement, setBtnsPlacement] = React.useState(
     "br" as PlacementType
@@ -63,26 +60,27 @@ export function SettingsForm(props: {
   const [formBtnsSize, setFormBtnsSize] = React.useState(1);
 
   React.useEffect(() => {
-    let isMounted = true;
-    front
-      .getStorage({
-        isEnabled: true,
-        btnsize: 0.8,
-        placement: "br",
-      })
-      .then((vals) => {
-        if (!isMounted) return;
-        setHasAllEnabled(vals.isEnabled);
-        setFormBtnsSize(vals.btnsize);
-        setBtnsPlacement(vals.placement);
-      });
-    return () => (isMounted = false);
+    let mounted = true;
+    sfc.GetSettings().then((vals) => {
+      if (!mounted) return;
+      setHasAllEnabled(vals.isEnabled);
+      setFormBtnsSize(vals.btnsize);
+      setBtnsPlacement(vals.placement);
+    });
+    sfc
+      .IsCurrentUrlBlacklisted()
+      .then(
+        (isBlacklisted) => mounted && setCurrentUrlBlacklisted(isBlacklisted)
+      );
+    return () => (mounted = false);
   }, []);
 
-  const siteEnabledChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isSiteEnabled = e.target.checked;
-    setHasSiteEnabled(isSiteEnabled);
-    changeHostBlacklisted(isSiteEnabled);
+  const currentUrlBlackListedChanged = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const isBlackListed = !e.target.checked;
+    debounceSetBlackListed(isBlackListed);
+    setCurrentUrlBlacklisted(isBlackListed);
   };
 
   const runAllEnabledChanged = async (
@@ -115,7 +113,7 @@ export function SettingsForm(props: {
         {isPopupPage && (
           <>
             <div className="field">
-              <div className="control has-text-centered">
+              <div className="control has-text-centered pt-2">
                 <button
                   onClick={(e) => !isLoading && onClickCheck()}
                   disabled={isLoading}
@@ -133,8 +131,8 @@ export function SettingsForm(props: {
                 <label className="checkbox">
                   <input
                     type="checkbox"
-                    checked={hasSiteEnabled}
-                    onChange={siteEnabledChanged}
+                    checked={currentUrlBlackListed}
+                    onChange={currentUrlBlackListedChanged}
                   />
                   <span className="ml-2">Enabled on this website</span>
                 </label>
@@ -186,11 +184,15 @@ export function SettingsForm(props: {
             />
             <span>{formBtnsSize}</span>
           </div>
-          <div>
+          <div style={{ height: "90px" }}>
             <img
               id="btnsPreview"
               src="https://i.imgur.com/dVvDrfN.png"
-              style={{ width: "100px", zoom: formBtnsSize }}
+              style={{
+                width: "100px",
+                transformOrigin: "top left",
+                transform: `scale(${formBtnsSize})`,
+              }}
             />
           </div>
         </div>

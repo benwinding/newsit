@@ -1,20 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import { front } from "./browser/front";
-import { MessageApi } from "./browser/messages";
 import { useApi } from "./browser/useApi";
+
 import { Header } from "./shared/header";
 import { SettingsForm } from "./shared/settings-form";
-import { setTimeoutAsyc } from "./shared/utils";
+
+import { createPopupController } from "./popup.controller";
+
+const pc = createPopupController();
 
 // let version = 0;
 export function MyComp() {
   const [, fetchHn, loadingApi] = useApi<void>(async () => {
-    const tabId = await front.getCurrentTabId();
-    MessageApi.emitEventToTab("request_reddit", tabId);
-    MessageApi.emitEventToTab("request_hn", tabId);
-    await setTimeoutAsyc(200);
+    await pc.SendCheckApiEvent();
   }, null);
 
   return (
@@ -27,7 +26,7 @@ export function MyComp() {
       />
       <section className="section py-1">
         <button
-          onClick={() => front.gotoOptionsPage()}
+          onClick={() => pc.LaunchOptionsPage()}
           className="button"
         >
           More Options

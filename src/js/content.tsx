@@ -1,27 +1,23 @@
 import React, { CSSProperties, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { MessageApi } from "./browser/messages";
-import { front } from "./browser/front";
+
 import { ButtonResult, PlacementType } from "./browser/models";
+import { createContentController } from "./content.controller";
+
 import { BtnItem } from "./shared/buttons";
 import { IFrame } from "./shared/IFrame";
-import { checkIsBlackListed } from "./shared/utils";
 
 const root = document.createElement("div");
 document.body.appendChild(root);
 
-const url = location.href;
-checkIsBlackListed(url).then((isBlackListed) => {
-  const iconEnabled = !isBlackListed;
-  MessageApi.emitEvent("change_icon_enable", iconEnabled);
-  if (!isBlackListed) {
-    ReactDOM.render(<Container />, root);
-  }
-})
+ReactDOM.render(<Container />, root);
 
-const LOADING = '...';
+const LOADING = "...";
+
+const cc = createContentController();
 
 function Container() {
+  const [show, setShow] = useState(false);
   const [size, setSize] = useState(1 as number);
   const [iframeWidth, setIframeWidth] = useState(100 as number);
   const [placement, setPlacement] = useState("br" as PlacementType);
@@ -64,42 +60,55 @@ function Container() {
   useEffect(() => {
     let mounted = true;
 
-    setRedditLogo(front.getLocalAssetUrl("./img/reddit.png"));
-    setHnLogo(front.getLocalAssetUrl("./img/hn.png"));
-
-    // Initialize from storage
-    front.getStorage({ placement: "br" }).then((res) => {
-      mounted && setPlacement(res.placement);
-    });
-    front.getStorage({ btnsize: 1 }).then((res) => {
-      mounted && setSize(res.btnsize);
-    });
-
-    // Subscriptions
-    MessageApi.onStorageChanged("placement", (v: PlacementType) => {
+    // Listen For Storage Changes
+    cc.ListenPlacementChanged((v) => {
       mounted && setPlacement(v);
     });
-    MessageApi.onStorageChanged("btnsize", (v: number) => {
+    cc.ListenBtnSizeChanged((v) => {
       mounted && setSize(v);
     });
-    MessageApi.onEvent<ButtonResult>("result_from_hn", (res) => {
+    cc.ListenBlackListedChanged((hosts) => {
+      cc.GetIsCurrentUrlBlackListed().then((isBlackListed) => {
+        const shouldShow = !isBlackListed;
+        mounted && setShow(shouldShow);
+      });
+    });
+    // Listen For Events
+    cc.ListenResultsHn((res) => {
       mounted && setHn(res);
     });
-    MessageApi.onEvent<ButtonResult>("result_from_reddit", (res) => {
+    cc.ListenResultsReddit((res) => {
       mounted && setReddit(res);
     });
-    MessageApi.onEvent('tab_active', (d, s) => {
-      // Page Loaded Trigger
-      MessageApi.emitEvent("request_hn");
-      MessageApi.emitEvent("request_reddit");
-    })
+    cc.ListenTabChanged(() => {
+      show && cc.SendCheckApiEvent();
+    });
 
-    // Page Loaded Trigger
-    MessageApi.emitEvent("request_hn");
-    MessageApi.emitEvent("request_reddit");
+    function onStart() {
+      cc.GetLogoUrls().then(({reddit, hn}) => {
+        setRedditLogo(reddit);
+        setHnLogo(hn);
+      })
+      cc.GetPlacement().then(placement => {
+        mounted && setPlacement(placement);
+      })
+      cc.GetBtnSize().then(btnsize => {
+        mounted && setSize(btnsize);
+      })
+      cc.GetIsCurrentUrlBlackListed().then(isBlackListed => {
+        const shouldShow = !isBlackListed;
+        mounted && setShow(shouldShow);
+      })
+    }
 
+    onStart();
+  
     return () => (mounted = false);
   }, []);
+
+  React.useEffect(() => {
+    show && cc.SendCheckApiEvent();
+  }, [show])
 
   React.useEffect(() => {
     function len(res: ButtonResult) {
@@ -118,40 +127,42 @@ function Container() {
 
   return (
     <>
-      <IFrame
-        style={{
-          // zoom: size,
-          zIndex: "10000",
-          position: "fixed",
-          border: "0px",
-          ...placementStyles,
-        }}
-        height="48px"
-        width={iframeWidth + "px"}
-      >
-        <div
+      {show && (
+        <IFrame
           style={{
-            display: "flex",
-            color: "white",
-            flexDirection: "column",
+            // zoom: size,
+            zIndex: "10000",
+            position: "fixed",
+            border: "0px",
+            ...placementStyles,
           }}
+          height="48px"
+          width={iframeWidth + "px"}
         >
-          <BtnItem
-            reverseLayout={isReversed}
-            logoUrl={redditLogo}
-            link={reddit && reddit.link}
-            text={reddit && reddit.text}
-            bgColor={"#AAAAAA"}
-          />
-          <BtnItem
-            reverseLayout={isReversed}
-            logoUrl={hnLogo}
-            link={hn && hn.link}
-            text={hn && hn.text}
-            bgColor={"#FD6F1D"}
-          />
-        </div>
-      </IFrame>
+          <div
+            style={{
+              display: "flex",
+              color: "white",
+              flexDirection: "column",
+            }}
+          >
+            <BtnItem
+              reverseLayout={isReversed}
+              logoUrl={redditLogo}
+              link={reddit && reddit.link}
+              text={reddit && reddit.text}
+              bgColor={"#AAAAAA"}
+            />
+            <BtnItem
+              reverseLayout={isReversed}
+              logoUrl={hnLogo}
+              link={hn && hn.link}
+              text={hn && hn.text}
+              bgColor={"#FD6F1D"}
+            />
+          </div>
+        </IFrame>
+      )}
     </>
   );
 }

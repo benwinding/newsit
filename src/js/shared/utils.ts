@@ -1,17 +1,3 @@
-import { front } from "../browser/front";
-
-export async function getIsBlackListed() {
-  const thisUrl = await front.getCurrentTabUrl();
-  const isBlackListed = await front.isBlackListed(thisUrl);
-  return isBlackListed;
-}
-
-export async function checkIsBlackListed(url: string) {
-  const isBlackListed = await front.isBlackListed(url);
-  console.log('checkIsBlackListed', {url, isBlackListed});
-  return isBlackListed;
-}
-
 export function debounce<T>(
   fn: (v: T) => void,
   delayMs: number

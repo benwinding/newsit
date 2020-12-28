@@ -21,6 +21,7 @@ module.exports = [
     externals: {
       quill: "Quill",
     },
+    mode: isProd ? "production" : "development",
     devtool: isProd ? undefined : "inline-source-map",
     plugins: [
       new webpack.DefinePlugin({
@@ -33,7 +34,7 @@ module.exports = [
       rules: [
         {
           test: /\.tsx?$/,
-          use: 'ts-loader',
+          use: "ts-loader",
           exclude: /node_modules/,
         },
         {
@@ -50,7 +51,7 @@ module.exports = [
       ],
     },
     resolve: {
-      extensions: [ '.tsx', '.ts', '.js' ],
+      extensions: [".tsx", ".ts", ".js"],
     },
     optimization: {
       minimize: false,

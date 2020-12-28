@@ -27,7 +27,7 @@ export function IFrame(props: any) {
   return (
     <iframe
       allowtransparency="true" 
-      frameborder="0"
+      frameBorder="0"
       srcDoc={`<!DOCTYPE html>`}
       {...props}
       title={title}

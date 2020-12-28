@@ -1,6 +1,8 @@
-import { front } from "./front";
 import { ButtonResult } from "./models";
 import { doUrlsMatch } from "./url-matcher";
+
+import { alist } from "./allowlist-manager";
+import { system } from "./browser";
 
 interface ResultItem {
   url: string;
@@ -19,28 +21,43 @@ function translateHnToItem(h: HnHit): ResultItem {
     url: h.url,
     comments: h.num_comments,
     comments_link: `https://news.ycombinator.com/item?id=${h.objectID}`,
-  }
+  };
 }
 
-function querySafe<T extends HTMLElement>(el: HTMLElement, search: string, attr: keyof T): string {
+function querySafe<T extends HTMLElement>(
+  el: HTMLElement,
+  search: string,
+  attr: keyof T
+): string {
   const res = el.querySelector(search) as T;
-  const attrVal = res ? res[attr] : '';
-  return attrVal+'';
+  const attrVal = res ? res[attr] : "";
+  return attrVal + "";
 }
 
 function translateRedditToItem(el: HTMLDivElement): ResultItem {
-  const url = querySafe<HTMLAnchorElement>(el, '.search-link', 'href')
-  const commentsText = querySafe<HTMLAnchorElement>(el, '.search-comments', 'text')
-  const commentsLink = querySafe<HTMLAnchorElement>(el, '.search-comments', 'href')
-  const commentsCount = +commentsText.split(' ').shift();
+  const url = querySafe<HTMLAnchorElement>(el, ".search-link", "href");
+  const commentsText = querySafe<HTMLAnchorElement>(
+    el,
+    ".search-comments",
+    "text"
+  );
+  const commentsLink = querySafe<HTMLAnchorElement>(
+    el,
+    ".search-comments",
+    "href"
+  );
+  const commentsCount = +commentsText.split(" ").shift();
   return {
     url: url,
     comments: commentsCount,
     comments_link: commentsLink,
-  }
+  };
 }
 
-function processResults(itemsAll: ResultItem[], searchUrl: string): ButtonResult {
+function processResults(
+  itemsAll: ResultItem[],
+  searchUrl: string
+): ButtonResult {
   const itemsMatches = itemsAll.filter((h) => doUrlsMatch(h.url, searchUrl));
   if (!itemsMatches.length) {
     console.log("Hacker News API: No urls matches found");
@@ -58,12 +75,17 @@ function processResults(itemsAll: ResultItem[], searchUrl: string): ButtonResult
   return responseData;
 }
 
+async function getTabUrl(tabId: number) {
+  const t = await system.tabs.get(tabId);
+  const url = t.url;
+  return url;
+}
+
 export async function onRequestBackgroundHN(
   tabId: number
 ): Promise<ButtonResult> {
-  const t = await front.getTab(tabId);
-  const searchUrl = t.url;
-  const blocked = await front.isBlackListed(searchUrl);
+  const searchUrl = await getTabUrl(tabId);
+  const blocked = await alist.IsUrlBlackListed(searchUrl);
   if (blocked) {
     console.log("Hacker News API: Url blocked");
     return {
@@ -93,9 +115,8 @@ export async function onRequestBackgroundHN(
 export async function onRequestBackgroundReddit(
   tabId: number
 ): Promise<ButtonResult> {
-  const t = await front.getTab(tabId);
-  const searchUrl = t.url;
-  const blocked = await front.isBlackListed(searchUrl);
+  const searchUrl = await getTabUrl(tabId);
+  const blocked = await alist.IsUrlBlackListed(searchUrl);
   if (blocked) {
     console.log("Reddit API: Url blocked");
     return {
@@ -107,8 +128,9 @@ export async function onRequestBackgroundReddit(
   const data = await makeRequest(requestUrl, false);
   const html = document.createElement("html");
   html.innerHTML = data;
-  const results = html.querySelectorAll('.search-result-link');
+  const results = html.querySelectorAll(".search-result-link");
   if (results.length == 0) {
+    html.remove();
     console.log("Reddit API: No urls matches found");
     return {
       text: "-",
@@ -116,6 +138,7 @@ export async function onRequestBackgroundReddit(
   }
   const itemsAll = Array.from(results).map(translateRedditToItem);
   const itemsResults = processResults(itemsAll, searchUrl);
+  html.remove();
   return itemsResults;
 }
 

@@ -1,14 +1,13 @@
 import React from 'react';
-import { front } from '../browser/front';
+import { system } from '../browser/browser';
 
 export function Header() {
   const [version, setVersion] = React.useState(null);
 
   React.useEffect(() => {
     let isMounted = true;
-    front.getVersion().then((version: any) => {
-      isMounted && setVersion(version);
-    });
+    const ver = system.runtime.getManifest().version;
+    setVersion(ver);
     return () => isMounted = false;
   }, []);
   

@@ -5,21 +5,9 @@
   "short_name": "Newsit",
   "homepage_url": "https://newsit.benwinding.com/",
   "background": {
-    "scripts": ["js/background.js"]
+    "scripts": ["vendor/browser-polyfill.min.js", "js/background.js"]
   },
-  "web_accessible_resources": [
-    "img/*.png"
-  ],
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": [
-        "vendor/react.development.js",
-        "vendor/react-dom.development.js",
-        "js/content.js"
-      ]
-    }
-  ],
+  "web_accessible_resources": ["img/*.png"],
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": "img/favicon-32x32.png"

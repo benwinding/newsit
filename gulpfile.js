@@ -23,9 +23,8 @@ function getDevVersion() {
 
 const conf = {
   vendorPaths: [
-    "./node_modules/jquery/dist/jquery.min.js",
+    "./node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
     "./node_modules/bulma/css/bulma.min.css",
-    "./node_modules/vue/dist/vue.min.js",
     "./node_modules/react/umd/react.development.js",
     "./node_modules/react-dom/umd/react-dom.development.js",
   ],
