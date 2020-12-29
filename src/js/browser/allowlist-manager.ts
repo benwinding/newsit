@@ -51,6 +51,9 @@ export class AllowListManager {
     const hostsNew = hosts.filter((h) => h !== hostToRemove);
     return store.SetStorage({ blackListed: hostsNew });
   }
+  BlackListSetNewArray(newHostArr: string[]) {
+    return store.SetStorage({ blackListed: newHostArr });
+  }
 }
 
 export const alist = new AllowListManager();

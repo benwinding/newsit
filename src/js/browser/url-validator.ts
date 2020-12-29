@@ -1,5 +1,3 @@
-import { doUrlsMatch } from "./url-matcher";
-
 export function GetUrlSafe(urlString: string): URL {
   const empty = {} as any;
   if (typeof urlString !== "string") {
@@ -48,8 +46,14 @@ export function CheckHostAllowedOnFirefox(urlString: string): void {
 }
 
 export function CheckBlacklist(urlString: string, blackList: string[]): void {
-  const isBlackListed = blackList.some(h => doUrlsMatch(urlString, h));
+  const isBlackListed = blackList.some(h => DoUrlDomainsMatch(urlString, h));
   if (isBlackListed) {
     throw new Error(`found blacklist host "${urlString}", blocking`);
   }
+}
+
+export function DoUrlDomainsMatch(url1: string, url2: string) {
+  const stripped1 = GetUrlSafe(url1).host;
+  const stripped2 = GetUrlSafe(url2).host;
+  return stripped1 == stripped2;
 }

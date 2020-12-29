@@ -25,6 +25,9 @@ class SettingsFormController {
   ListenPlacementChanged(cb: (v: PlacementType) => void) {
     store.OnStorageChanged("placement", cb, "br");
   }
+  SetHostsArr(newHostArr: string[]) {
+    alist.BlackListSetNewArray(newHostArr);
+  }
   async SetCurrentEnabled(enabled: boolean) {
     const blackListed = !enabled;
     const tab = await getCurrentTab();
