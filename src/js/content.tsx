@@ -112,6 +112,7 @@ class Container extends React.Component<{}, DbState> {
               border: "0px",
               width: iframeWidth + "px",
               height: iframeHeight + "px",
+              overflow: 'hidden',
               ...placementStyles,
             }}
             height="48px"
@@ -163,7 +164,7 @@ function BtnGroup(props: {
   }, []);
 
   async function notifySizeChanged() {
-    await setTimeoutAsyc(2);
+    await setTimeoutAsyc(10);
     const width = divRef.current?.clientWidth;
     const height = divRef.current?.clientHeight;
     props.sizeChanged(width, height);
@@ -194,6 +195,7 @@ function BtnGroup(props: {
       >
         <BtnItem
           reverseLayout={props.isReversed}
+          title="Reddit"
           logoUrl={redditLogo}
           result={reddit}
           sizeChanged={onButtonSizeChanged}
@@ -206,6 +208,7 @@ function BtnGroup(props: {
       >
         <BtnItem
           reverseLayout={props.isReversed}
+          title="Hacker News"
           logoUrl={hnLogo}
           result={hn}
           sizeChanged={onButtonSizeChanged}

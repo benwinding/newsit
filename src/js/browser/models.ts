@@ -18,6 +18,7 @@ export interface OtherResult {
   post_title: string;
   post_upvotes: number;
   post_date: string;
+  post_by: string;
   comments_count: number;
   comments_link: string;
 }

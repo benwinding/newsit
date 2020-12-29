@@ -4,14 +4,16 @@ import { doUrlsMatch } from "./url-matcher";
 import { alist } from "./allowlist-manager";
 import { system } from "./browser";
 import { MakeLogger } from "../shared/logger";
+import fromNow from 'fromnow';
 
-const logger = MakeLogger('api');
+const logger = MakeLogger("api");
 
 interface ResultItem {
   submitted_url: string;
   submitted_date: string;
   submitted_upvotes: number;
   submitted_title: string;
+  submitted_by: string;
   comments_count: number;
   comments_link: string;
 }
@@ -19,6 +21,7 @@ interface ResultItem {
 interface HnHit {
   url: string;
   created_at: string;
+  author: string;
   title: string;
   num_comments: number;
   points: number;
@@ -26,11 +29,14 @@ interface HnHit {
 }
 
 function translateHnToItem(h: HnHit): ResultItem {
+  const fromNowStr = fromNow(h.created_at);
+  const fromNowFirst = fromNowStr.split(',').shift() + ' ago';
   return {
     submitted_url: h.url,
-    submitted_date: h.created_at,
+    submitted_date: fromNowFirst,
     submitted_upvotes: h.points,
     submitted_title: h.title,
+    submitted_by: h.author,
     comments_count: h.num_comments,
     comments_link: `https://news.ycombinator.com/item?id=${h.objectID}`,
   };
@@ -58,11 +64,7 @@ function translateRedditToItem(el: HTMLDivElement): ResultItem {
     ".search-comments",
     "href"
   );
-  const postTitle = querySafe<HTMLAnchorElement>(
-    el,
-    ".search-title",
-    "text"
-  );
+  const postTitle = querySafe<HTMLAnchorElement>(el, ".search-title", "text");
   const postDate = querySafe<HTMLAnchorElement>(
     el,
     ".search-time time",
@@ -73,6 +75,11 @@ function translateRedditToItem(el: HTMLDivElement): ResultItem {
     ".search-score",
     "innerText"
   );
+  const postAuthor = querySafe<HTMLAnchorElement>(
+    el,
+    ".search-author a",
+    "text"
+  );
   const commentsCount = +commentsText.split(" ").shift();
   const postPoints = +postPointsText.split(" ").shift();
   const r: ResultItem = {
@@ -80,6 +87,7 @@ function translateRedditToItem(el: HTMLDivElement): ResultItem {
     submitted_title: postTitle,
     submitted_date: postDate,
     submitted_upvotes: postPoints,
+    submitted_by: postAuthor,
     comments_count: commentsCount,
     comments_link: commentsLink,
   };
@@ -90,7 +98,9 @@ function processResults(
   itemsAll: ResultItem[],
   searchUrl: string
 ): ButtonResult {
-  const itemsMatches = itemsAll.filter((h) => doUrlsMatch(h.submitted_url, searchUrl));
+  const itemsMatches = itemsAll.filter((h) =>
+    doUrlsMatch(h.submitted_url, searchUrl)
+  );
   if (!itemsMatches.length) {
     logger.log("Hacker News API: No urls matches found");
     return {
@@ -100,22 +110,23 @@ function processResults(
   itemsMatches.sort((a, b) => b.comments_count - a.comments_count);
   const mostComments = itemsMatches[0];
 
-  const otherResults: OtherResult[] = itemsMatches.map(r => {
+  const otherResults: OtherResult[] = itemsMatches.map((r) => {
     const other: OtherResult = {
       post_url: r.submitted_url,
       post_title: r.submitted_title,
       post_upvotes: r.submitted_upvotes,
       post_date: r.submitted_date,
+      post_by: r.submitted_by,
       comments_count: r.comments_count,
       comments_link: r.comments_link,
     };
     return other;
-  })
+  });
 
   const responseData: ButtonResult = {
     text: mostComments.comments_count + "",
     link: mostComments.comments_link,
-    other_results: otherResults
+    other_results: otherResults,
   };
   return responseData;
 }

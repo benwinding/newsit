@@ -19,6 +19,9 @@ export function IFrame(props: any) {
       padding: 0;
       margin: 0;
     }
+    html {
+      overflow: hidden;
+    }
     `;
     iframeDoc.head.append(s);
     !e.defaultPrevented && setIframeBody(iframeDoc.body);

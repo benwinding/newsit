@@ -3,11 +3,12 @@ import { ButtonResult } from "../browser/models";
 
 export function BtnItem(props: {
   reverseLayout: boolean;
+  title: string;
   logoUrl: string;
   result: ButtonResult;
   sizeChanged: () => void;
 }) {
-  const { logoUrl, reverseLayout, result } = props;
+  const { logoUrl, title, reverseLayout, result } = props;
   const { link, text, other_results } = result;
 
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -49,12 +50,14 @@ export function BtnItem(props: {
             flexDirection: "column",
           }}
         >
-          <h5 style={{ margin: "2px" }}>All Results</h5>
-          {other_results.map((r) => {
+          <h5 style={{ margin: "2px" }}>All {title} Results</h5>
+          {other_results.map((r, i) => {
             return (
               <OtherResultItem
+                key={i}
                 commentsCount={r.comments_count}
                 commentsLink={r.comments_link}
+                postAuthor={r.post_by}
                 postTitle={r.post_title}
                 postUrl={r.post_url}
                 postDate={r.post_date}
@@ -71,6 +74,7 @@ export function BtnItem(props: {
 function OtherResultItem(props: {
   commentsCount: number;
   commentsLink: string;
+  postAuthor: string;
   postTitle: string;
   postUrl: string;
   postDate: string;
@@ -79,6 +83,7 @@ function OtherResultItem(props: {
   const {
     commentsCount,
     commentsLink,
+    postAuthor,
     postTitle,
     postUrl,
     postDate,
@@ -95,8 +100,8 @@ function OtherResultItem(props: {
       }}
     >
       <a
-        href={postUrl}
-        title="Open's link to post"
+        href={commentsLink}
+        title="Open's link to comments"
         target="_blank"
         style={{
           color: "black",
@@ -118,6 +123,7 @@ function OtherResultItem(props: {
         >
           <div style={{ color: "#555" }}>{upvotes} points</div>
           <div style={{ color: "#222" }}>({postDate})</div>
+          <div style={{ fontSize: "0.5em" }}>by {postAuthor}</div>
         </div>
         <a
           href={commentsLink}
@@ -175,6 +181,7 @@ function ButtonLine(props: {
       <a
         target="_blank"
         href={link}
+        title={'click to view discussion'}
         style={{
           textDecoration: !!link ? "underline" : "none",
           cursor: !!link ? "pointer" : "default",
@@ -197,6 +204,7 @@ function ButtonLine(props: {
           backgroundColor: "#b1b1b159",
           boxShadow: menuDisabled ? "unset" : "#00000047 0px 1px 4px 1px",
           marginRight: "3px",
+          cursor: menuDisabled ? "unset" : 'pointer'
         }}
         onClick={() => !menuDisabled && menuOpenChanged(!menuOpen)}
       >
