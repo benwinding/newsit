@@ -17,6 +17,7 @@ interface DbState {
   size: number;
   zindex: number;
   iframeWidth: number;
+  iframeHeight: number;
   placement: PlacementType;
   placementStyles: Partial<CSSProperties>;
 }
@@ -29,6 +30,7 @@ class Container extends React.Component<{}, DbState> {
     size: 1,
     zindex: 999,
     iframeWidth: 100,
+    iframeHeight: 48,
     placement: "br" as PlacementType,
     placementStyles: {} as Partial<CSSProperties>,
   };
@@ -81,13 +83,22 @@ class Container extends React.Component<{}, DbState> {
     });
   }
 
-  charCountChanged(count: number) {
-    const widthChars = count * 7.8 + 31;
-    this.setState({ iframeWidth: widthChars });
+  sizeChanged(newWidth: number, newHeight: number) {
+    this.setState({
+      iframeWidth: newWidth,
+      iframeHeight: newHeight,
+    });
   }
 
   render() {
-    const { iframeWidth, placement, placementStyles, shouldShow, zindex } = this.state;
+    const {
+      iframeWidth,
+      iframeHeight,
+      placement,
+      placementStyles,
+      shouldShow,
+      zindex,
+    } = this.state;
     const isReversed = (placement + "").includes("l");
 
     return (
@@ -99,8 +110,8 @@ class Container extends React.Component<{}, DbState> {
               position: "fixed",
               bottom: "0px",
               border: "0px",
-              height: "48px",
               width: iframeWidth + "px",
+              height: iframeHeight + "px",
               ...placementStyles,
             }}
             height="48px"
@@ -108,7 +119,7 @@ class Container extends React.Component<{}, DbState> {
           >
             <BtnGroup
               isReversed={isReversed}
-              charCountChanged={(n) => this.charCountChanged(n)}
+              sizeChanged={(w, h) => this.sizeChanged(w, h)}
             />
           </IFrame>
         )}
@@ -121,20 +132,22 @@ const LOADING = "...";
 
 function BtnGroup(props: {
   isReversed: boolean;
-  charCountChanged: (chars: number) => void;
+  sizeChanged: (newWidth: number, newHeight: number) => void;
 }) {
   const [reddit, setReddit] = useState({ text: LOADING } as ButtonResult);
   const [hn, setHn] = useState({ text: LOADING } as ButtonResult);
   const [redditLogo, setRedditLogo] = React.useState("");
   const [hnLogo, setHnLogo] = React.useState("");
 
+  const divRef = React.useRef<HTMLDivElement>();
+
   useEffect(() => {
     let mounted = true;
     // Listen For Events
-    const subHn = cc.ListenResultsHn((res) => {
+    const unsubHn = cc.ListenResultsHn((res) => {
       mounted && setHn(res);
     });
-    const subReddit = cc.ListenResultsReddit((res) => {
+    const unsubReddit = cc.ListenResultsReddit((res) => {
       mounted && setReddit(res);
     });
     cc.GetLogoUrls().then(({ reddit, hn }) => {
@@ -144,15 +157,25 @@ function BtnGroup(props: {
     cc.SendCheckApiEvent();
     return () => {
       mounted = false;
-      subHn();
-      subReddit();
+      unsubHn();
+      unsubReddit();
     };
   }, []);
 
+  async function notifySizeChanged() {
+    await setTimeoutAsyc(2);
+    const width = divRef.current?.clientWidth;
+    const height = divRef.current?.clientHeight;
+    props.sizeChanged(width, height);
+  }
+
   useEffect(() => {
-    const width = len(reddit) > len(hn) ? len(reddit) : len(hn);
-    props.charCountChanged(width);
+    notifySizeChanged();
   }, [hn, reddit]);
+
+  const onButtonSizeChanged = () => {
+    notifySizeChanged();
+  };
 
   return (
     <div
@@ -160,22 +183,34 @@ function BtnGroup(props: {
         display: "flex",
         color: "white",
         flexDirection: "column",
+        width: "min-content",
       }}
+      ref={divRef}
     >
-      <BtnItem
-        reverseLayout={props.isReversed}
-        logoUrl={redditLogo}
-        link={reddit && reddit.link}
-        text={reddit && reddit.text}
-        bgColor={"#AAAAAA"}
-      />
-      <BtnItem
-        reverseLayout={props.isReversed}
-        logoUrl={hnLogo}
-        link={hn && hn.link}
-        text={hn && hn.text}
-        bgColor={"#FD6F1D"}
-      />
+      <div
+        style={{
+          backgroundColor: "#AAAAAA",
+        }}
+      >
+        <BtnItem
+          reverseLayout={props.isReversed}
+          logoUrl={redditLogo}
+          result={reddit}
+          sizeChanged={onButtonSizeChanged}
+        />
+      </div>
+      <div
+        style={{
+          backgroundColor: "#FD6F1D",
+        }}
+      >
+        <BtnItem
+          reverseLayout={props.isReversed}
+          logoUrl={hnLogo}
+          result={hn}
+          sizeChanged={onButtonSizeChanged}
+        />
+      </div>
     </div>
   );
 }

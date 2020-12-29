@@ -10,6 +10,16 @@ export interface RootState {
 export interface ButtonResult {
   text: string;
   link?: string;
+  other_results?: OtherResult[]
+}
+
+export interface OtherResult {
+  post_url: string;
+  post_title: string;
+  post_upvotes: number;
+  post_date: string;
+  comments_count: number;
+  comments_link: string;
 }
 
 export type PlacementType = 'br' | 'bl' | 'tr' | 'tl';

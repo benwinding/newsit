@@ -1,4 +1,4 @@
-import { ButtonResult } from "./models";
+import { ButtonResult, OtherResult } from "./models";
 import { doUrlsMatch } from "./url-matcher";
 
 import { alist } from "./allowlist-manager";
@@ -8,21 +8,30 @@ import { MakeLogger } from "../shared/logger";
 const logger = MakeLogger('api');
 
 interface ResultItem {
-  url: string;
-  comments: number;
+  submitted_url: string;
+  submitted_date: string;
+  submitted_upvotes: number;
+  submitted_title: string;
+  comments_count: number;
   comments_link: string;
 }
 
 interface HnHit {
   url: string;
+  created_at: string;
+  title: string;
   num_comments: number;
+  points: number;
   objectID: string;
 }
 
 function translateHnToItem(h: HnHit): ResultItem {
   return {
-    url: h.url,
-    comments: h.num_comments,
+    submitted_url: h.url,
+    submitted_date: h.created_at,
+    submitted_upvotes: h.points,
+    submitted_title: h.title,
+    comments_count: h.num_comments,
     comments_link: `https://news.ycombinator.com/item?id=${h.objectID}`,
   };
 }
@@ -49,31 +58,64 @@ function translateRedditToItem(el: HTMLDivElement): ResultItem {
     ".search-comments",
     "href"
   );
+  const postTitle = querySafe<HTMLAnchorElement>(
+    el,
+    ".search-title",
+    "text"
+  );
+  const postDate = querySafe<HTMLAnchorElement>(
+    el,
+    ".search-time time",
+    "innerText"
+  );
+  const postPointsText = querySafe<HTMLAnchorElement>(
+    el,
+    ".search-score",
+    "innerText"
+  );
   const commentsCount = +commentsText.split(" ").shift();
-  return {
-    url: url,
-    comments: commentsCount,
+  const postPoints = +postPointsText.split(" ").shift();
+  const r: ResultItem = {
+    submitted_url: url,
+    submitted_title: postTitle,
+    submitted_date: postDate,
+    submitted_upvotes: postPoints,
+    comments_count: commentsCount,
     comments_link: commentsLink,
   };
+  return r;
 }
 
 function processResults(
   itemsAll: ResultItem[],
   searchUrl: string
 ): ButtonResult {
-  const itemsMatches = itemsAll.filter((h) => doUrlsMatch(h.url, searchUrl));
+  const itemsMatches = itemsAll.filter((h) => doUrlsMatch(h.submitted_url, searchUrl));
   if (!itemsMatches.length) {
     logger.log("Hacker News API: No urls matches found");
     return {
       text: "-",
     };
   }
-  itemsMatches.sort((a, b) => b.comments - a.comments);
+  itemsMatches.sort((a, b) => b.comments_count - a.comments_count);
   const mostComments = itemsMatches[0];
 
-  const responseData = {
-    text: mostComments.comments + "",
+  const otherResults: OtherResult[] = itemsMatches.map(r => {
+    const other: OtherResult = {
+      post_url: r.submitted_url,
+      post_title: r.submitted_title,
+      post_upvotes: r.submitted_upvotes,
+      post_date: r.submitted_date,
+      comments_count: r.comments_count,
+      comments_link: r.comments_link,
+    };
+    return other;
+  })
+
+  const responseData: ButtonResult = {
+    text: mostComments.comments_count + "",
     link: mostComments.comments_link,
+    other_results: otherResults
   };
   return responseData;
 }
