@@ -5,10 +5,11 @@ export function BtnItem(props: {
   reverseLayout: boolean;
   title: string;
   logoUrl: string;
+  submitLink: string;
   result: ButtonResult;
   sizeChanged: () => void;
 }) {
-  const { logoUrl, title, reverseLayout, result } = props;
+  const { logoUrl, title, reverseLayout, result, submitLink } = props;
   const { link, text, other_results } = result;
 
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -33,6 +34,8 @@ export function BtnItem(props: {
         iconSrc={logoUrl}
         link={link}
         text={text}
+        title={title}
+        submitLink={submitLink}
         menuDisabled={!other_results?.length}
         menuOpen={menuOpen}
         menuOpenChanged={(isOpen) => {
@@ -58,7 +61,7 @@ export function BtnItem(props: {
             }}
           >
             <h5 style={{ margin: "2px" }}>All {title} Results</h5>
-            <p style={{ margin: "2px", fontSize: '0.6em' }}>
+            <p style={{ margin: "2px", fontSize: "0.6em" }}>
               {other_results.length} found
             </p>
           </div>
@@ -155,7 +158,9 @@ function OtherResultItem(props: {
 
 function ButtonLine(props: {
   iconSrc: string;
+  submitLink: string;
   link: string;
+  title: string;
   text: string;
   reverseLayout: boolean;
   menuDisabled: boolean;
@@ -165,12 +170,16 @@ function ButtonLine(props: {
   const {
     reverseLayout,
     iconSrc,
+    submitLink,
+    title,
     text,
     link,
     menuDisabled,
     menuOpen,
     menuOpenChanged,
   } = props;
+  const menuEnabled = !menuDisabled;
+  const hasLink = !!link;
   return (
     <div
       style={{
@@ -180,27 +189,45 @@ function ButtonLine(props: {
         width: "100%",
       }}
     >
-      <img
-        src={iconSrc}
-        style={{
-          height: "18px",
-          margin: "0",
-          padding: 0,
-          paddingLeft: "3px",
-        }}
-      />
-      <a
-        target="_blank"
-        href={link}
-        title={"click to view discussion"}
-        style={{
-          textDecoration: !!link ? "underline" : "none",
-          cursor: !!link ? "pointer" : "default",
-          padding: "3px 5px",
-        }}
-      >
-        {text}
-      </a>
+      {menuEnabled && (
+        <img
+          src={iconSrc}
+          style={{
+            height: "18px",
+            margin: "0",
+            padding: 0,
+            paddingLeft: "3px",
+          }}
+        />
+      )}
+      {hasLink && (
+        <a
+          target="_blank"
+          href={link}
+          title={"click to view discussion"}
+          style={{
+            textDecoration: "underline",
+            cursor: "pointer",
+            padding: "3px 5px",
+          }}
+        >
+          {text}
+        </a>
+      )}
+      {!hasLink && (
+        <a
+          target="_blank"
+          href={submitLink}
+          title={"No submissions found, click to submit to " + title}
+          style={{
+            textDecoration: "none",
+            cursor: "pointer",
+            padding: "3px 2px",
+          }}
+        >
+          +
+        </a>
+      )}
       {menuOpen && <span style={{ width: "100%" }}></span>}
       <div
         style={{
@@ -209,15 +236,14 @@ function ButtonLine(props: {
           width: "0px",
           height: "16px",
           overflow: "hidden",
-          padding: "0 8px",
+          padding: `0 ${menuEnabled && "8px"}`,
           transform: `rotate(${menuOpen ? "0" : "180"}deg)`,
-
           backgroundColor: "#b1b1b159",
-          boxShadow: menuDisabled ? "unset" : "#00000047 0px 1px 4px 1px",
-          marginRight: "3px",
+          boxShadow: menuEnabled && "#00000047 0px 1px 4px 1px",
+          marginRight: menuEnabled && "3px",
           cursor: menuDisabled ? "unset" : "pointer",
         }}
-        onClick={() => !menuDisabled && menuOpenChanged(!menuOpen)}
+        onClick={() => menuEnabled && menuOpenChanged(!menuOpen)}
       >
         <span
           style={{

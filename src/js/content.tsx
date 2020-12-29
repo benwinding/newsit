@@ -139,6 +139,8 @@ function BtnGroup(props: {
   const [hn, setHn] = useState({ text: LOADING } as ButtonResult);
   const [redditLogo, setRedditLogo] = React.useState("");
   const [hnLogo, setHnLogo] = React.useState("");
+  const [redditSubmitLink, setRedditSubmitLink] = React.useState("");
+  const [hnSubmitLink, setHnSubmitLink] = React.useState("");
 
   const divRef = React.useRef<HTMLDivElement>();
 
@@ -155,6 +157,8 @@ function BtnGroup(props: {
       mounted && setRedditLogo(reddit);
       mounted && setHnLogo(hn);
     });
+    setHnSubmitLink(cc.GetHnSubmitLink())
+    setRedditSubmitLink(cc.GetRedditSubmitLink())
     cc.SendCheckApiEvent();
     return () => {
       mounted = false;
@@ -198,6 +202,7 @@ function BtnGroup(props: {
           reverseLayout={props.isReversed}
           title="Reddit"
           logoUrl={redditLogo}
+          submitLink={redditSubmitLink}
           result={reddit}
           sizeChanged={onButtonSizeChanged}
         />
@@ -211,6 +216,7 @@ function BtnGroup(props: {
           reverseLayout={props.isReversed}
           title="Hacker News"
           logoUrl={hnLogo}
+          submitLink={hnSubmitLink}
           result={hn}
           sizeChanged={onButtonSizeChanged}
         />
