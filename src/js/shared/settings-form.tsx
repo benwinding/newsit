@@ -248,6 +248,13 @@ export class SettingsForm extends React.Component<
             </div>
           </div>
         </section>
+        <section>
+          <div>
+            <a href="https://github.com/benwinding/newsit" title="source code link">
+              Github source code
+            </a>
+          </div>
+        </section>
       </div>
     );
   }
