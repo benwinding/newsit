@@ -6,119 +6,99 @@ import { createContentController } from "./content.controller";
 
 import { BtnItem } from "./shared/buttons";
 import { IFrame } from "./shared/IFrame";
-import { len, randomUuid, setTimeoutAsyc } from "./shared/utils";
-
-const root = document.createElement("div");
-document.body.appendChild(root);
-
-ReactDOM.render(<Container />, root);
+import { len, setTimeoutAsyc } from "./shared/utils";
 
 const cc = createContentController();
 
-function DbContainer() {
-  return 
+interface DbState {
+  isBlackListed: boolean;
+  isEnabled: boolean;
+  shouldShow: boolean;
+  size: number;
+  iframeWidth: number;
+  placement: PlacementType;
+  placementStyles: Partial<CSSProperties>;
 }
 
-function Container() {
-  const [isBlackListed, setIsBlackListed] = useState(false);
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [isManualRequest, setIsManualRequest] = useState(null);
+class Container extends React.Component<{}, DbState> {
+  state = {
+    isBlackListed: false,
+    isEnabled: false,
+    shouldShow: false,
+    size: 1,
+    iframeWidth: 100,
+    placement: "br" as PlacementType,
+    placementStyles: {} as Partial<CSSProperties>,
+  };
 
-  const [shouldShow, setShouldShow] = useState(false);
-
-  console.log("-> vals", { isBlackListed, isEnabled });
-
-  const [size, setSize] = useState(1 as number);
-  const [iframeWidth, setIframeWidth] = useState(100 as number);
-  const [placement, setPlacement] = useState("br" as PlacementType);
-  const [placementStyles, setPlacementStyles] = useState<
-    Partial<CSSProperties>
-  >({});
-
-  useEffect(() => {
-    const s = cc.CalculatePlacementStyles(size, placement);
-    setPlacementStyles(s);
-  }, [placement, size]);
-
-  useEffect(() => {
-    let mounted = true;
-
-    // Listen For Storage Changes
+  componentDidMount() {
+    const ctx = this;
+    const setShouldShow = () => {
+      const shouldShow = ctx.state.isEnabled && !ctx.state.isBlackListed;
+      ctx.setState({ shouldShow: shouldShow });
+    };
     cc.ListenPlacementChanged((v) => {
-      mounted && setPlacement(v);
+      ctx.setState({ placement: v });
     });
     cc.ListenBtnSizeChanged((v) => {
-      mounted && setSize(v);
+      ctx.setState({ size: v });
     });
     cc.ListenIsEnabledChanged((v) => {
-      console.log("-> setIsEnabled", v);
-      mounted && setIsEnabled(v);
+      ctx.setState({ isEnabled: v });
+      setShouldShow();
     });
     cc.ListenIsTabBlackListedChanged((v) => {
-      console.log("-> setIsBlackListed", v);
-      mounted && setIsBlackListed(v);
-      mounted && setIsManualRequest(null);
+      ctx.setState({ isBlackListed: v });
+      setShouldShow();
     });
-    const unsubP = cc.ListenCheckPageTrigger(async () => {
-      mounted && setIsManualRequest(randomUuid());
-    });
-    const unsubT = cc.ListenTabUrlChanged(async () => {
-      mounted && setShouldShow(false);
-      setTimeoutAsyc(10).then(() => {
-        console.log("-> setShow", { isBlackListed, isEnabled });
-        mounted && setShouldShow(isEnabled && !isBlackListed);
+    cc.ListenCheckPageTrigger(async () => {
+      ctx.setState({ shouldShow: false });
+      setTimeoutAsyc(1).then(() => {
+        ctx.setState({ shouldShow: true });
       });
     });
-
-    return () => {
-      mounted = false;
-      unsubP();
-      unsubT();
-    };
-  }, []);
-
-  const isReversed = (placement + "").includes("l");
-
-  useEffect(() => {
-    let mounted = true;
-    if (isManualRequest) {
-      setShouldShow(false);
-      setTimeoutAsyc(10).then(() => {
-        mounted && setShouldShow(true);
+    cc.ListenTabUrlChanged(async () => {
+      ctx.setState({ shouldShow: false });
+      setTimeoutAsyc(1).then(() => {
+        setShouldShow();
       });
-    } else {
-      console.log("-> setShow watched", { isBlackListed, isEnabled });
-      mounted && setShouldShow(isEnabled && !isBlackListed);
-    }
-    return () => (mounted = false);
-  }, [isManualRequest, isEnabled, isBlackListed]);
+    });
+  }
 
-  return (
-    <>
-      {shouldShow && (
-        <IFrame
-          style={{
-            zIndex: "99",
-            position: "fixed",
-            border: "0px",
-            height: "48px",
-            width: iframeWidth + "px",
-            ...placementStyles,
-          }}
-          height="48px"
-          width={iframeWidth + "px"}
-        >
-          <BtnGroup
-            isReversed={isReversed}
-            charCountChanged={(count) => {
-              const widthChars = count * 7.8 + 31;
-              setIframeWidth(widthChars);
+  charCountChanged(count: number) {
+    const widthChars = count * 7.8 + 31;
+    this.setState({ iframeWidth: widthChars });
+  }
+
+  render() {
+    const { iframeWidth, placement, placementStyles, shouldShow } = this.state;
+    const isReversed = (placement + "").includes("l");
+
+    return (
+      <>
+        {shouldShow && (
+          <IFrame
+            style={{
+              zIndex: "99",
+              position: "fixed",
+              bottom: "0px",
+              border: "0px",
+              height: "48px",
+              width: iframeWidth + "px",
+              ...placementStyles,
             }}
-          />
-        </IFrame>
-      )}
-    </>
-  );
+            height="48px"
+            width={iframeWidth + "px"}
+          >
+            <BtnGroup
+              isReversed={isReversed}
+              charCountChanged={(n) => this.charCountChanged(n)}
+            />
+          </IFrame>
+        )}
+      </>
+    );
+  }
 }
 
 const LOADING = "...";
@@ -183,3 +163,8 @@ function BtnGroup(props: {
     </div>
   );
 }
+
+const root = document.createElement("div");
+document.body.appendChild(root);
+
+ReactDOM.render(<Container />, root);

@@ -20,10 +20,10 @@ bc.ListenTabChange(async (tabId, tabUrl) => {
 bc.ListenForRequestApi((tabId) => {
   onRequestBackgroundHN(tabId)
     .then((res) => bc.SendEventToTab("result_from_hn", tabId, res))
-    .catch((err) => console.warn("request_hn", err));
+    .catch((err) => console.log("!!!! request_hn", err));
   onRequestBackgroundReddit(tabId)
     .then((res) => bc.SendEventToTab("result_from_reddit", tabId, res))
-    .catch((err) => console.warn("request_reddit", err));
+    .catch((err) => console.log("!!!! request_reddit", err));
 });
 bc.ListenForHostRemove(async (hostToRemove: string) => {
   await bc.BlacklistRemoveHost(hostToRemove);
