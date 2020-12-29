@@ -4,24 +4,29 @@
   "name": "Newsit: Hacker News and Reddit Links",
   "short_name": "Newsit",
   "homepage_url": "https://newsit.benwinding.com/",
-  "options_page": "options.html",
+  "background": {
+    "scripts": ["vendor/browser-polyfill.min.js", "js/background.js"]
+  },
+  "web_accessible_resources": ["img/*.png"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "css": ["css/content.css"],
-      "js": ["vendor/jquery.min.js", "js/content.js"]
+      "js": [
+        "vendor/react.development.js",
+        "vendor/react-dom.development.js",
+        "js/content.js"
+      ]
     }
   ],
-  "background": {
-    "scripts": ["js/background.js"]
-  },
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": "img/favicon-32x32.png"
   },
   "icons": {
-    "128": "img/favicon-128x128.png"
+    "128": "img/favicon-128x128.png",
+    "32": "img/favicon-32x32.png"
   },
   "permissions": ["storage", "tabs", "<all_urls>"],
+  "options_page": "options.html",
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

@@ -1,6 +1,5 @@
 const del = require("del");
 const gulp = require("gulp");
-const gulpSequence = require("gulp-sequence");
 const imagemin = require("gulp-imagemin");
 const jsonTransform = require("gulp-json-transform");
 const rename = require("gulp-rename");
@@ -14,11 +13,20 @@ console.log("       VERSION=" + version);
 console.log("        TARGET=" + target);
 console.log(" IS_PRODUCTION=" + isProduction);
 
+function getDevVersion() {
+  const versionPatch = parseInt(
+    (parseInt(new Date().getTime() / 1000) - 1603194242) / 20
+  );
+  const version = "1.2." + versionPatch;
+  return version;
+}
+
 const conf = {
   vendorPaths: [
-    "./node_modules/jquery/dist/jquery.min.js",
+    "./node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
     "./node_modules/bulma/css/bulma.min.css",
-    "./node_modules/vue/dist/vue.min.js",
+    "./node_modules/react/umd/react.development.js",
+    "./node_modules/react-dom/umd/react-dom.development.js",
   ],
   src: {
     core: ["./src/js/shared/core.js"],
@@ -29,10 +37,10 @@ const conf = {
     manifest: `./src/manifest-${target}.json`,
   },
   webpack: {
-    build: "./build/**/*.js",
+    build: "./build/webpack/**/*",
   },
   output: {
-    dir: `./build-${target}`,
+    dir: `./build/${target}`,
     zipFile: `./build-${target}-${version}.zip`,
   },
 };
@@ -69,7 +77,9 @@ gulp.task("manifest", function () {
         return JSON.stringify(
           {
             description: process.env.npm_package_description,
-            version: process.env.npm_package_version,
+            version: isProduction
+              ? process.env.npm_package_version
+              : getDevVersion(),
             ...data,
           },
           null,
@@ -90,9 +100,17 @@ gulp.task("copy-webpack-build", function () {
   return gulp.src(conf.webpack.build).pipe(gulp.dest(conf.output.dir + "/js"));
 });
 
+var { exec } = require("child_process");
+gulp.task("webpack-compile-watch", function (done) {
+  var proc = exec("npm run watch-webpack");
+  proc.stdout.on("data", function (data) {
+    console.log(data);
+  });
+});
+
 gulp.task(
   "copy-code",
-  gulpSequence("copy-webpack-build", [
+  gulp.series("copy-webpack-build", [
     "html",
     "images",
     "manifest",
@@ -101,12 +119,18 @@ gulp.task(
   ])
 );
 
-gulp.task("watch", ["copy-code"], function () {
-  gulp.watch(conf.src.html, ["html"]);
-  gulp.watch(conf.src.css, ["css"]);
-  gulp.watch(conf.src.images, ["images"]);
-  gulp.watch(conf.src.manifest, ["manifest"]);
-});
+gulp.task(
+  "watch-and-copy",
+  gulp.series("copy-code", function (done) {
+    gulp.watch(conf.src.html, gulp.series("html"));
+    gulp.watch(conf.src.css, gulp.series("css"));
+    gulp.watch(conf.src.images, gulp.series("images"));
+    gulp.watch(conf.src.manifest, gulp.series("manifest"));
+    gulp.watch(conf.webpack.build, gulp.series("copy-webpack-build"));
+  })
+);
+
+gulp.task("watch", gulp.parallel("webpack-compile-watch", "watch-and-copy"));
 
 gulp.task("zip", function () {
   return gulp
@@ -115,6 +139,6 @@ gulp.task("zip", function () {
     .pipe(gulp.dest("./"));
 });
 
-gulp.task("build", gulpSequence("clean", "copy-code", "zip"));
+gulp.task("build", gulp.series("clean", "copy-code", "zip"));
 
-gulp.task("default", ["build"]);
+gulp.task("default", gulp.series("build"));
