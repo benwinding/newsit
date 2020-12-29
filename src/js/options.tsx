@@ -12,6 +12,7 @@ export function MyComp() {
 
   React.useEffect(() => {
     let mounted = true;
+
     oc.ListenBlackListedChanged((blackListed) => {
       mounted && setHosts(blackListed);
     });

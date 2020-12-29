@@ -3,19 +3,42 @@ import { ButtonResult, PlacementType } from "./browser/models";
 import { store } from "./browser/store";
 import { system } from "./browser/browser";
 import { alist } from "./browser/allowlist-manager";
+import { CSSProperties } from "react";
 
 class ContentController {
+  CalculatePlacementStyles(size: number, placement: PlacementType) {
+    const s: Partial<CSSProperties> = {};
+    s.transform = `scale(${size})`;
+    switch (placement) {
+      case "bl":
+        s.bottom = 0;
+        s.left = 0;
+        s.transformOrigin = "bottom left";
+        break;
+      case "br":
+        s.bottom = 0;
+        s.right = 0;
+        s.transformOrigin = "bottom right";
+        break;
+      case "tl":
+        s.top = 0;
+        s.left = 0;
+        s.transformOrigin = "top left";
+        break;
+      case "tr":
+        s.top = 0;
+        s.right = 0;
+        s.transformOrigin = "top right";
+        break;
+    }
+    return s;
+  }
   async GetIsCurrentUrlBlackListed() {
-    return alist.IsCurrentUrlBlacklisted()
+    const url = window.location.href;
+    return alist.IsUrlBlackListed(url);
   }
   SendCheckApiEvent() {
     return MessageApi.emitEvent("request_api");
-  }
-  async GetPlacement(): Promise<PlacementType> {
-    return store.GetStorage({ placement: "br" }).then((s) => s.placement);
-  }
-  async GetBtnSize() {
-    return store.GetStorage({ btnsize: 1 }).then((s) => s.btnsize);
   }
   async GetLogoUrls() {
     return {
@@ -24,22 +47,35 @@ class ContentController {
     };
   }
   ListenPlacementChanged(cb: (v: PlacementType) => void) {
-    store.OnStorageChanged("placement", cb);
+    store.OnStorageChanged("placement", cb, 'br');
   }
   ListenBtnSizeChanged(cb: (v: number) => void) {
-    store.OnStorageChanged("btnsize", cb);
+    store.OnStorageChanged("btnsize", cb, 0.8);
   }
-  ListenBlackListedChanged(cb: (hosts: string[]) => void) {
-    store.OnStorageChanged("blackListed", cb);
+  ListenIsEnabledChanged(cb: (v: boolean) => void) {
+    store.OnStorageChanged("isEnabled", cb, true);
+  }
+  ListenIsTabBlackListedChanged(cb: (isBlackListed: boolean) => void) {
+    MessageApi.onEvent("tab_url_changed", async () => {
+      const isBlacklisted = await this.GetIsCurrentUrlBlackListed();
+      cb(isBlacklisted);
+    });
+    store.OnStorageChanged("blackListed", async (list: string[]) => {
+      const isBlacklisted = await this.GetIsCurrentUrlBlackListed();
+      cb(isBlacklisted);
+    }, []);
   }
   ListenResultsHn(cb: (hosts: ButtonResult) => void) {
-    MessageApi.onEvent("result_from_hn", cb);
+    return MessageApi.onEvent("result_from_hn", cb);
   }
   ListenResultsReddit(cb: (hosts: ButtonResult) => void) {
-    MessageApi.onEvent("result_from_reddit", cb);
+    return MessageApi.onEvent("result_from_reddit", cb);
   }
-  ListenTabChanged(cb: () => void) {
-    MessageApi.onEvent("tab_url_changed", cb);
+  ListenTabUrlChanged(cb: () => void) {
+    return MessageApi.onEvent("tab_url_changed", cb);
+  }
+  ListenCheckPageTrigger(cb: () => void) {
+    return MessageApi.onEvent("check_active_tab", cb);
   }
 }
 

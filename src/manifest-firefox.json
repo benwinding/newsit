@@ -8,6 +8,16 @@
     "scripts": ["vendor/browser-polyfill.min.js", "js/background.js"]
   },
   "web_accessible_resources": ["img/*.png"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "vendor/react.development.js",
+        "vendor/react-dom.development.js",
+        "js/content.js"
+      ]
+    }
+  ],
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": "img/favicon-32x32.png"
@@ -17,7 +27,10 @@
     "32": "img/favicon-32x32.png"
   },
   "permissions": ["storage", "tabs", "<all_urls>"],
-  "options_page": "options.html",
+  "options_ui": {
+    "page": "options.html",
+    "browser_style": true
+  },
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "applications": {
     "gecko": {

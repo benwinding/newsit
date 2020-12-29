@@ -1,42 +1,74 @@
 import { alist } from "../browser/allowlist-manager";
-import { system } from "../browser/browser";
+import { getCurrentTab, system } from "../browser/browser";
 import { MessageApi } from "../browser/messages";
 import { PlacementType } from "../browser/models";
 import { store } from "../browser/store";
+import { debounce } from "./utils";
 
 class SettingsFormController {
-  IsCurrentUrlBlacklisted() {
-    return alist.IsCurrentUrlBlacklisted();
-  }
-  async GetSettings() {
-    return store.GetStorage({
-      isEnabled: true,
-      btnsize: 0.8,
-      placement: "br",
-      blackListed: [],
-    });
+  async IsCurrentUrlBlacklisted() {
+    const tab = await getCurrentTab();
+    return alist.IsUrlBlackListed(tab.url);
   }
   async GetVersion() {
     return system.management.getSelf().then((ext) => ext.version);
   }
-  SetBlackListed(val: boolean): void {
-    alist.SetCurrentBlackListed(val);
+  ListenBlackListChanged(cb: (v: string[]) => void) {
+    store.OnStorageChanged("blackListed", cb, []);
   }
-  SetBtnSize(val: number): void {
+  ListenIsEnabledChanged(cb: (v: boolean) => void) {
+    store.OnStorageChanged("isEnabled", cb, true);
+  }
+  ListenBtnSizeChanged(cb: (v: number) => void) {
+    store.OnStorageChanged("btnsize", cb, 0.8);
+  }
+  ListenPlacementChanged(cb: (v: PlacementType) => void) {
+    store.OnStorageChanged("placement", cb, "br");
+  }
+  async SetCurrentEnabled(enabled: boolean) {
+    const blackListed = !enabled;
+    const tab = await getCurrentTab();
+    if (blackListed) {
+      alist.BlackListAdd(tab.url);
+    } else {
+      alist.BlackListRemove(tab.url);
+    }
+  }
+  SetBtnSize = debounce((val: number): void => {
     store.SetStorage({ btnsize: val });
-  }
-  SetPlacement(val: PlacementType): void {
+  }, 300);
+  SetPlacement = debounce((val: PlacementType): void => {
     store.SetStorage({ placement: val });
-  }
-  SetAllEnabled(val: boolean): void {
+  }, 300);
+  SetAllEnabled = debounce((val: boolean): void => {
     store.SetStorage({ isEnabled: val });
-  }
+  }, 300);
   LaunchOptionsPage(): Promise<any> {
     return system.runtime.openOptionsPage();
   }
   async SendCheckApiEvent() {
-    const tabId = (await system.tabs.getCurrent()).id;
-    return MessageApi.emitEventToTab("request_api", tabId);
+    const tabId = (await getCurrentTab()).id;
+    return MessageApi.emitEventToTab("tab_url_changed", tabId);
+  }
+  GetFormBtnsLocation() {
+    return [
+      {
+        value: "br",
+        text: "Bottom Right",
+      },
+      {
+        value: "bl",
+        text: "Bottom Left",
+      },
+      {
+        value: "tr",
+        text: "Top Right",
+      },
+      {
+        value: "tl",
+        text: "Top Left",
+      },
+    ];
   }
 }
 

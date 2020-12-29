@@ -6,7 +6,7 @@ class OptionsController {
     return alist.BlackListRemove(hostToRemove);
   }
   ListenBlackListedChanged(cb: (hosts: string[]) => void) {
-    store.OnStorageChanged("blackListed", cb);
+    store.OnStorageChanged("blackListed", cb, []);
   }
 }
 

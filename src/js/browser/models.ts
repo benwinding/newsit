@@ -3,6 +3,7 @@ export interface RootState {
   btnsize: number;
   placement: PlacementType;
   blackListed: string[];
+  debug?: boolean;
 }
 
 export interface ButtonResult {

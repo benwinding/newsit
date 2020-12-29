@@ -1,3 +1,5 @@
+import { ButtonResult } from "../browser/models";
+
 export function debounce<T>(
   fn: (v: T) => void,
   delayMs: number
@@ -16,3 +18,13 @@ export function debounce<T>(
 export const setTimeoutAsyc = (ms: number) =>
   new Promise((res) => setTimeout(res, ms));
 
+export function len(res: ButtonResult) {
+  if (!res || !res.text) {
+    return 0;
+  }
+  return res.text.length;
+}
+
+export function randomUuid() {
+  return Math.random().toString(32).slice(0, 8);
+}

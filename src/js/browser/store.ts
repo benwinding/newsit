@@ -17,7 +17,8 @@ export class Store {
 
   public OnStorageChanged(
     storageKey: keyof RootState,
-    cb: (newValue: any) => void
+    cb: (newValue: any) => void,
+    defaultValue?: any
   ) {
     type StorageChanges = { [key: string]: chrome.storage.StorageChange };
     function listenerCallback(changes: StorageChanges) {
@@ -25,6 +26,15 @@ export class Store {
         if (key === storageKey) {
           cb(val.newValue);
         }
+      });
+    }
+    if (defaultValue !== undefined) {
+      const v = {} as any;
+      v[storageKey] = defaultValue;
+      this.GetStorage(v).then((values) => {
+        const value = values[storageKey];
+        console.log("store OnStorageChanged first", { storageKey, value });
+        cb(value);
       });
     }
     system.storage.onChanged.addListener(listenerCallback);

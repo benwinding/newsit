@@ -6,54 +6,37 @@ import { createContentController } from "./content.controller";
 
 import { BtnItem } from "./shared/buttons";
 import { IFrame } from "./shared/IFrame";
+import { len, randomUuid, setTimeoutAsyc } from "./shared/utils";
 
 const root = document.createElement("div");
 document.body.appendChild(root);
 
 ReactDOM.render(<Container />, root);
 
-const LOADING = "...";
-
 const cc = createContentController();
 
+function DbContainer() {
+  return 
+}
+
 function Container() {
-  const [show, setShow] = useState(false);
+  const [isBlackListed, setIsBlackListed] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [isManualRequest, setIsManualRequest] = useState(null);
+
+  const [shouldShow, setShouldShow] = useState(false);
+
+  console.log("-> vals", { isBlackListed, isEnabled });
+
   const [size, setSize] = useState(1 as number);
   const [iframeWidth, setIframeWidth] = useState(100 as number);
   const [placement, setPlacement] = useState("br" as PlacementType);
   const [placementStyles, setPlacementStyles] = useState<
     Partial<CSSProperties>
   >({});
-  const [reddit, setReddit] = useState({ text: LOADING } as ButtonResult);
-  const [hn, setHn] = useState({ text: LOADING } as ButtonResult);
-  const [redditLogo, setRedditLogo] = React.useState("");
-  const [hnLogo, setHnLogo] = React.useState("");
 
-  React.useEffect(() => {
-    const s: Partial<CSSProperties> = {};
-    s.transform = `scale(${size})`;
-    switch (placement) {
-      case "bl":
-        s.bottom = 0;
-        s.left = 0;
-        s.transformOrigin = "bottom left";
-        break;
-      case "br":
-        s.bottom = 0;
-        s.right = 0;
-        s.transformOrigin = "bottom right";
-        break;
-      case "tl":
-        s.top = 0;
-        s.left = 0;
-        s.transformOrigin = "top left";
-        break;
-      case "tr":
-        s.top = 0;
-        s.right = 0;
-        s.transformOrigin = "top right";
-        break;
-    }
+  useEffect(() => {
+    const s = cc.CalculatePlacementStyles(size, placement);
     setPlacementStyles(s);
   }, [placement, size]);
 
@@ -67,102 +50,136 @@ function Container() {
     cc.ListenBtnSizeChanged((v) => {
       mounted && setSize(v);
     });
-    cc.ListenBlackListedChanged((hosts) => {
-      cc.GetIsCurrentUrlBlackListed().then((isBlackListed) => {
-        const shouldShow = !isBlackListed;
-        mounted && setShow(shouldShow);
+    cc.ListenIsEnabledChanged((v) => {
+      console.log("-> setIsEnabled", v);
+      mounted && setIsEnabled(v);
+    });
+    cc.ListenIsTabBlackListedChanged((v) => {
+      console.log("-> setIsBlackListed", v);
+      mounted && setIsBlackListed(v);
+      mounted && setIsManualRequest(null);
+    });
+    const unsubP = cc.ListenCheckPageTrigger(async () => {
+      mounted && setIsManualRequest(randomUuid());
+    });
+    const unsubT = cc.ListenTabUrlChanged(async () => {
+      mounted && setShouldShow(false);
+      setTimeoutAsyc(10).then(() => {
+        console.log("-> setShow", { isBlackListed, isEnabled });
+        mounted && setShouldShow(isEnabled && !isBlackListed);
       });
     });
-    // Listen For Events
-    cc.ListenResultsHn((res) => {
-      mounted && setHn(res);
-    });
-    cc.ListenResultsReddit((res) => {
-      mounted && setReddit(res);
-    });
-    cc.ListenTabChanged(() => {
-      show && cc.SendCheckApiEvent();
-    });
 
-    function onStart() {
-      cc.GetLogoUrls().then(({reddit, hn}) => {
-        setRedditLogo(reddit);
-        setHnLogo(hn);
-      })
-      cc.GetPlacement().then(placement => {
-        mounted && setPlacement(placement);
-      })
-      cc.GetBtnSize().then(btnsize => {
-        mounted && setSize(btnsize);
-      })
-      cc.GetIsCurrentUrlBlackListed().then(isBlackListed => {
-        const shouldShow = !isBlackListed;
-        mounted && setShow(shouldShow);
-      })
-    }
-
-    onStart();
-  
-    return () => (mounted = false);
+    return () => {
+      mounted = false;
+      unsubP();
+      unsubT();
+    };
   }, []);
-
-  React.useEffect(() => {
-    show && cc.SendCheckApiEvent();
-  }, [show])
-
-  React.useEffect(() => {
-    function len(res: ButtonResult) {
-      if (!res || !res.text) {
-        return 0;
-      }
-      return res.text.length;
-    }
-
-    const width = len(reddit) > len(hn) ? len(reddit) : len(hn);
-    const widthChars = width * 7.8 + 31;
-    setIframeWidth(widthChars);
-  }, [hn, reddit]);
 
   const isReversed = (placement + "").includes("l");
 
+  useEffect(() => {
+    let mounted = true;
+    if (isManualRequest) {
+      setShouldShow(false);
+      setTimeoutAsyc(10).then(() => {
+        mounted && setShouldShow(true);
+      });
+    } else {
+      console.log("-> setShow watched", { isBlackListed, isEnabled });
+      mounted && setShouldShow(isEnabled && !isBlackListed);
+    }
+    return () => (mounted = false);
+  }, [isManualRequest, isEnabled, isBlackListed]);
+
   return (
     <>
-      {show && (
+      {shouldShow && (
         <IFrame
           style={{
-            // zoom: size,
-            zIndex: "10000",
+            zIndex: "99",
             position: "fixed",
             border: "0px",
+            height: "48px",
+            width: iframeWidth + "px",
             ...placementStyles,
           }}
           height="48px"
           width={iframeWidth + "px"}
         >
-          <div
-            style={{
-              display: "flex",
-              color: "white",
-              flexDirection: "column",
+          <BtnGroup
+            isReversed={isReversed}
+            charCountChanged={(count) => {
+              const widthChars = count * 7.8 + 31;
+              setIframeWidth(widthChars);
             }}
-          >
-            <BtnItem
-              reverseLayout={isReversed}
-              logoUrl={redditLogo}
-              link={reddit && reddit.link}
-              text={reddit && reddit.text}
-              bgColor={"#AAAAAA"}
-            />
-            <BtnItem
-              reverseLayout={isReversed}
-              logoUrl={hnLogo}
-              link={hn && hn.link}
-              text={hn && hn.text}
-              bgColor={"#FD6F1D"}
-            />
-          </div>
+          />
         </IFrame>
       )}
     </>
+  );
+}
+
+const LOADING = "...";
+
+function BtnGroup(props: {
+  isReversed: boolean;
+  charCountChanged: (chars: number) => void;
+}) {
+  const [reddit, setReddit] = useState({ text: LOADING } as ButtonResult);
+  const [hn, setHn] = useState({ text: LOADING } as ButtonResult);
+  const [redditLogo, setRedditLogo] = React.useState("");
+  const [hnLogo, setHnLogo] = React.useState("");
+
+  useEffect(() => {
+    let mounted = true;
+    // Listen For Events
+    const subHn = cc.ListenResultsHn((res) => {
+      mounted && setHn(res);
+    });
+    const subReddit = cc.ListenResultsReddit((res) => {
+      mounted && setReddit(res);
+    });
+    cc.GetLogoUrls().then(({ reddit, hn }) => {
+      mounted && setRedditLogo(reddit);
+      mounted && setHnLogo(hn);
+    });
+    cc.SendCheckApiEvent();
+    return () => {
+      mounted = false;
+      subHn();
+      subReddit();
+    };
+  }, []);
+
+  useEffect(() => {
+    const width = len(reddit) > len(hn) ? len(reddit) : len(hn);
+    props.charCountChanged(width);
+  }, [hn, reddit]);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        color: "white",
+        flexDirection: "column",
+      }}
+    >
+      <BtnItem
+        reverseLayout={props.isReversed}
+        logoUrl={redditLogo}
+        link={reddit && reddit.link}
+        text={reddit && reddit.text}
+        bgColor={"#AAAAAA"}
+      />
+      <BtnItem
+        reverseLayout={props.isReversed}
+        logoUrl={hnLogo}
+        link={hn && hn.link}
+        text={hn && hn.text}
+        bgColor={"#FD6F1D"}
+      />
+    </div>
   );
 }
