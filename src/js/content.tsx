@@ -185,6 +185,7 @@ function BtnGroup(props: {
         color: "white",
         flexDirection: "column",
         width: "min-content",
+        alignItems: props.isReversed ? "flex-start" : "flex-end"
       }}
       ref={divRef}
     >
