@@ -50,7 +50,18 @@ export function BtnItem(props: {
             flexDirection: "column",
           }}
         >
-          <h5 style={{ margin: "2px" }}>All {title} Results</h5>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <h5 style={{ margin: "2px" }}>All {title} Results</h5>
+            <p style={{ margin: "2px", fontSize: '0.6em' }}>
+              {other_results.length} found
+            </p>
+          </div>
           {other_results.map((r, i) => {
             return (
               <OtherResultItem
@@ -181,7 +192,7 @@ function ButtonLine(props: {
       <a
         target="_blank"
         href={link}
-        title={'click to view discussion'}
+        title={"click to view discussion"}
         style={{
           textDecoration: !!link ? "underline" : "none",
           cursor: !!link ? "pointer" : "default",
@@ -204,7 +215,7 @@ function ButtonLine(props: {
           backgroundColor: "#b1b1b159",
           boxShadow: menuDisabled ? "unset" : "#00000047 0px 1px 4px 1px",
           marginRight: "3px",
-          cursor: menuDisabled ? "unset" : 'pointer'
+          cursor: menuDisabled ? "unset" : "pointer",
         }}
         onClick={() => !menuDisabled && menuOpenChanged(!menuOpen)}
       >
