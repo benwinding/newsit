@@ -6,17 +6,18 @@ import { createBackgroundController } from "./background.controller";
 
 const bc = createBackgroundController();
 
-bc.ListenUrlChange((tabId) => {
-  bc.SendEventToTab("tab_url_changed", tabId).catch((err) => {
-    if (bc.ErrorIsNotLoaded(err)) {
-      // bc.RunScripts(tabId);
-    }
-  });
+bc.ListenUrlChange(async (tabId, tabUrl) => {
+  const shouldBeGrey = await bc.IsUrlBlackListed(tabUrl);
+  bc.SetIconGrey(shouldBeGrey);
+  bc.SendEventToTab("tab_url_changed", tabId);
 });
 bc.ListenTabChange(async (tabId, tabUrl) => {
   const shouldBeGrey = await bc.IsUrlBlackListed(tabUrl);
   bc.SetIconGrey(shouldBeGrey);
 });
+bc.ListenForAllEnabledChange((isAllEnabled) => {
+  bc.SetIconText(isAllEnabled);
+})
 bc.ListenForRequestApi((tabId) => {
   onRequestBackgroundHN(tabId)
     .then((res) => bc.SendEventToTab("result_from_hn", tabId, res))

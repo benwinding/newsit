@@ -17,8 +17,8 @@ interface SettingsFormState {
   hasAllEnabled: boolean;
   btnsPlacement: PlacementType;
   formBtnsSize: number;
-  blackListStr: string;
   blackListAlteredStr: string;
+  blackListStr: string;
 }
 
 export class SettingsForm extends React.Component<
@@ -30,8 +30,8 @@ export class SettingsForm extends React.Component<
     hasAllEnabled: false,
     btnsPlacement: "br" as PlacementType,
     formBtnsSize: 1,
-    blackListStr: "",
     blackListAlteredStr: "",
+    blackListStr: "",
   };
 
   constructor(props: SettingsFormProps) {
@@ -43,8 +43,12 @@ export class SettingsForm extends React.Component<
     sfc.ListenBlackListChanged(async (list) => {
       const isBlackListed = await sfc.IsCurrentUrlBlacklisted();
       const isEnabled = !isBlackListed;
-      ctx.setState({ blackListStr: list.join("\n") });
-      ctx.setState({ hasCurrentEnabled: isEnabled });
+      const blackListStr = list.join("\n");
+      ctx.setState({
+        hasCurrentEnabled: isEnabled,
+        blackListAlteredStr: "",
+        blackListStr: blackListStr,
+      });
     });
     sfc.ListenPlacementChanged((v) => {
       ctx.setState({ btnsPlacement: v });
@@ -57,9 +61,9 @@ export class SettingsForm extends React.Component<
     });
   }
 
-  onCurrentUrlBlackListedChanged(value: boolean) {
-    sfc.SetCurrentEnabled(value);
-    this.setState({ hasCurrentEnabled: value });
+  onCurrentEnabledChanged(isEnabled: boolean) {
+    sfc.SetCurrentEnabled(isEnabled);
+    this.setState({ hasCurrentEnabled: isEnabled });
   }
 
   onAllEnabledChanged(value: boolean) {
@@ -83,7 +87,6 @@ export class SettingsForm extends React.Component<
     const newHosts = this.state.blackListAlteredStr;
     const newHostArr = newHosts.split("\n");
     sfc.SetHostsArr(newHostArr);
-    this.setState({ blackListAlteredStr: "" });
   }
 
   render() {
@@ -92,8 +95,8 @@ export class SettingsForm extends React.Component<
       hasAllEnabled,
       btnsPlacement,
       formBtnsSize,
-      blackListStr,
       blackListAlteredStr,
+      blackListStr,
     } = this.state;
     const { isPopupPage, onClickCheck, isLoading } = this.props;
 
@@ -117,23 +120,23 @@ export class SettingsForm extends React.Component<
               </div>
               <CheckBox
                 value={hasCurrentEnabled}
-                onChange={this.onCurrentUrlBlackListedChanged}
+                onChange={(e) => this.onCurrentEnabledChanged(e)}
                 title="Enabled on this website"
               />
             </>
           )}
           <CheckBox
             value={hasAllEnabled}
-            onChange={this.onAllEnabledChanged}
+            onChange={(e) => this.onAllEnabledChanged(e)}
             title="Run automatically on page load"
           />
           <p>Hosts Blocked</p>
           <textarea
             style={{ width: "100%", height: isPopupPage ? "60px" : "200px" }}
-            defaultValue={blackListStr}
+            value={blackListStr}
             onChange={(e) => {
               const text = e.target.value;
-              this.setState({ blackListAlteredStr: text });
+              this.setState({ blackListStr: text, blackListAlteredStr: text });
             }}
           ></textarea>
           {!!blackListAlteredStr && (

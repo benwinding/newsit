@@ -5,6 +5,9 @@ import { MessageChannelType } from "./browser/models";
 import { store } from "./browser/store";
 
 class BackgroundController {
+  ListenForAllEnabledChange(cb: (isAllEnabled: boolean) => void) {
+    store.OnStorageChanged('isEnabled', cb, true);
+  }
   ListenForHostAdd(cb: (hostToAdd: string) => Promise<void>) {
     MessageApi.onEvent("host_add_to_list", (d: string, s) => {
       return cb(d);
@@ -36,13 +39,6 @@ class BackgroundController {
       if (!url) {
         return;
       }
-      const isBlackListed = !alist.IsUrlBlackListed(url);
-      console.log(`tab: ${tabId}, url changed to: ${url}`, {
-        isBlackListed,
-      });
-      if (isBlackListed) {
-        return;
-      }
       cb(tabId, url);
     });
   }
@@ -72,10 +68,19 @@ class BackgroundController {
   SendEventToTab(e: MessageChannelType, tabId: number, d?: any) {
     return MessageApi.emitEventToTab(e, tabId, d);
   }
-  SetIconGrey(enabled: boolean) {
-    const iconPath = enabled ? "./img/icon.png" : "./img/icon-grey.png";
+  SetIconGrey(shouldBeGrey: boolean) {
+    const iconPath = shouldBeGrey ? "./img/icon-grey.png" : "./img/icon.png";
     const iconP = system.runtime.getURL(iconPath);
     system.browserAction.setIcon({ path: iconP });
+  }
+  SetIconText(isAllOn: boolean) {
+    // ⏻ ⏼ ⏽ ⭘ ⏾
+    const iconPath = isAllOn ? "●" : "";
+    // const iconTextBackgroundColor = isAllOn ? "#FF0000" : "gray";
+    // const iconTextColor = isAllOn ? "white" : "black";
+    system.browserAction.setBadgeText({text: iconPath});
+    // system.browserAction.setBadgeTextColor({color: iconTextColor});
+    // system.browserAction.setBadgeBackgroundColor({color: iconTextBackgroundColor});
   }
 
   private async ExecuteContentScripts(tabId: number) {

@@ -6,29 +6,32 @@ import {
 } from "./url-validator";
 
 export class AllowListManager {
-  public async IsUrlBlackListed(urlString: string): Promise<boolean> {
+  public async IsUrlBlackListed(url: string): Promise<boolean> {
     const blackList = await this.GetBlackListedHosts();
-    console.log("IsUrlBlackListed", { urlString, blackList });
+    let isBlackListed = false;
     try {
-      CheckProtocolAllowed(urlString);
-      CheckHostAllowedOnFirefox(urlString);
-      CheckBlacklist(urlString, blackList);
+      CheckProtocolAllowed(url);
+      CheckHostAllowedOnFirefox(url);
+      CheckBlacklist(url, blackList);
     } catch (error) {
       console.log(error);
-      return true;
+      isBlackListed = true;
     }
-    return false;
+    console.log("IsUrlBlackListed", { isBlackListed, url, blackList });
+    return isBlackListed;
   }
 
   IsHostAllowedOnFirefox(url: string) {
+    let isBlackListed = false;
     try {
       CheckProtocolAllowed(url);
       CheckHostAllowedOnFirefox(url);
     } catch (error) {
       console.log(error);
-      return true;
+      isBlackListed = true;
     }
-    return false;
+    console.log("IsUrlBlackListed", { isBlackListed, url });
+    return isBlackListed;
   }
 
   public async GetBlackListedHosts(): Promise<string[]> {
