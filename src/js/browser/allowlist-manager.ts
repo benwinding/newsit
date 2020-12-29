@@ -1,9 +1,12 @@
+import { MakeLogger } from "../shared/logger";
 import { store } from "./store";
 import {
   CheckBlacklist,
   CheckHostAllowedOnFirefox,
   CheckProtocolAllowed,
 } from "./url-validator";
+
+const logger = MakeLogger('allowlist-manager');
 
 export class AllowListManager {
   public async IsUrlBlackListed(url: string): Promise<boolean> {
@@ -14,10 +17,10 @@ export class AllowListManager {
       CheckHostAllowedOnFirefox(url);
       CheckBlacklist(url, blackList);
     } catch (error) {
-      console.log(error);
+      logger.log(error);
       isBlackListed = true;
     }
-    console.log("IsUrlBlackListed", { isBlackListed, url, blackList });
+    logger.log("IsUrlBlackListed", { isBlackListed, url, blackList });
     return isBlackListed;
   }
 
@@ -27,10 +30,10 @@ export class AllowListManager {
       CheckProtocolAllowed(url);
       CheckHostAllowedOnFirefox(url);
     } catch (error) {
-      console.log(error);
+      logger.log(error);
       isBlackListed = true;
     }
-    console.log("IsUrlBlackListed", { isBlackListed, url });
+    logger.log("IsUrlBlackListed", { isBlackListed, url });
     return isBlackListed;
   }
 

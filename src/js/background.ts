@@ -3,8 +3,11 @@ import {
   onRequestBackgroundReddit,
 } from "./browser/api";
 import { createBackgroundController } from "./background.controller";
+import { MakeLogger } from "./shared/logger";
 
 const bc = createBackgroundController();
+
+const logger = MakeLogger('background');
 
 bc.ListenUrlChange(async (tabId, tabUrl) => {
   const shouldBeGrey = await bc.IsUrlBlackListed(tabUrl);
@@ -21,10 +24,10 @@ bc.ListenForAllEnabledChange((isAllEnabled) => {
 bc.ListenForRequestApi((tabId) => {
   onRequestBackgroundHN(tabId)
     .then((res) => bc.SendEventToTab("result_from_hn", tabId, res))
-    .catch((err) => console.log("!!!! request_hn", err));
+    .catch((err) => logger.log("!!!! request_hn", err));
   onRequestBackgroundReddit(tabId)
     .then((res) => bc.SendEventToTab("result_from_reddit", tabId, res))
-    .catch((err) => console.log("!!!! request_reddit", err));
+    .catch((err) => logger.log("!!!! request_reddit", err));
 });
 bc.ListenForHostRemove(async (hostToRemove: string) => {
   await bc.BlacklistRemoveHost(hostToRemove);

@@ -33,23 +33,34 @@ class Container extends React.Component<{}, DbState> {
 
   componentDidMount() {
     const ctx = this;
-    const setShouldShow = () => {
+    function updateShouldShow() {
       const shouldShow = ctx.state.isEnabled && !ctx.state.isBlackListed;
       ctx.setState({ shouldShow: shouldShow });
-    };
+    }
+    function updatePlacementStyles() {
+      const styles = cc.CalculatePlacementStyles(
+        ctx.state.size,
+        ctx.state.placement
+      );
+      ctx.setState({
+        placementStyles: styles,
+      });
+    }
     cc.ListenPlacementChanged((v) => {
       ctx.setState({ placement: v });
+      updatePlacementStyles();
     });
     cc.ListenBtnSizeChanged((v) => {
       ctx.setState({ size: v });
+      updatePlacementStyles();
     });
     cc.ListenIsEnabledChanged((v) => {
       ctx.setState({ isEnabled: v });
-      setShouldShow();
+      updateShouldShow();
     });
     cc.ListenIsTabBlackListedChanged((v) => {
       ctx.setState({ isBlackListed: v });
-      setShouldShow();
+      updateShouldShow();
     });
     cc.ListenCheckPageTrigger(async () => {
       ctx.setState({ shouldShow: false });
@@ -60,7 +71,7 @@ class Container extends React.Component<{}, DbState> {
     cc.ListenTabUrlChanged(async () => {
       ctx.setState({ shouldShow: false });
       setTimeoutAsyc(1).then(() => {
-        setShouldShow();
+        updateShouldShow();
       });
     });
   }
@@ -79,7 +90,7 @@ class Container extends React.Component<{}, DbState> {
         {shouldShow && (
           <IFrame
             style={{
-              zIndex: "99",
+              zIndex: "999",
               position: "fixed",
               bottom: "0px",
               border: "0px",

@@ -15,6 +15,7 @@ interface SettingsFormProps {
 interface SettingsFormState {
   hasCurrentEnabled: boolean;
   hasAllEnabled: boolean;
+  hasDebugEnabled: boolean;
   btnsPlacement: PlacementType;
   formBtnsSize: number;
   blackListAlteredStr: string;
@@ -28,6 +29,7 @@ export class SettingsForm extends React.Component<
   state = {
     hasCurrentEnabled: true,
     hasAllEnabled: false,
+    hasDebugEnabled: false,
     btnsPlacement: "br" as PlacementType,
     formBtnsSize: 1,
     blackListAlteredStr: "",
@@ -59,6 +61,14 @@ export class SettingsForm extends React.Component<
     sfc.ListenIsEnabledChanged((v) => {
       ctx.setState({ hasAllEnabled: v });
     });
+    sfc.ListenConsoleDebugChanged((v) => {
+      ctx.setState({ hasDebugEnabled: v });
+    });
+  }
+
+  onConsoleDebugChanged(isEnabled: boolean) {
+    sfc.SetConsoleDebug(isEnabled);
+    this.setState({ hasDebugEnabled: isEnabled });
   }
 
   onCurrentEnabledChanged(isEnabled: boolean) {
@@ -79,8 +89,8 @@ export class SettingsForm extends React.Component<
 
   onFormBtnsSizeChanged(e: React.ChangeEvent<HTMLInputElement>) {
     const value = +e.target.value;
-    sfc.SetBtnSize(value);
     this.setState({ formBtnsSize: value });
+    sfc.SetBtnSize(value);
   }
 
   onSaveHosts() {
@@ -93,6 +103,7 @@ export class SettingsForm extends React.Component<
     const {
       hasCurrentEnabled,
       hasAllEnabled,
+      hasDebugEnabled,
       btnsPlacement,
       formBtnsSize,
       blackListAlteredStr,
@@ -130,6 +141,11 @@ export class SettingsForm extends React.Component<
             onChange={(e) => this.onAllEnabledChanged(e)}
             title="Run automatically on page load"
           />
+          <CheckBox
+            value={hasDebugEnabled}
+            onChange={(e) => this.onConsoleDebugChanged(e)}
+            title="Show Console Output"
+          />
           <p>Hosts Blocked</p>
           <textarea
             style={{ width: "100%", height: isPopupPage ? "60px" : "200px" }}
@@ -158,7 +174,7 @@ export class SettingsForm extends React.Component<
               <div className="select">
                 <select
                   value={btnsPlacement}
-                  onChange={this.onBtnsLocationChanged}
+                  onChange={(e) => this.onBtnsLocationChanged(e)}
                 >
                   <option disabled value="">
                     Nothing selected
@@ -180,7 +196,7 @@ export class SettingsForm extends React.Component<
               <input
                 type="range"
                 value={formBtnsSize}
-                onChange={this.onFormBtnsSizeChanged}
+                onChange={(e) => this.onFormBtnsSizeChanged(e)}
                 min="0.2"
                 max="2"
                 step="0.05"

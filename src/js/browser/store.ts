@@ -1,7 +1,10 @@
+import { MakeLogger } from "../shared/logger";
 import { getBrowserInstance } from "./browser";
 import { RootState } from "./models";
 
 const system = getBrowserInstance();
+
+const logger = MakeLogger('store');
 
 export class Store {
   public GetStorage<T extends Partial<RootState>>(
@@ -11,7 +14,7 @@ export class Store {
   }
 
   public SetStorage<T extends Partial<RootState>>(newValues: T): Promise<void> {
-    console.log("SetStorage", newValues);
+    logger.log("SetStorage", newValues);
     return system.storage.sync.set(newValues);
   }
 
@@ -24,7 +27,9 @@ export class Store {
     function listenerCallback(changes: StorageChanges) {
       Object.entries(changes).map(([key, val]) => {
         if (key === storageKey) {
-          cb(val.newValue);
+          const value = val.newValue;
+          logger.log("store OnStorageChanged event", { storageKey, value });
+          cb(value);
         }
       });
     }
@@ -33,7 +38,7 @@ export class Store {
       v[storageKey] = defaultValue;
       this.GetStorage(v).then((values) => {
         const value = values[storageKey];
-        console.log("store OnStorageChanged first", { storageKey, value });
+        logger.log("store OnStorageChanged first", { storageKey, value });
         cb(value);
       });
     }

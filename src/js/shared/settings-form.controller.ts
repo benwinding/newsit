@@ -19,6 +19,9 @@ class SettingsFormController {
   ListenIsEnabledChanged(cb: (v: boolean) => void) {
     store.OnStorageChanged("isEnabled", cb, true);
   }
+  ListenConsoleDebugChanged(cb: (v: boolean) => void) {
+    store.OnStorageChanged("debug", cb, false);
+  }
   ListenBtnSizeChanged(cb: (v: number) => void) {
     store.OnStorageChanged("btnsize", cb, 0.8);
   }
@@ -45,6 +48,9 @@ class SettingsFormController {
   }, 300);
   SetAllEnabled = debounce((val: boolean): void => {
     store.SetStorage({ isEnabled: val });
+  }, 300);
+  SetConsoleDebug = debounce((val: boolean): void => {
+    store.SetStorage({ debug: val });
   }, 300);
   LaunchOptionsPage(): Promise<any> {
     return system.runtime.openOptionsPage();

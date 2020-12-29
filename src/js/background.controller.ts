@@ -3,6 +3,9 @@ import { system } from "./browser/browser";
 import { MessageApi } from "./browser/messages";
 import { MessageChannelType } from "./browser/models";
 import { store } from "./browser/store";
+import { MakeLogger } from "./shared/logger";
+
+const logger = MakeLogger('background.controller')
 
 class BackgroundController {
   ListenForAllEnabledChange(cb: (isAllEnabled: boolean) => void) {
@@ -26,7 +29,7 @@ class BackgroundController {
   ListenTabChange(cb: (tabId: any, tabUrl: any) => Promise<void>) {
     system.tabs.onActivated.addListener(async (activeInfo) => {
       const tabId = activeInfo.tabId;
-      console.log(`onTabChangeActive, tab: ${tabId}, is the new ActiveTab`, {
+      logger.log(`onTabChangeActive, tab: ${tabId}, is the new ActiveTab`, {
         activeInfo,
       });
       const tab = await system.tabs.get(tabId);
@@ -85,7 +88,7 @@ class BackgroundController {
 
   private async ExecuteContentScripts(tabId: number) {
     function exec(relPath: string) {
-      console.log("executeContentScripts", { relPath });
+      logger.log("executeContentScripts", { relPath });
       return system.tabs.executeScript(tabId, {
         file: relPath,
       });
@@ -100,7 +103,7 @@ class BackgroundController {
   async RunScripts(tabId: number) {
     const tab = await this.getTab(tabId);
     await this.ExecuteContentScripts(tabId).catch((err) => {
-      console.error("executeContentScripts", err);
+      logger.error("executeContentScripts", err);
     });
   }
 }

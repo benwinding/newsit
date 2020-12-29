@@ -3,6 +3,9 @@ import { doUrlsMatch } from "./url-matcher";
 
 import { alist } from "./allowlist-manager";
 import { system } from "./browser";
+import { MakeLogger } from "../shared/logger";
+
+const logger = MakeLogger('api');
 
 interface ResultItem {
   url: string;
@@ -60,7 +63,7 @@ function processResults(
 ): ButtonResult {
   const itemsMatches = itemsAll.filter((h) => doUrlsMatch(h.url, searchUrl));
   if (!itemsMatches.length) {
-    console.log("Hacker News API: No urls matches found");
+    logger.log("Hacker News API: No urls matches found");
     return {
       text: "-",
     };
@@ -87,7 +90,7 @@ export async function onRequestBackgroundHN(
   const searchUrl = await getTabUrl(tabId);
   const blocked = await alist.IsUrlBlackListed(searchUrl);
   if (blocked) {
-    console.log("Hacker News API: Url blocked");
+    logger.log("Hacker News API: Url blocked");
     return {
       text: "-",
     };
@@ -102,7 +105,7 @@ export async function onRequestBackgroundHN(
   }
   const res: HnJsonRes = await makeRequest(requestUrl, true);
   if (res.nbHits == 0) {
-    console.log("Hacker News API: No urls found");
+    logger.log("Hacker News API: No urls found");
     return {
       text: "-",
     };
@@ -118,7 +121,7 @@ export async function onRequestBackgroundReddit(
   const searchUrl = await getTabUrl(tabId);
   const blocked = await alist.IsUrlBlackListed(searchUrl);
   if (blocked) {
-    console.log("Reddit API: Url blocked");
+    logger.log("Reddit API: Url blocked");
     return {
       text: "-",
     };
@@ -131,7 +134,7 @@ export async function onRequestBackgroundReddit(
   const results = html.querySelectorAll(".search-result-link");
   if (results.length == 0) {
     html.remove();
-    console.log("Reddit API: No urls matches found");
+    logger.log("Reddit API: No urls matches found");
     return {
       text: "-",
     };
@@ -146,7 +149,7 @@ async function makeRequest(
   url: RequestInfo,
   isJson: boolean
 ): Promise<string | any> {
-  console.log("makeRequest", { url, isJson });
+  logger.log("makeRequest", { url, isJson });
   const res = await fetch(url);
   if (isJson) {
     return res.json();

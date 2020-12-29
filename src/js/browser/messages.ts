@@ -1,10 +1,20 @@
 import { MessageChannelObj, MessageChannelType, RootState } from "./models";
 import { getBrowserInstance } from "./browser";
 import { Runtime } from "webextension-polyfill-ts";
+import { MakeLogger } from "../shared/logger";
 
 const system = getBrowserInstance();
 
 type UnsubscribeFn = () => void;
+
+const logger = MakeLogger("messages");
+
+function handleMessageError(err: {message: string}) {
+  const tabClosed = err.message.includes("Receiving end does not exist.");
+  if (!tabClosed) {
+    logger.error("requestWithResponse", err);
+  }
+}
 
 export const MessageApi = {
   async requestWithResponse<T>(
@@ -15,32 +25,27 @@ export const MessageApi = {
       channel: channel,
       data: data,
     };
-    return system.runtime.sendMessage(msg).catch((err) => {
-      const tabClosed = err.message.includes("Receiving end does not exist.");
-      if (!tabClosed) {
-        console.error("requestWithResponse", err);
-      }
-    });
+    return system.runtime.sendMessage(msg).catch(handleMessageError);
   },
-  emitEvent(channel: MessageChannelType, data?: {}): Promise<any> {
+  async emitEvent(channel: MessageChannelType, data?: {}): Promise<void> {
     const msg: MessageChannelObj = {
       channel: channel,
       data: data,
     };
-    console.log("^ emitting event: ", msg);
-    return system.runtime.sendMessage(msg);
+    logger.log("^ emitting event: ", msg);
+    await system.runtime.sendMessage(msg).catch(handleMessageError);
   },
-  emitEventToTab(
+  async emitEventToTab(
     channel: MessageChannelType,
     tabId: number,
     data?: {}
-  ): Promise<any> {
+  ): Promise<void> {
     const msg: MessageChannelObj = {
       channel: channel,
       data: data,
     };
-    console.log("^ emitting event to tab(" + tabId + "): ", msg);
-    return system.tabs.sendMessage(tabId, msg);
+    logger.log("^ emitting event to tab(" + tabId + "): ", msg);
+    await system.tabs.sendMessage(tabId, msg).catch(handleMessageError);
   },
   onEvent<T>(
     channel: MessageChannelType,
@@ -54,11 +59,11 @@ export const MessageApi = {
       if (sendingChannel !== channel) {
         return;
       }
-      console.log("> recieved event: " + sendingChannel, { request, sender });
+      logger.log("> recieved event: " + sendingChannel, { request, sender });
       cb(request.data, sender);
       return true;
     }
-    console.log(">> Registering for ", { channel });
+    logger.log(">> Registering for ", { channel });
     system.runtime.onMessage.addListener(listenerCallback);
     function unSubscribe() {
       system.runtime.onMessage.removeListener(listenerCallback);
