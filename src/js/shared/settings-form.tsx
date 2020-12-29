@@ -124,7 +124,10 @@ export class SettingsForm extends React.Component<
     const { isPopupPage, onClickCheck, isLoading } = this.props;
 
     return (
-      <div className="section py-1">
+      <div
+        className="section py-1"
+        style={{ overflowY: "auto", height: isPopupPage && "400px" }}
+      >
         <section className="form">
           {isPopupPage && (
             <>
