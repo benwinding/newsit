@@ -28,6 +28,9 @@ class SettingsFormController {
   ListenPlacementChanged(cb: (v: PlacementType) => void) {
     store.OnStorageChanged("placement", cb, "br");
   }
+  ListenZindexChanged(cb: (v: number) => void) {
+    store.OnStorageChanged("btnzindex", cb, 999);
+  }
   SetHostsArr(newHostArr: string[]) {
     alist.BlackListSetNewArray(newHostArr);
   }
@@ -51,6 +54,9 @@ class SettingsFormController {
   }, 300);
   SetConsoleDebug = debounce((val: boolean): void => {
     store.SetStorage({ debug: val });
+  }, 300);
+  SetZindex = debounce((val: number): void => {
+    store.SetStorage({ btnzindex: val });
   }, 300);
   LaunchOptionsPage(): Promise<any> {
     return system.runtime.openOptionsPage();

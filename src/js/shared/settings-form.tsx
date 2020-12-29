@@ -18,6 +18,7 @@ interface SettingsFormState {
   hasDebugEnabled: boolean;
   btnsPlacement: PlacementType;
   formBtnsSize: number;
+  formZindex: number;
   blackListAlteredStr: string;
   blackListStr: string;
 }
@@ -32,6 +33,7 @@ export class SettingsForm extends React.Component<
     hasDebugEnabled: false,
     btnsPlacement: "br" as PlacementType,
     formBtnsSize: 1,
+    formZindex: 999,
     blackListAlteredStr: "",
     blackListStr: "",
   };
@@ -64,6 +66,9 @@ export class SettingsForm extends React.Component<
     sfc.ListenConsoleDebugChanged((v) => {
       ctx.setState({ hasDebugEnabled: v });
     });
+    sfc.ListenZindexChanged((v) => {
+      ctx.setState({ formZindex: v });
+    });
   }
 
   onConsoleDebugChanged(isEnabled: boolean) {
@@ -93,6 +98,12 @@ export class SettingsForm extends React.Component<
     sfc.SetBtnSize(value);
   }
 
+  onFormZindexChanged(e: React.ChangeEvent<HTMLInputElement>): void {
+    const value = +e.target.value;
+    this.setState({ formZindex: value });
+    sfc.SetZindex(value);
+  }
+
   onSaveHosts() {
     const newHosts = this.state.blackListAlteredStr;
     const newHostArr = newHosts.split("\n");
@@ -106,6 +117,7 @@ export class SettingsForm extends React.Component<
       hasDebugEnabled,
       btnsPlacement,
       formBtnsSize,
+      formZindex,
       blackListAlteredStr,
       blackListStr,
     } = this.state;
@@ -146,7 +158,10 @@ export class SettingsForm extends React.Component<
             onChange={(e) => this.onConsoleDebugChanged(e)}
             title="Show Console Output"
           />
-          <p>Hosts Blocked</p>
+          <label className="label mb-0">Hosts Blocked</label>
+          <p style={{ color: "darkgrey", fontSize: "13px" }}>
+            <i>Edit which hosts are blocked</i>
+          </p>
           <textarea
             style={{ width: "100%", height: isPopupPage ? "60px" : "200px" }}
             value={blackListStr}
@@ -213,6 +228,20 @@ export class SettingsForm extends React.Component<
                   transform: `scale(${formBtnsSize})`,
                 }}
               />
+            </div>
+          </div>
+          <div className="field">
+            <label className="label">Buttons Z-index</label>
+            <div className="control">
+              <input
+                type="number"
+                value={formZindex}
+                onChange={(e) => this.onFormZindexChanged(e)}
+                min="1"
+                max="9999"
+                step="1"
+              />
+              <span>{formZindex}</span>
             </div>
           </div>
         </section>

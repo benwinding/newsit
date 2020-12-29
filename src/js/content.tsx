@@ -15,6 +15,7 @@ interface DbState {
   isEnabled: boolean;
   shouldShow: boolean;
   size: number;
+  zindex: number;
   iframeWidth: number;
   placement: PlacementType;
   placementStyles: Partial<CSSProperties>;
@@ -26,6 +27,7 @@ class Container extends React.Component<{}, DbState> {
     isEnabled: false,
     shouldShow: false,
     size: 1,
+    zindex: 999,
     iframeWidth: 100,
     placement: "br" as PlacementType,
     placementStyles: {} as Partial<CSSProperties>,
@@ -53,6 +55,9 @@ class Container extends React.Component<{}, DbState> {
     cc.ListenBtnSizeChanged((v) => {
       ctx.setState({ size: v });
       updatePlacementStyles();
+    });
+    cc.ListenZindexChanged((v) => {
+      ctx.setState({ zindex: v });
     });
     cc.ListenIsEnabledChanged((v) => {
       ctx.setState({ isEnabled: v });
@@ -82,7 +87,7 @@ class Container extends React.Component<{}, DbState> {
   }
 
   render() {
-    const { iframeWidth, placement, placementStyles, shouldShow } = this.state;
+    const { iframeWidth, placement, placementStyles, shouldShow, zindex } = this.state;
     const isReversed = (placement + "").includes("l");
 
     return (
@@ -90,7 +95,7 @@ class Container extends React.Component<{}, DbState> {
         {shouldShow && (
           <IFrame
             style={{
-              zIndex: "999",
+              zIndex: zindex,
               position: "fixed",
               bottom: "0px",
               border: "0px",

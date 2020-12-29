@@ -63,9 +63,10 @@ export const MessageApi = {
       cb(request.data, sender);
       return true;
     }
-    logger.log(">> Registering for ", { channel });
+    logger.log(">> listener registered for events", { channel });
     system.runtime.onMessage.addListener(listenerCallback);
     function unSubscribe() {
+      logger.log("<< unregistering listener", { channel });
       system.runtime.onMessage.removeListener(listenerCallback);
     }
     return unSubscribe;

@@ -1,6 +1,7 @@
 export interface RootState {
   isEnabled: boolean;
   btnsize: number;
+  btnzindex: number;
   placement: PlacementType;
   blackListed: string[];
   debug?: boolean;

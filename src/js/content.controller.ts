@@ -52,6 +52,9 @@ class ContentController {
   ListenBtnSizeChanged(cb: (v: number) => void) {
     store.OnStorageChanged("btnsize", cb, 0.8);
   }
+  ListenZindexChanged(cb: (v: number) => void) {
+    store.OnStorageChanged("btnzindex", cb, 999);
+  }
   ListenIsEnabledChanged(cb: (v: boolean) => void) {
     store.OnStorageChanged("isEnabled", cb, true);
   }
