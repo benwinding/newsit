@@ -1,10 +1,21 @@
-const withHttp = (url: string) => !/^https?:\/\//i.test(url) ? `http://${url}` : url;
+const withHttp = (url: string) =>
+  !/^https?:\/\//i.test(url) ? `http://${url}` : url;
 
 export function stripUrl(urlString: string) {
   const urlWithProtocol = withHttp(urlString);
   const urlObj = new URL(urlWithProtocol);
-  const result = urlObj.host + urlObj.pathname + urlObj.search;
+  const hostStripped = stripHostPrefix(urlObj.host);
+  const result = hostStripped + urlObj.pathname + urlObj.search;
   return result;
+}
+
+export function stripHostPrefix(hostName: string): string {
+  for (let prefix of ["www.", "m."]) {
+    if (hostName.startsWith(prefix)) {
+      return hostName.replace(prefix, '');
+    }
+  }
+  return hostName;
 }
 
 export function doUrlsMatch(url1: string, url2: string) {

@@ -14,6 +14,15 @@ describe("stripUrl checks", () => {
     expect(stripUrl("https://host.com/?abc=123")).toBe("host.com/?abc=123");
     expect(stripUrl("https://host.com/?abc=123#kjascjascjjasc")).toBe("host.com/?abc=123");
   });
+  test("check ignores www.", () => {
+    expect(stripUrl("https://www.host.com/")).toBe("host.com/");
+  });
+  test("check ignores m.", () => {
+    expect(stripUrl("https://m.host.com/")).toBe("host.com/");
+  });
+  test("check only ignores first m.", () => {
+    expect(stripUrl("https://m.m.www.host.com/")).toBe("m.www.host.com/");
+  });
 });
 
 describe("doUrlsMatch checks", () => {

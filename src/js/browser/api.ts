@@ -1,5 +1,5 @@
 import { ButtonResult, OtherResult } from "./models";
-import { doUrlsMatch } from "./url-matcher";
+import { doUrlsMatch, stripUrl } from "./url-matcher";
 
 import { alist } from "./allowlist-manager";
 import { system } from "./browser";
@@ -141,7 +141,8 @@ export async function onRequestBackgroundHN(
   tabId: number
 ): Promise<ButtonResult> {
   const searchUrl = await getTabUrl(tabId);
-  const blocked = await alist.IsUrlBlackListed(searchUrl);
+  const searchUrlStripped = stripUrl(searchUrl);
+  const blocked = await alist.IsUrlBlackListed(searchUrlStripped);
   if (blocked) {
     logger.log("Hacker News API: Url blocked");
     return {
@@ -149,7 +150,7 @@ export async function onRequestBackgroundHN(
     };
   }
   const queryString = `query=${encodeURIComponent(
-    searchUrl
+    searchUrlStripped
   )}&restrictSearchableAttributes=url`;
   const requestUrl = "https://hn.algolia.com/api/v1/search?" + queryString;
   interface HnJsonRes {
@@ -164,7 +165,7 @@ export async function onRequestBackgroundHN(
     };
   }
   const itemsAll = res.hits.map(translateHnToItem);
-  const itemsResults = processResults(itemsAll, searchUrl);
+  const itemsResults = processResults(itemsAll, searchUrlStripped);
   return itemsResults;
 }
 
