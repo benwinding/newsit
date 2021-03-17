@@ -4,6 +4,7 @@ const imagemin = require("gulp-imagemin");
 const jsonTransform = require("gulp-json-transform");
 const rename = require("gulp-rename");
 const zip = require("gulp-zip");
+const path = require("path");
 
 const target = process.env.TARGET || "chrome";
 const version = process.env.npm_package_version;
@@ -22,12 +23,14 @@ function getDevVersion() {
 }
 
 const conf = {
-  vendorPaths: [
-    "./node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
-    "./node_modules/bulma/css/bulma.min.css",
-    "./node_modules/react/umd/react.development.js",
-    "./node_modules/react-dom/umd/react-dom.development.js",
-  ],
+  vendorPaths: {
+    "./node_modules/webextension-polyfill/dist/browser-polyfill.min.js":
+      "browser-polyfill.min.js",
+    "./node_modules/bulma/css/bulma.min.css": "bulma.min.css",
+    "./node_modules/react/umd/react.production.min.js": "react.min.js",
+    "./node_modules/react-dom/umd/react-dom.production.min.js":
+      "react-dom.min.js",
+  },
   src: {
     core: ["./src/js/shared/core.js"],
     scripts: ["./src/js/**/*.js"],
@@ -91,8 +94,23 @@ gulp.task("manifest", function () {
 });
 
 gulp.task("vendor", function () {
+  const vendorPaths = Object.keys(conf.vendorPaths);
+  const vendorPathsMap = Object.entries(conf.vendorPaths).reduce(
+    (acc, [key, val]) => {
+      acc[path.basename(key)] = val;
+      return acc;
+    },
+    {}
+  );
   return gulp
-    .src(conf.vendorPaths)
+    .src(vendorPaths)
+    .pipe(
+      rename(function (p) {
+        const fullPath = p.basename + p.extname;
+        const newFileName = vendorPathsMap[fullPath];
+        p.basename = path.basename(newFileName, path.extname(newFileName));
+      })
+    )
     .pipe(gulp.dest(conf.output.dir + "/vendor"));
 });
 

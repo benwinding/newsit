@@ -95,8 +95,8 @@ class BackgroundController {
     }
 
     await exec("vendor/browser-polyfill.min.js");
-    await exec("vendor/react.development.js");
-    await exec("vendor/react-dom.development.js");
+    await exec("vendor/react.js");
+    await exec("vendor/react-dom.js");
     await exec("js/content.js");
   }
 

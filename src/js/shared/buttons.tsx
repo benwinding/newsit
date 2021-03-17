@@ -214,11 +214,16 @@ function ButtonLine(props: {
           {text}
         </a>
       )}
-      {!hasLink && (
+      {menuOpen && <span style={{ width: "100%" }}></span>}
+      {(!hasLink || menuOpen) && (
         <a
           target="_blank"
           href={submitLink}
-          title={"No submissions found, click to submit to " + title}
+          title={
+            (!hasLink ? "No submissions found, " : "") +
+            "click to submit to " +
+            title
+          }
           style={{
             textDecoration: "none",
             cursor: "pointer",
@@ -228,7 +233,6 @@ function ButtonLine(props: {
           +
         </a>
       )}
-      {menuOpen && <span style={{ width: "100%" }}></span>}
       <div
         style={{
           position: "relative",

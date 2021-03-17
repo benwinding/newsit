@@ -13,18 +13,19 @@ export function useApi<T>(
     }
     let mounted = true;
     setLoading(true);
-    action().then(res => {
+    action().then((res) => {
       setLoading(false);
       if (mounted) {
         setResult(res);
       }
-    })
-    return () => mounted = false;
-  }, [fetchFlag])
+    });
+    return () => {
+      mounted = false;
+    };
+  }, [fetchFlag]);
 
   function triggerFetch() {
     setFetchFlag(Math.random());
   }
   return [result, triggerFetch, loading];
 }
-

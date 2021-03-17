@@ -12,8 +12,8 @@
     {
       "matches": ["<all_urls>"],
       "js": [
-        "vendor/react.development.js",
-        "vendor/react-dom.development.js",
+        "vendor/react.min.js",
+        "vendor/react-dom.min.js",
         "js/content.js"
       ]
     }

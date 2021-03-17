@@ -1,5 +1,5 @@
-import React from 'react';
-import { system } from '../browser/browser';
+import React from "react";
+import { system } from "../browser/browser";
 
 export function Header() {
   const [version, setVersion] = React.useState(null);
@@ -8,9 +8,11 @@ export function Header() {
     let isMounted = true;
     const ver = system.runtime.getManifest().version;
     setVersion(ver);
-    return () => isMounted = false;
+    return () => {
+      isMounted = false;
+    };
   }, []);
-  
+
   return (
     <section className="hero is-dark is-bold">
       <div id="newsit-header" className="hero-body">
