@@ -81,6 +81,9 @@ class ContentController {
   ListenIsEnabledChanged(cb: (v: boolean) => void) {
     store.OnStorageChanged("isEnabled", cb, true);
   }
+  ListenHideWhenNoResultsChanged(cb: (v: boolean) => void) {
+    store.OnStorageChanged("hideWhenNoResults", cb, true);
+  }
   ListenIsTabBlackListedChanged(cb: (isBlackListed: boolean) => void) {
     MessageApi.onEvent("tab_url_changed", async () => {
       const isBlacklisted = await this.GetIsCurrentUrlBlackListed();

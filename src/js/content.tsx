@@ -13,6 +13,7 @@ const cc = createContentController();
 interface DbState {
   isBlackListed: boolean;
   isEnabled: boolean;
+  hideWhenNoResults: boolean;
   shouldShow: boolean;
   size: number;
   zindex: number;
@@ -26,6 +27,7 @@ class Container extends React.Component<{}, DbState> {
   state = {
     isBlackListed: false,
     isEnabled: false,
+    hideWhenNoResults: false,
     shouldShow: false,
     size: 1,
     zindex: 999,
@@ -65,6 +67,10 @@ class Container extends React.Component<{}, DbState> {
       ctx.setState({ isEnabled: v });
       updateShouldShow();
     });
+    cc.ListenHideWhenNoResultsChanged((v) => {
+      ctx.setState({ hideWhenNoResults: v });
+      updateShouldShow();
+    });
     cc.ListenIsTabBlackListedChanged((v) => {
       ctx.setState({ isBlackListed: v });
       updateShouldShow();
@@ -96,6 +102,7 @@ class Container extends React.Component<{}, DbState> {
       iframeHeight,
       placement,
       placementStyles,
+      hideWhenNoResults,
       shouldShow,
       zindex,
     } = this.state;
@@ -112,13 +119,14 @@ class Container extends React.Component<{}, DbState> {
               border: "0px",
               width: iframeWidth + "px",
               height: iframeHeight + "px",
-              overflow: 'hidden',
+              overflow: "hidden",
               ...placementStyles,
             }}
             height="48px"
             width={iframeWidth + "px"}
           >
             <BtnGroup
+              hideWhenNoResults={hideWhenNoResults}
               isReversed={isReversed}
               sizeChanged={(w, h) => this.sizeChanged(w, h)}
             />
@@ -132,6 +140,7 @@ class Container extends React.Component<{}, DbState> {
 const LOADING = "...";
 
 function BtnGroup(props: {
+  hideWhenNoResults: boolean;
   isReversed: boolean;
   sizeChanged: (newWidth: number, newHeight: number) => void;
 }) {
@@ -157,8 +166,8 @@ function BtnGroup(props: {
       mounted && setRedditLogo(reddit);
       mounted && setHnLogo(hn);
     });
-    setHnSubmitLink(cc.GetHnSubmitLink())
-    setRedditSubmitLink(cc.GetRedditSubmitLink())
+    setHnSubmitLink(cc.GetHnSubmitLink());
+    setRedditSubmitLink(cc.GetRedditSubmitLink());
     cc.SendCheckApiEvent();
     return () => {
       mounted = false;
@@ -189,38 +198,42 @@ function BtnGroup(props: {
         color: "white",
         flexDirection: "column",
         width: "min-content",
-        alignItems: props.isReversed ? "flex-start" : "flex-end"
+        alignItems: props.isReversed ? "flex-start" : "flex-end",
       }}
       ref={divRef}
     >
-      <div
-        style={{
-          backgroundColor: "#AAAAAA",
-        }}
-      >
-        <BtnItem
-          reverseLayout={props.isReversed}
-          title="Reddit"
-          logoUrl={redditLogo}
-          submitLink={redditSubmitLink}
-          result={reddit}
-          sizeChanged={onButtonSizeChanged}
-        />
-      </div>
-      <div
-        style={{
-          backgroundColor: "#FD6F1D",
-        }}
-      >
-        <BtnItem
-          reverseLayout={props.isReversed}
-          title="Hacker News"
-          logoUrl={hnLogo}
-          submitLink={hnSubmitLink}
-          result={hn}
-          sizeChanged={onButtonSizeChanged}
-        />
-      </div>
+      {!props.hideWhenNoResults && (
+        <div
+          style={{
+            backgroundColor: "#AAAAAA",
+          }}
+        >
+          <BtnItem
+            reverseLayout={props.isReversed}
+            title="Reddit"
+            logoUrl={redditLogo}
+            submitLink={redditSubmitLink}
+            result={reddit}
+            sizeChanged={onButtonSizeChanged}
+          />
+        </div>
+      )}
+      {!props.hideWhenNoResults && (
+        <div
+          style={{
+            backgroundColor: "#FD6F1D",
+          }}
+        >
+          <BtnItem
+            reverseLayout={props.isReversed}
+            title="Hacker News"
+            logoUrl={hnLogo}
+            submitLink={hnSubmitLink}
+            result={hn}
+            sizeChanged={onButtonSizeChanged}
+          />
+        </div>
+      )}
     </div>
   );
 }
