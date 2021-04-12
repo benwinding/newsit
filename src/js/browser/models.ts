@@ -1,5 +1,6 @@
 export interface RootState {
   isEnabled: boolean;
+  hideWhenNoResults: boolean;
   btnsize: number;
   btnzindex: number;
   placement: PlacementType;

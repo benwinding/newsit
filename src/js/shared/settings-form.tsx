@@ -16,6 +16,7 @@ interface SettingsFormState {
   hasCurrentEnabled: boolean;
   hasAllEnabled: boolean;
   hasDebugEnabled: boolean;
+  hideWhenNoResults: boolean;
   btnsPlacement: PlacementType;
   formBtnsSize: number;
   formZindex: number;
@@ -31,6 +32,7 @@ export class SettingsForm extends React.Component<
     hasCurrentEnabled: true,
     hasAllEnabled: false,
     hasDebugEnabled: false,
+    hideWhenNoResults: false,
     btnsPlacement: "br" as PlacementType,
     formBtnsSize: 1,
     formZindex: 999,
@@ -57,6 +59,9 @@ export class SettingsForm extends React.Component<
     sfc.ListenPlacementChanged((v) => {
       ctx.setState({ btnsPlacement: v });
     });
+    sfc.ListenNoResultsChanged((v) => {
+      ctx.setState({ hideWhenNoResults: v });
+    });
     sfc.ListenBtnSizeChanged((v) => {
       ctx.setState({ formBtnsSize: v });
     });
@@ -74,6 +79,11 @@ export class SettingsForm extends React.Component<
   onConsoleDebugChanged(isEnabled: boolean) {
     sfc.SetConsoleDebug(isEnabled);
     this.setState({ hasDebugEnabled: isEnabled });
+  }
+
+  onHideWhenNoResultsChanged(isEnabled: boolean) {
+    sfc.SetHideWhenNoResults(isEnabled);
+    this.setState({ hideWhenNoResults: isEnabled });
   }
 
   onCurrentEnabledChanged(isEnabled: boolean) {
@@ -120,6 +130,7 @@ export class SettingsForm extends React.Component<
       formZindex,
       blackListAlteredStr,
       blackListStr,
+      hideWhenNoResults
     } = this.state;
     const { isPopupPage, onClickCheck, isLoading } = this.props;
 
@@ -160,6 +171,11 @@ export class SettingsForm extends React.Component<
             value={hasDebugEnabled}
             onChange={(e) => this.onConsoleDebugChanged(e)}
             title="Show Console Output"
+          />
+          <CheckBox
+            value={hideWhenNoResults}
+            onChange={(e) => this.onHideWhenNoResultsChanged(e)}
+            title="Hide [+] When No Results"
           />
           <label className="label mb-0">Hosts Blocked</label>
           <p style={{ color: "darkgrey", fontSize: "13px" }}>

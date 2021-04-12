@@ -19,6 +19,9 @@ class SettingsFormController {
   ListenIsEnabledChanged(cb: (v: boolean) => void) {
     store.OnStorageChanged("isEnabled", cb, true);
   }
+  ListenNoResultsChanged(cb: (v: boolean) => void) {
+    store.OnStorageChanged('hideWhenNoResults', cb, false);
+  }
   ListenConsoleDebugChanged(cb: (v: boolean) => void) {
     store.OnStorageChanged("debug", cb, false);
   }
@@ -54,6 +57,9 @@ class SettingsFormController {
   }, 300);
   SetConsoleDebug = debounce((val: boolean): void => {
     store.SetStorage({ debug: val });
+  }, 300);
+  SetHideWhenNoResults = debounce((val: boolean): void => {
+    store.SetStorage({ hideWhenNoResults: val });
   }, 300);
   SetZindex = debounce((val: number): void => {
     store.SetStorage({ btnzindex: val });
