@@ -9,13 +9,13 @@ function getTitle() {
   if (document.title) {
     return document.title;
   }
-  for (let hTag of ['h1', 'h2', 'h3', 'title']) {
+  for (let hTag of ["h1", "h2", "h3", "title"]) {
     const dVal = document.querySelector(hTag);
     if (dVal) {
       return dVal.textContent;
     }
   }
-  return '';
+  return "";
 }
 
 class ContentController {
@@ -70,33 +70,29 @@ class ContentController {
     };
   }
   ListenPlacementChanged(cb: (v: PlacementType) => void) {
-    store.OnStorageChanged("placement", cb, "br");
+    store.OnStorageChanged("placement", cb);
   }
   ListenBtnSizeChanged(cb: (v: number) => void) {
-    store.OnStorageChanged("btnsize", cb, 0.8);
+    store.OnStorageChanged("btnsize", cb);
   }
   ListenZindexChanged(cb: (v: number) => void) {
-    store.OnStorageChanged("btnzindex", cb, 999);
+    store.OnStorageChanged("btnzindex", cb);
   }
   ListenIsEnabledChanged(cb: (v: boolean) => void) {
-    store.OnStorageChanged("isEnabled", cb, true);
+    store.OnStorageChanged("isEnabled", cb);
   }
   ListenHideWhenNoResultsChanged(cb: (v: boolean) => void) {
-    store.OnStorageChanged("hideWhenNoResults", cb, true);
+    store.OnStorageChanged("hideWhenNoResults", cb);
   }
   ListenIsTabBlackListedChanged(cb: (isBlackListed: boolean) => void) {
     MessageApi.onEvent("tab_url_changed", async () => {
       const isBlacklisted = await this.GetIsCurrentUrlBlackListed();
       cb(isBlacklisted);
     });
-    store.OnStorageChanged(
-      "blackListed",
-      async (list: string[]) => {
-        const isBlacklisted = await this.GetIsCurrentUrlBlackListed();
-        cb(isBlacklisted);
-      },
-      []
-    );
+    store.OnStorageChanged("blackListed", async (list: string[]) => {
+      const isBlacklisted = await this.GetIsCurrentUrlBlackListed();
+      cb(isBlacklisted);
+    });
   }
   ListenResultsHn(cb: (hosts: ButtonResult) => void) {
     return MessageApi.onEvent("result_from_hn", cb);

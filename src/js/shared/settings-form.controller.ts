@@ -14,25 +14,25 @@ class SettingsFormController {
     return system.management.getSelf().then((ext) => ext.version);
   }
   ListenBlackListChanged(cb: (v: string[]) => void) {
-    store.OnStorageChanged("blackListed", cb, []);
+    store.OnStorageChanged("blackListed", cb);
   }
   ListenIsEnabledChanged(cb: (v: boolean) => void) {
-    store.OnStorageChanged("isEnabled", cb, true);
+    store.OnStorageChanged("isEnabled", cb);
   }
   ListenNoResultsChanged(cb: (v: boolean) => void) {
-    store.OnStorageChanged('hideWhenNoResults', cb, false);
+    store.OnStorageChanged('hideWhenNoResults', cb);
   }
   ListenConsoleDebugChanged(cb: (v: boolean) => void) {
-    store.OnStorageChanged("debug", cb, false);
+    store.OnStorageChanged("debug", cb);
   }
   ListenBtnSizeChanged(cb: (v: number) => void) {
-    store.OnStorageChanged("btnsize", cb, 0.8);
+    store.OnStorageChanged("btnsize", cb);
   }
   ListenPlacementChanged(cb: (v: PlacementType) => void) {
-    store.OnStorageChanged("placement", cb, "br");
+    store.OnStorageChanged("placement", cb);
   }
   ListenZindexChanged(cb: (v: number) => void) {
-    store.OnStorageChanged("btnzindex", cb, 999);
+    store.OnStorageChanged("btnzindex", cb);
   }
   SetHostsArr(newHostArr: string[]) {
     alist.BlackListSetNewArray(newHostArr);

@@ -1,3 +1,13 @@
+export const DEFAULT_STATE: RootState = {
+  isEnabled: true,
+  hideWhenNoResults: false,
+  btnsize: 0.8,
+  btnzindex: 999,
+  placement: "br",
+  blackListed: [],
+  debug: false,
+};
+
 export interface RootState {
   isEnabled: boolean;
   hideWhenNoResults: boolean;
@@ -11,7 +21,7 @@ export interface RootState {
 export interface ButtonResult {
   text: string;
   link?: string;
-  other_results?: OtherResult[]
+  other_results?: OtherResult[];
 }
 
 export interface OtherResult {
@@ -24,7 +34,7 @@ export interface OtherResult {
   comments_link: string;
 }
 
-export type PlacementType = 'br' | 'bl' | 'tr' | 'tl';
+export type PlacementType = "br" | "bl" | "tr" | "tl";
 
 export interface MessageChannelObj {
   channel: MessageChannelType;

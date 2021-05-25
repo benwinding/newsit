@@ -9,7 +9,7 @@ const logger = MakeLogger('background.controller', store);
 
 class BackgroundController {
   ListenForAllEnabledChange(cb: (isAllEnabled: boolean) => void) {
-    store.OnStorageChanged('isEnabled', cb, true);
+    store.OnStorageChanged('isEnabled', cb);
   }
   ListenForHostAdd(cb: (hostToAdd: string) => Promise<void>) {
     MessageApi.onEvent("host_add_to_list", (d: string, s) => {
@@ -61,7 +61,7 @@ class BackgroundController {
     return err.message.includes("Receiving end does not exist.");
   }
   async GetIsAllEnabled() {
-    return store.GetStorage({ isEnabled: true }).then((v) => v.isEnabled);
+    return store.GetStorage().then((v) => v.isEnabled);
   }
   private getTab(tabId: number) {
     return system.tabs.get(tabId);

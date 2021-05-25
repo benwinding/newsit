@@ -6,6 +6,6 @@ export function MakeLogger(prefix: string, store: IStore): ILogger {
   const logger = new Logger(prefix, false);
   store.OnStorageChanged("debug", (isDebug) => {
     isDebug ? logger.Enable() : logger.Disable();
-  }, false);
+  });
   return logger;
 }

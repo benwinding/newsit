@@ -1,10 +1,10 @@
 import { ILogger } from "./../shared/ilogger";
-import { RootState } from "./models";
+import { DEFAULT_STATE, RootState } from "./models";
 import { Browser } from "webextension-polyfill-ts";
 import { IStore } from "./istore";
 
 export class Store implements IStore {
-  logger: ILogger
+  private logger: ILogger;
 
   constructor(private system: Browser) {}
 
@@ -12,10 +12,8 @@ export class Store implements IStore {
     this.logger = logger;
   }
 
-  public GetStorage<T extends Partial<RootState>>(
-    defaultValues: T
-  ): Promise<T> {
-    return this.system.storage.sync.get(defaultValues) as Promise<T>;
+  public GetStorage(): Promise<RootState> {
+    return this.system.storage.sync.get(DEFAULT_STATE) as Promise<RootState>;
   }
 
   public SetStorage<T extends Partial<RootState>>(newValues: T): Promise<void> {
@@ -25,8 +23,7 @@ export class Store implements IStore {
 
   public OnStorageChanged(
     storageKey: keyof RootState,
-    cb: (newValue: any) => void,
-    defaultValue?: any
+    cb: (newValue: any) => void
   ) {
     type StorageChanges = { [key: string]: chrome.storage.StorageChange };
     const ctx = this;
@@ -42,15 +39,19 @@ export class Store implements IStore {
         }
       });
     }
-    if (defaultValue !== undefined) {
-      const v = {} as any;
-      v[storageKey] = defaultValue;
-      ctx.GetStorage(v).then((values) => {
-        const value = values[storageKey];
-        ctx.logger?.log("store OnStorageChanged first", { storageKey, value, allStoreValues: values });
-        cb(value);
+    const defaultValue = DEFAULT_STATE[storageKey];
+    const v = {} as any;
+    v[storageKey] = defaultValue;
+    ctx.GetStorage().then((values) => {
+      const value = values[storageKey];
+      ctx.logger?.log("store OnStorageChanged first", {
+        storageKey,
+        value,
+        valueDefault: defaultValue,
+        allStoreValues: values,
       });
-    }
+      cb(value);
+    });
     this.system.storage.onChanged.addListener(listenerCallback);
   }
 }

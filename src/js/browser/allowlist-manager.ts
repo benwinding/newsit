@@ -39,9 +39,7 @@ export class AllowListManager {
 
   public async GetBlackListedHosts(): Promise<string[]> {
     return store
-      .GetStorage({
-        blackListed: [] as string[],
-      })
+      .GetStorage()
       .then((items) => items.blackListed)
       .then((hosts) => (Array.isArray(hosts) ? hosts : []));
   }
