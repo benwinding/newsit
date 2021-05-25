@@ -1,6 +1,6 @@
-import { system } from "../browser/browser";
+import { ILogger, ILogFn } from "./ilogger";
 
-class Logger {
+export class Logger implements ILogger {
   private loggerID = Math.random().toString(32).slice(2, 6);
   private color: string;
 
@@ -18,9 +18,9 @@ class Logger {
 
   public get log() {
     if (!this.enabled) {
-      return (...args: any[]) => {};
+      return (() => {});
     }
-    const boundLogFn: (...args: any[]) => void = console.log.bind(
+    const boundLogFn: ILogFn = console.log.bind(
       console,
       ...this.getPrefix()
     );
@@ -29,9 +29,9 @@ class Logger {
 
   public get warn() {
     if (!this.enabled) {
-      return (...args: any[]) => {};
+      return (() => {});
     }
-    const boundLogFn: (...args: any[]) => void = console.warn.bind(
+    const boundLogFn: ILogFn = console.warn.bind(
       console,
       ...this.getPrefix()
     );
@@ -42,7 +42,7 @@ class Logger {
     // if (!this.enabled) {
     //   return (...args: any[]) => {};
     // }
-    const boundLogFn: (...args: any[]) => void = console.error.bind(
+    const boundLogFn: ILogFn = console.error.bind(
       console,
       ...this.getPrefix()
     );
@@ -58,14 +58,6 @@ class Logger {
   Disable() {
     this.enabled = false;
   }
-}
-
-export function MakeLogger(prefix: string): Logger {
-  const logger = new Logger(prefix, false);
-  system.storage.sync.get('debug').then(val => {
-    val.debug && logger.Enable();
-  })
-  return logger;
 }
 
 function String2Color(str: string) {

@@ -2,7 +2,7 @@ import { alist } from "../browser/allowlist-manager";
 import { getCurrentTab, system } from "../browser/browser";
 import { MessageApi } from "../browser/messages";
 import { PlacementType } from "../browser/models";
-import { store } from "../browser/store";
+import { store } from "../browser/store.factory";
 import { debounce } from "./utils";
 
 class SettingsFormController {

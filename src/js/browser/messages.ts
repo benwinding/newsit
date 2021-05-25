@@ -1,13 +1,14 @@
-import { MessageChannelObj, MessageChannelType, RootState } from "./models";
+import { store } from './store.factory';
+import { MessageChannelObj, MessageChannelType } from "./models";
 import { getBrowserInstance } from "./browser";
 import { Runtime } from "webextension-polyfill-ts";
-import { MakeLogger } from "../shared/logger";
+import { MakeLogger } from "../shared/logger.factory";
 
 const system = getBrowserInstance();
 
 type UnsubscribeFn = () => void;
 
-const logger = MakeLogger("messages");
+const logger = MakeLogger("messages", store);
 
 function handleMessageError(err: {message: string}) {
   const tabClosed = err.message.includes("Receiving end does not exist.");

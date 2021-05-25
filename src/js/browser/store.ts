@@ -1,21 +1,26 @@
-import { MakeLogger } from "../shared/logger";
-import { getBrowserInstance } from "./browser";
+import { ILogger } from "./../shared/ilogger";
 import { RootState } from "./models";
+import { Browser } from "webextension-polyfill-ts";
+import { IStore } from "./istore";
 
-const system = getBrowserInstance();
+export class Store implements IStore {
+  logger: ILogger
 
-const logger = MakeLogger('store');
+  constructor(private system: Browser) {}
 
-export class Store {
+  public _SetLogger(logger: ILogger) {
+    this.logger = logger;
+  }
+
   public GetStorage<T extends Partial<RootState>>(
     defaultValues: T
   ): Promise<T> {
-    return system.storage.sync.get(defaultValues) as Promise<T>;
+    return this.system.storage.sync.get(defaultValues) as Promise<T>;
   }
 
   public SetStorage<T extends Partial<RootState>>(newValues: T): Promise<void> {
-    logger.log("SetStorage", newValues);
-    return system.storage.sync.set(newValues);
+    this.logger?.log("SetStorage", newValues);
+    return this.system.storage.sync.set(newValues);
   }
 
   public OnStorageChanged(
@@ -24,11 +29,15 @@ export class Store {
     defaultValue?: any
   ) {
     type StorageChanges = { [key: string]: chrome.storage.StorageChange };
+    const ctx = this;
     function listenerCallback(changes: StorageChanges) {
       Object.entries(changes).map(([key, val]) => {
         if (key === storageKey) {
           const value = val.newValue;
-          logger.log("store OnStorageChanged event", { storageKey, value });
+          ctx.logger?.log("store OnStorageChanged event", {
+            storageKey,
+            value,
+          });
           cb(value);
         }
       });
@@ -36,14 +45,12 @@ export class Store {
     if (defaultValue !== undefined) {
       const v = {} as any;
       v[storageKey] = defaultValue;
-      this.GetStorage(v).then((values) => {
+      ctx.GetStorage(v).then((values) => {
         const value = values[storageKey];
-        logger.log("store OnStorageChanged first", { storageKey, value });
+        ctx.logger?.log("store OnStorageChanged first", { storageKey, value, allStoreValues: values });
         cb(value);
       });
     }
-    system.storage.onChanged.addListener(listenerCallback);
+    this.system.storage.onChanged.addListener(listenerCallback);
   }
 }
-
-export const store = new Store();

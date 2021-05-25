@@ -6,7 +6,7 @@ import { createContentController } from "./content.controller";
 
 import { BtnItem } from "./shared/buttons";
 import { IFrame } from "./shared/IFrame";
-import { len, setTimeoutAsyc } from "./shared/utils";
+import { setTimeoutAsyc } from "./shared/utils";
 
 const cc = createContentController();
 

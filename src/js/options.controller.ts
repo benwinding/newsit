@@ -1,5 +1,5 @@
 import { alist } from "./browser/allowlist-manager";
-import { store } from "./browser/store";
+import { store } from "./browser/store.factory";
 
 class OptionsController {
   RemoveHostFromList(hostToRemove: string) {

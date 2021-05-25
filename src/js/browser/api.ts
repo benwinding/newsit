@@ -3,10 +3,11 @@ import { doUrlsMatch, stripUrl } from "./url-matcher";
 
 import { alist } from "./allowlist-manager";
 import { system } from "./browser";
-import { MakeLogger } from "../shared/logger";
-import fromNow from 'fromnow';
+import { MakeLogger } from "../shared/logger.factory";
+import fromNow from "fromnow";
+import { store } from "./store.factory";
 
-const logger = MakeLogger("api");
+const logger = MakeLogger("api", store);
 
 interface ResultItem {
   submitted_url: string;
@@ -30,7 +31,7 @@ interface HnHit {
 
 function translateHnToItem(h: HnHit): ResultItem {
   const fromNowStr = fromNow(h.created_at);
-  const fromNowFirst = fromNowStr.split(',').shift() + ' ago';
+  const fromNowFirst = fromNowStr.split(",").shift() + " ago";
   return {
     submitted_url: h.url,
     submitted_date: fromNowFirst,

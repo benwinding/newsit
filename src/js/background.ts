@@ -1,13 +1,14 @@
+import { store } from './browser/store.factory';
 import {
   onRequestBackgroundHN,
   onRequestBackgroundReddit,
 } from "./browser/api";
 import { createBackgroundController } from "./background.controller";
-import { MakeLogger } from "./shared/logger";
+import { MakeLogger } from "./shared/logger.factory";
 
 const bc = createBackgroundController();
 
-const logger = MakeLogger('background');
+const logger = MakeLogger('background', store);
 
 bc.ListenUrlChange(async (tabId, tabUrl) => {
   const shouldBeGrey = await bc.IsUrlBlackListed(tabUrl);

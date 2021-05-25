@@ -1,6 +1,6 @@
 import { MessageApi } from "./browser/messages";
 import { ButtonResult, PlacementType } from "./browser/models";
-import { store } from "./browser/store";
+import { store } from "./browser/store.factory";
 import { system } from "./browser/browser";
 import { alist } from "./browser/allowlist-manager";
 import { CSSProperties } from "react";

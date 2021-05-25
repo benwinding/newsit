@@ -1,12 +1,12 @@
-import { MakeLogger } from "../shared/logger";
-import { store } from "./store";
+import { MakeLogger } from "../shared/logger.factory";
+import { store } from "./store.factory";
 import {
   CheckBlacklist,
   CheckHostAllowedOnFirefox,
   CheckProtocolAllowed,
 } from "./url-validator";
 
-const logger = MakeLogger('allowlist-manager');
+const logger = MakeLogger('allowlist-manager', store);
 
 export class AllowListManager {
   public async IsUrlBlackListed(url: string): Promise<boolean> {

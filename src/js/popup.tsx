@@ -25,10 +25,7 @@ export function MyComp() {
         isLoading={loadingApi}
       />
       <section className="section py-1">
-        <button
-          onClick={() => pc.LaunchOptionsPage()}
-          className="button"
-        >
+        <button onClick={() => pc.LaunchOptionsPage()} className="button">
           More Options
         </button>
       </section>

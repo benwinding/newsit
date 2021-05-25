@@ -2,10 +2,10 @@ import { alist } from "./browser/allowlist-manager";
 import { system } from "./browser/browser";
 import { MessageApi } from "./browser/messages";
 import { MessageChannelType } from "./browser/models";
-import { store } from "./browser/store";
-import { MakeLogger } from "./shared/logger";
+import { store } from "./browser/store.factory";
+import { MakeLogger } from "./shared/logger.factory";
 
-const logger = MakeLogger('background.controller')
+const logger = MakeLogger('background.controller', store);
 
 class BackgroundController {
   ListenForAllEnabledChange(cb: (isAllEnabled: boolean) => void) {
