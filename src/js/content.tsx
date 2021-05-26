@@ -191,6 +191,12 @@ function BtnGroup(props: {
     notifySizeChanged();
   };
 
+  const hasHn = !!hn.link;
+  const hasReddit = !!reddit.link;
+
+  const shouldShowHn = hasHn || !props.hideWhenNoResults;
+  const shouldShowReddit = hasReddit || !props.hideWhenNoResults;
+
   return (
     <div
       style={{
@@ -202,7 +208,7 @@ function BtnGroup(props: {
       }}
       ref={divRef}
     >
-      {!props.hideWhenNoResults && (
+      {shouldShowReddit && (
         <div
           style={{
             backgroundColor: "#AAAAAA",
@@ -218,7 +224,7 @@ function BtnGroup(props: {
           />
         </div>
       )}
-      {!props.hideWhenNoResults && (
+      {shouldShowHn && (
         <div
           style={{
             backgroundColor: "#FD6F1D",
