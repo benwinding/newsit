@@ -111,26 +111,27 @@ class Container extends React.Component<{}, DbState> {
     return (
       <>
         {shouldShow && (
-          <IFrame
-            style={{
-              zIndex: zindex,
-              position: "fixed",
-              bottom: "0px",
-              border: "0px",
-              width: iframeWidth + "px",
-              height: iframeHeight + "px",
-              overflow: "hidden",
-              ...placementStyles,
-            }}
-            height="48px"
-            width={iframeWidth + "px"}
-          >
-            <BtnGroup
-              hideWhenNoResults={hideWhenNoResults}
-              isReversed={isReversed}
-              sizeChanged={(w, h) => this.sizeChanged(w, h)}
-            />
-          </IFrame>
+          <>
+            <style>{`a, a:visited, a:active { color: white; }`}</style>
+            <div
+              style={{
+                zIndex: zindex,
+                position: "fixed",
+                bottom: "0px",
+                border: "0px",
+                width: iframeWidth + "px",
+                height: iframeHeight + "px",
+                overflow: "hidden",
+                ...placementStyles,
+              }}
+            >
+              <BtnGroup
+                hideWhenNoResults={hideWhenNoResults}
+                isReversed={isReversed}
+                sizeChanged={(w, h) => this.sizeChanged(w, h)}
+              />
+            </div>
+          </>
         )}
       </>
     );
@@ -245,6 +246,7 @@ function BtnGroup(props: {
 }
 
 const root = document.createElement("div");
+root.id = 'newsit-extension';
 document.body.appendChild(root);
-
-ReactDOM.render(<Container />, root);
+const shadow = root.attachShadow({ mode: "closed" });
+ReactDOM.render(<Container />, shadow);
