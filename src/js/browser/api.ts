@@ -10,6 +10,7 @@ import { store } from "./store.factory";
 const logger = MakeLogger("api", store);
 
 interface ResultItem {
+  raw_html?: string;
   submitted_url: string;
   submitted_date: string;
   submitted_upvotes: number;
@@ -84,6 +85,7 @@ function translateRedditToItem(el: HTMLDivElement): ResultItem {
   const commentsCount = +commentsText.split(" ").shift();
   const postPoints = +postPointsText.split(" ").shift();
   const r: ResultItem = {
+    raw_html: el.innerHTML,
     submitted_url: url,
     submitted_title: postTitle,
     submitted_date: postDate,
@@ -167,6 +169,7 @@ export async function onRequestBackgroundHN(
   }
   const itemsAll = res.hits.map(translateHnToItem);
   const itemsResults = processResults(itemsAll, searchUrlStripped);
+  logger.log("Reddit API: parsing api", { response: res, resultsTranslated: itemsAll, resultsButton: itemsResults });
   return itemsResults;
 }
 
@@ -196,6 +199,7 @@ export async function onRequestBackgroundReddit(
   }
   const itemsAll = Array.from(results).map(translateRedditToItem);
   const itemsResults = processResults(itemsAll, searchUrl);
+  logger.log("Reddit API: parsing api", { response: data, html, resultsHtml: results, resultsTranslated: itemsAll, resultsButton: itemsResults });
   html.remove();
   return itemsResults;
 }
