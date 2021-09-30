@@ -82,7 +82,7 @@ function translateRedditToItem(el: HTMLDivElement): ResultItem {
     ".search-author a",
     "text"
   );
-  const commentsCount = +commentsText.split(" ").shift();
+  const commentsCount = +commentsText.replace(',', '').split(" ").shift();
   const postPoints = +postPointsText.split(" ").shift();
   const r: ResultItem = {
     raw_html: el.innerHTML,
