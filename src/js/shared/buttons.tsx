@@ -241,10 +241,11 @@ function ButtonLine(props: {
           height: "16px",
           overflow: "hidden",
           padding: `0 ${menuEnabled && "8px"}`,
+          marginRight: '3px',
+          marginLeft: '3px',
           transform: `rotate(${menuOpen ? "0" : "180"}deg)`,
           backgroundColor: "#b1b1b159",
           boxShadow: menuEnabled && "#00000047 0px 1px 4px 1px",
-          marginRight: menuEnabled && "3px",
           cursor: menuDisabled ? "unset" : "pointer",
         }}
         onClick={() => menuEnabled && menuOpenChanged(!menuOpen)}
@@ -252,8 +253,11 @@ function ButtonLine(props: {
         <span
           style={{
             position: "absolute",
-            left: "25%",
-            top: "21%",
+            left: '50%',
+            top: '50%',
+            transform: 'translateY(-50%) translateX(-50%)',
+            height: '100%',
+            paddingTop: '18%',
           }}
         >
           ^
