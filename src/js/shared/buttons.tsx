@@ -237,12 +237,12 @@ function ButtonLine(props: {
         style={{
           position: "relative",
           borderRadius: "50px",
-          width: "0px",
+          width: "0",
           height: "16px",
           overflow: "hidden",
-          padding: `0 ${menuEnabled && "8px"}`,
-          marginRight: '3px',
-          marginLeft: '3px',
+          padding: `0 ${menuEnabled ? "8px" : "0"}`,
+          marginRight: menuEnabled ? "3px" : "0",
+          marginLeft: menuEnabled ? "3px" : "0",
           transform: `rotate(${menuOpen ? "0" : "180"}deg)`,
           backgroundColor: "#b1b1b159",
           boxShadow: menuEnabled && "#00000047 0px 1px 4px 1px",
@@ -257,7 +257,7 @@ function ButtonLine(props: {
             top: '50%',
             transform: 'translateY(-50%) translateX(-50%)',
             height: '100%',
-            paddingTop: '18%',
+            paddingTop: '40%',
           }}
         >
           ^
