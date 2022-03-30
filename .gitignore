@@ -2,3 +2,5 @@ node_modules
 yarn*
 build*
 .DS_Store
+*.tgz
+*.zip
