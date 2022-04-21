@@ -14,13 +14,17 @@ Find the discussion around the page you're looking at. Newsit can find the top v
 
 This is a collection of weird js libraries:
 
+- `react` 
 - `bulma` 
-- `jquery` 
-- `vue` 
 
-All brought together (without minification or bundling) for your pleasure.
+All brought together (with slight minification) for your pleasure.
 
 ## Build
 
 1. `yarn`
+2. `yarn build`
+
+## Release
+
+1. `npm version patch`
 2. `yarn build`
