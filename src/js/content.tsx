@@ -167,8 +167,17 @@ function BtnGroup(props: {
       mounted && setRedditLogo(reddit);
       mounted && setHnLogo(hn);
     });
-    setHnSubmitLink(cc.GetHnSubmitLink());
-    setRedditSubmitLink(cc.GetRedditSubmitLink());
+    const setSubmitLinks = () => {
+      if (!mounted) {
+        return;
+      }
+      setHnSubmitLink(cc.GetHnSubmitLink());
+      setRedditSubmitLink(cc.GetRedditSubmitLink());
+    }
+    // Wait a bit then try and read titles again (JS webapps sometimes renders the page title).
+    const setSubmitLinksAfterAppRender = () => setTimeout(setSubmitLinks, 2000);
+    setSubmitLinks();
+    setSubmitLinksAfterAppRender();
     cc.SendCheckApiEvent();
     return () => {
       mounted = false;
