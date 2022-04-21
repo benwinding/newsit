@@ -5,7 +5,7 @@
   "scripts": {
     "build": "yarn build-webpack && yarn build-firefox && yarn build-chrome && yarn zip-src",
     "zip-src": "npm pack && yarn tar-to-zip *.tgz",
-    "clean": "rm -rf ./build*",
+    "clean": "rm -rf ./build* && rm -rf ./newsit-*",
     "test": "jest",
     "build-webpack": "IS_PRODUCTION=true webpack --config ./webpack.config.js",
     "build-chrome": "IS_PRODUCTION=true TARGET=chrome gulp build",
@@ -54,6 +54,6 @@
     "webpack-cli": "3"
   },
   "engines": {
-    "node": "10 || 12 || 16"
+    "node": "10 || 12 || 16 || 17"
   }
 }
