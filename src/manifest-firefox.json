@@ -35,7 +35,6 @@
     "page": "options.html",
     "browser_style": true
   },
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "applications": {
     "gecko": {
       "id": "benwinding@gmail.com"
