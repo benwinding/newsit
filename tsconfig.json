@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./build/ts/",
     "lib": ["DOM", "ES2017"],
-    "types": ["jest", "jquery", "chrome"],
+    "types": ["jest", "jquery", "chrome", "dompurify"],
     "noImplicitAny": true,
     "module": "es6",
     "moduleResolution": "node",

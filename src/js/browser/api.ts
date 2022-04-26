@@ -188,7 +188,8 @@ export async function onRequestBackgroundReddit(
   const requestUrl = "https://old.reddit.com/search?" + queryString;
   const data = await makeRequest(requestUrl, false);
   const html = document.createElement("html");
-  html.innerHTML = data;
+  const cleanHTML = window.DOMPurify.sanitize(data);
+  html.innerHTML = cleanHTML;
   const results = html.querySelectorAll(".search-result-link");
   if (results.length == 0) {
     html.remove();

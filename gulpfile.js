@@ -30,6 +30,8 @@ const conf = {
     "./node_modules/react/umd/react.production.min.js": "react.min.js",
     "./node_modules/react-dom/umd/react-dom.production.min.js":
       "react-dom.min.js",
+    "./node_modules/dompurify/dist/purify.min.js":
+      "purify.min.js",
   },
   src: {
     core: ["./src/js/shared/core.js"],
