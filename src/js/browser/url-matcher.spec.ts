@@ -23,6 +23,9 @@ describe("stripUrl checks", () => {
   test("check only ignores first m.", () => {
     expect(stripUrl("https://m.m.www.host.com/")).toBe("m.www.host.com/");
   });
+  test("check removes query if asked", () => {
+    expect(stripUrl("https://my.com/?hasQuery=3333", { removeQuery: true })).toBe("my.com/");
+  });
 });
 
 describe("doUrlsMatch checks", () => {

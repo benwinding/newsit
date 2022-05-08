@@ -1,11 +1,11 @@
 const withHttp = (url: string) =>
   !/^https?:\/\//i.test(url) ? `http://${url}` : url;
 
-export function stripUrl(urlString: string) {
+export function stripUrl(urlString: string, options?: { removeQuery: boolean }) {
   const urlWithProtocol = withHttp(urlString);
   const urlObj = new URL(urlWithProtocol);
   const hostStripped = stripHostPrefix(urlObj.host);
-  const result = hostStripped + urlObj.pathname + urlObj.search;
+  const result = hostStripped + urlObj.pathname + (options?.removeQuery ? '' : urlObj.search);
   return result;
 }
 
