@@ -5,6 +5,7 @@ export const DEFAULT_STATE: RootState = {
   btnzindex: 999,
   placement: "br",
   blackListed: [],
+  blockListedQueryPaths: [],
   debug: false,
 };
 
@@ -15,6 +16,7 @@ export interface RootState {
   btnzindex: number;
   placement: PlacementType;
   blackListed: string[];
+  blockListedQueryPaths: string[];
   debug?: boolean;
 }
 
@@ -44,6 +46,8 @@ export interface MessageChannelObj {
 export type MessageChannelType =
   | "host_add_to_list"
   | "host_remove_from_list"
+  | "query_add_to_list"
+  | "query_remove_from_list"
   | "check_active_tab"
   | "tab_url_changed"
   | "request_api"

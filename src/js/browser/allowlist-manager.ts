@@ -55,9 +55,31 @@ export class AllowListManager {
     const hostsNew = hosts.filter((h) => h !== hostToRemove);
     return store.SetStorage({ blackListed: hostsNew });
   }
+
   BlackListSetNewArray(newHostArr: string[]) {
     return store.SetStorage({ blackListed: newHostArr });
   }
+
+  public async GetQueryBlockList(): Promise<string[]> {
+    return store
+      .GetStorage()
+      .then((items) => items.blackListed)
+      .then((hosts) => (Array.isArray(hosts) ? hosts : []));
+  }
+
+  public async IsPathInQueryBlocklist(path: string) {
+    const blackList = await this.GetQueryBlockList();
+    let isBlackListed = false;
+    try {
+      CheckProtocolAllowed(path);
+      CheckHostAllowedOnFirefox(path);
+      CheckBlacklist(path, blackList);
+    } catch (error) {
+      logger.log(error);
+      isBlackListed = true;
+    }
+    logger.log("IsUrlBlackListed", { isBlackListed, path, blackList });
+    return isBlackListed;  }
 }
 
 export const alist = new AllowListManager();
