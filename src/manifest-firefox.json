@@ -6,7 +6,6 @@
   "homepage_url": "https://newsit.benwinding.com/",
   "background": {
     "scripts": [
-      "vendor/purify.min.js",
       "vendor/browser-polyfill.min.js", 
       "js/background.js"
     ]
@@ -16,6 +15,7 @@
     {
       "matches": ["<all_urls>"],
       "js": [
+        "vendor/purify.min.js",
         "vendor/react.min.js",
         "vendor/react-dom.min.js",
         "js/content.js"
