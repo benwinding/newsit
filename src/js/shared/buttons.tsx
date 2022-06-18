@@ -251,7 +251,7 @@ function ExpanderButton(props: { onClick: () => void, menuEnabled: boolean, menu
         justifyContent: 'center',
       }}
     >
-      <svg id="i-chevron-top" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="10" height="10" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+      <svg id="i-chevron-top" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="10" height="10" fill="none" stroke="currentcolor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2">
         <path d="M30 20 L16 8 2 20" />
       </svg>
     </span>
@@ -275,7 +275,7 @@ function SubmitButton(props: {submitLink: string, title: string, hasLink: boolea
       alignItems: 'center',
     }}
   >
-    <svg id="i-plus" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="12" height="12" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <svg id="i-plus" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="12" height="12" fill="none" stroke="currentcolor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2">
       <path d="M16 2 L16 30 M2 16 L30 16" />
     </svg>
   </a>
