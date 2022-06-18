@@ -17,6 +17,7 @@ module.exports = [
       filename: "[name].js",
       path: path.resolve(__dirname, "build/webpack"),
       libraryTarget: "umd",
+      globalObject: 'this',
     },
     externals: {
       quill: "Quill",

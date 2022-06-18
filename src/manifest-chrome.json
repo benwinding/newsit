@@ -22,6 +22,10 @@
     "default_popup": "popup.html",
     "default_icon": "img/favicon-32x32.png"
   },
+  "web_accessible_resources": [{
+    "resources": ["img/*.png"],
+    "matches": ["<all_urls>"]
+  }],
   "icons": {
     "128": "img/favicon-128x128.png",
     "32": "img/favicon-32x32.png"
