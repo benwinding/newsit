@@ -4,7 +4,7 @@ export function debounce<T>(
   fn: (v: T) => void,
   delayMs: number
 ): (v: T) => void {
-  let timeoutID = 0;
+  let timeoutID: any;
   return function () {
     clearTimeout(timeoutID);
     var args = arguments;

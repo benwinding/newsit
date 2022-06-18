@@ -1,8 +1,6 @@
 import { store } from './shared/store';
-import {
-  onRequestBackgroundHN,
-  onRequestBackgroundReddit,
-} from "./background/api";
+import { onRequestBackgroundReddit } from "./background/reddit";
+import { onRequestBackgroundHN } from "./background/hn";
 import { createBackgroundController } from "./background.controller";
 import { MakeLogger } from "./shared/logger";
 

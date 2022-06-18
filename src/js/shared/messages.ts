@@ -18,13 +18,14 @@ function handleMessageError(err: {message: string}) {
 export const MessageApi = {
   async requestWithResponse<T>(
     channel: MessageChannelType,
+    tabId: number,
     data?: {}
   ): Promise<T> {
     const msg: MessageChannelObj = {
       channel: channel,
       data: data,
     };
-    return system.runtime.sendMessage(msg).catch(handleMessageError);
+    return system.tabs.sendMessage(tabId, msg).catch(handleMessageError);
   },
   async emitEvent(channel: MessageChannelType, data?: {}): Promise<void> {
     const msg: MessageChannelObj = {
@@ -48,18 +49,23 @@ export const MessageApi = {
   },
   onEvent<T>(
     channel: MessageChannelType,
-    cb: (data: T, sender?: Runtime.MessageSender) => Promise<any> | any
+    cb: (data: T, sender?: Runtime.MessageSender) => Promise<any>
   ): UnsubscribeFn {
-    async function listenerCallback(
+    function listenerCallback(
       request: MessageChannelObj,
-      sender: Runtime.MessageSender
-    ): Promise<any> {
+      sender: Runtime.MessageSender,
+      sendResponse?: (value: any) => void,
+    ): any {
       const sendingChannel = request && request.channel;
       if (sendingChannel !== channel) {
         return;
       }
       logger.log("> recieved event: " + sendingChannel, { request, sender });
-      cb(request.data, sender);
+      cb(request.data, sender).then(result => {
+        logger.log("> sending back result to: " + sendingChannel, { result });
+        sendResponse?.(result);
+        return result;
+      })
       return true;
     }
     logger.log(">> listener registered for events", { channel });

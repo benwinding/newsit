@@ -4,19 +4,9 @@ import { doUrlsMatch } from "./url-matcher";
 import { system } from "../shared/browser";
 import { MakeLogger } from "../shared/logger";
 import { store } from "../shared/store";
+import { ResultItem } from "../shared/ResultItem";
 
 export const logger = MakeLogger("api", store);
-
-export interface ResultItem {
-  raw_html?: string;
-  submitted_url: string;
-  submitted_date: string;
-  submitted_upvotes: number;
-  submitted_title: string;
-  submitted_by: string;
-  comments_count: number;
-  comments_link: string;
-}
 
 export function processResults(
   itemsAll: ResultItem[],

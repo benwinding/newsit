@@ -86,6 +86,7 @@ class Container extends React.Component<{}, DbState> {
         updateShouldShow();
       });
     });
+    cc.ListenRequestRedditDomParse()
   }
 
   sizeChanged(newWidth: number, newHeight: number) {
@@ -156,10 +157,10 @@ function BtnGroup(props: {
   useEffect(() => {
     let mounted = true;
     // Listen For Events
-    const unsubHn = cc.ListenResultsHn((res) => {
+    const unsubHn = cc.ListenResultsHn(async (res) => {
       mounted && setHn(res);
     });
-    const unsubReddit = cc.ListenResultsReddit((res) => {
+    const unsubReddit = cc.ListenResultsReddit(async (res) => {
       mounted && setReddit(res);
     });
     cc.GetLogoUrls().then(({ reddit, hn }) => {

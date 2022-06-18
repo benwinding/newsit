@@ -47,5 +47,6 @@ export type MessageChannelType =
   | "check_active_tab"
   | "tab_url_changed"
   | "request_api"
+  | "request_reddit_dom_parse"
   | "result_from_hn"
   | "result_from_reddit";

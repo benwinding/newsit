@@ -4,6 +4,7 @@ import { store } from "./shared/store";
 import { system } from "./shared/browser";
 import { alist } from "./shared/allowlist";
 import { CSSProperties } from "react";
+import { parseRedditHtml } from "./content.reddit-dom-parse";
 
 function getTitle() {
   if (document.title) {
@@ -94,17 +95,23 @@ class ContentController {
       cb(isBlacklisted);
     });
   }
-  ListenResultsHn(cb: (hosts: ButtonResult) => void) {
+  ListenResultsHn(cb: (hosts: ButtonResult) => Promise<void>) {
     return MessageApi.onEvent("result_from_hn", cb);
   }
-  ListenResultsReddit(cb: (hosts: ButtonResult) => void) {
+  ListenResultsReddit(cb: (hosts: ButtonResult) => Promise<void>) {
     return MessageApi.onEvent("result_from_reddit", cb);
   }
-  ListenTabUrlChanged(cb: () => void) {
+  ListenTabUrlChanged(cb: () => Promise<void>) {
     return MessageApi.onEvent("tab_url_changed", cb);
   }
-  ListenCheckPageTrigger(cb: () => void) {
+  ListenCheckPageTrigger(cb: () => Promise<void>) {
     return MessageApi.onEvent("check_active_tab", cb);
+  }
+  ListenRequestRedditDomParse() {
+    return MessageApi.onEvent("request_reddit_dom_parse", async (htmlData: string) => {
+      const result = parseRedditHtml(htmlData);
+      return result;
+    });
   }
 }
 

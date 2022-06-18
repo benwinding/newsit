@@ -1,7 +1,8 @@
 import { ButtonResult } from "../shared/models";
 import { stripUrl } from "./url-matcher";
 import { alist } from "../shared/allowlist";
-import { getTabUrl, logger, makeRequest, processResults, ResultItem } from "./api";
+import { getTabUrl, logger, makeRequest, processResults } from "./api";
+import { ResultItem } from "../shared/ResultItem";
 import fromNow from "fromnow";
 
 export async function onRequestBackgroundHN(
