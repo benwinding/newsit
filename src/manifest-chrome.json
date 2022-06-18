@@ -1,17 +1,13 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "author": "Ben Winding",
   "name": "Newsit: Hacker News and Reddit Links",
   "short_name": "Newsit",
   "homepage_url": "https://newsit.benwinding.com/",
+  "minimum_chrome_version": "93",
   "background": {
-    "scripts": [
-      "vendor/purify.min.js",
-      "vendor/browser-polyfill.min.js", 
-      "js/background.js"
-    ]
+    "service_worker": "background-wrapper.js"
   },
-  "web_accessible_resources": ["img/*.png"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -22,7 +18,7 @@
       ]
     }
   ],
-  "browser_action": {
+  "action": {
     "default_popup": "popup.html",
     "default_icon": "img/favicon-32x32.png"
   },
@@ -30,6 +26,7 @@
     "128": "img/favicon-128x128.png",
     "32": "img/favicon-32x32.png"
   },
-  "permissions": ["storage", "tabs", "<all_urls>"],
+  "permissions": ["storage", "tabs"],
+  "host_permissions": ["*://*/*"],
   "options_page": "options.html"
 }
