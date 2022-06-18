@@ -23,19 +23,15 @@ function getDevVersion() {
 }
 
 const conf = {
-  vendorPaths: {
-    "./node_modules/webextension-polyfill/dist/browser-polyfill.min.js":
-      "browser-polyfill.min.js",
-    "./node_modules/bulma/css/bulma.min.css": "bulma.min.css",
-    "./node_modules/react/umd/react.production.min.js": "react.min.js",
-    "./node_modules/react-dom/umd/react-dom.production.min.js":
-      "react-dom.min.js",
-    "./node_modules/dompurify/dist/purify.min.js":
-      "purify.min.js",
+  copyPaths: {
+    "./node_modules/webextension-polyfill/dist/browser-polyfill.min.js": "vendor/browser-polyfill.min.js",
+    "./node_modules/bulma/css/bulma.min.css": "vendor/bulma.min.css",
+    "./node_modules/react/umd/react.production.min.js": "vendor/react.min.js",
+    "./node_modules/react-dom/umd/react-dom.production.min.js": "vendor/react-dom.min.js",
+    "./node_modules/dompurify/dist/purify.min.js": "vendor/purify.min.js",
+    "./src/background-wrapper.js": "background-wrapper.js",
   },
   src: {
-    core: ["./src/js/shared/core.js"],
-    scripts: ["./src/js/**/*.js"],
     html: ["./src/**/*.html"],
     css: ["./src/css/*.css"],
     images: "./src/img/**/*",
@@ -95,9 +91,9 @@ gulp.task("manifest", function () {
     .pipe(gulp.dest(conf.output.dir));
 });
 
-gulp.task("vendor", function () {
-  const vendorPaths = Object.keys(conf.vendorPaths);
-  const vendorPathsMap = Object.entries(conf.vendorPaths).reduce(
+gulp.task("copyPaths", function () {
+  const srcPaths = Object.keys(conf.copyPaths);
+  const copyPathsMap = Object.entries(conf.copyPaths).reduce(
     (acc, [key, val]) => {
       acc[path.basename(key)] = val;
       return acc;
@@ -105,15 +101,15 @@ gulp.task("vendor", function () {
     {}
   );
   return gulp
-    .src(vendorPaths)
+    .src(srcPaths)
     .pipe(
       rename(function (p) {
         const fullPath = p.basename + p.extname;
-        const newFileName = vendorPathsMap[fullPath];
-        p.basename = path.basename(newFileName, path.extname(newFileName));
+        const newFileName = copyPathsMap[fullPath];
+        p.basename = newFileName.split('.').slice(0, -1).join('.');
       })
     )
-    .pipe(gulp.dest(conf.output.dir + "/vendor"));
+    .pipe(gulp.dest(conf.output.dir));
 });
 
 gulp.task("copy-webpack-build", function () {
@@ -134,7 +130,7 @@ gulp.task(
     "html",
     "images",
     "manifest",
-    "vendor",
+    "copyPaths",
     "css",
   ])
 );
