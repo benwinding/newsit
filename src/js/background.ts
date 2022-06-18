@@ -1,10 +1,10 @@
-import { store } from './browser/store.factory';
+import { store } from './shared/store';
 import {
   onRequestBackgroundHN,
   onRequestBackgroundReddit,
-} from "./browser/api";
+} from "./background/api";
 import { createBackgroundController } from "./background.controller";
-import { MakeLogger } from "./shared/logger.factory";
+import { MakeLogger } from "./shared/logger";
 
 const bc = createBackgroundController();
 

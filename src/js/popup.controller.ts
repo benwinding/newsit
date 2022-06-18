@@ -1,5 +1,5 @@
-import { MessageApi } from "./browser/messages";
-import { getCurrentTab, system } from "./browser/browser";
+import { MessageApi } from "./shared/messages";
+import { getCurrentTab, system } from "./shared/browser";
 
 class PopupController {
   LaunchOptionsPage(): Promise<any> {

@@ -1,5 +1,5 @@
 import React from "react";
-import { ButtonResult } from "../browser/models";
+import { ButtonResult } from "../shared/models";
 
 export function BtnItem(props: {
   reverseLayout: boolean;

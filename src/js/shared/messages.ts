@@ -1,8 +1,8 @@
-import { store } from './store.factory';
+import { store } from './store';
 import { MessageChannelObj, MessageChannelType } from "./models";
 import { getBrowserInstance } from "./browser";
 import { Runtime } from "webextension-polyfill-ts";
-import { MakeLogger } from "../shared/logger.factory";
+import { MakeLogger } from "./logger";
 
 const system = getBrowserInstance();
 

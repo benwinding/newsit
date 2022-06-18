@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import { Header } from "./shared/header";
-import { SettingsForm } from "./shared/settings-form";
+import { Header } from "./ui/header";
+import { SettingsForm } from "./ui/settings-form";
 
 export function MyComp() {
   return (

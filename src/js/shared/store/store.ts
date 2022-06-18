@@ -1,5 +1,5 @@
-import { ILogger } from "./../shared/ilogger";
-import { DEFAULT_STATE, RootState } from "./models";
+import { ILogger } from "../logger";
+import { DEFAULT_STATE, RootState } from "../models";
 import { Browser } from "webextension-polyfill-ts";
 import { IStore } from "./istore";
 

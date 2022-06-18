@@ -1,4 +1,4 @@
-import { IStore } from "../browser/istore";
+import { IStore } from "../store";
 import { ILogger } from "./ilogger";
 import { Logger } from "./logger";
 

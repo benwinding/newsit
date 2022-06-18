@@ -1,4 +1,4 @@
-import { RootState } from "./models";
+import { RootState } from "../models";
 
 export interface IStore {
   GetStorage(): Promise<RootState>;

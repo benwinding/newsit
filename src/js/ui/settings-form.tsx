@@ -1,5 +1,5 @@
 import React from "react";
-import { PlacementType } from "../browser/models";
+import { PlacementType } from "../shared/models";
 import { createSettingsFormController } from "./settings-form.controller";
 
 const sfc = createSettingsFormController();

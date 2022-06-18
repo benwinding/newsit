@@ -1,11 +1,10 @@
 import React, { CSSProperties, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
-import { ButtonResult, PlacementType } from "./browser/models";
+import { ButtonResult, PlacementType } from "./shared/models";
 import { createContentController } from "./content.controller";
 
-import { BtnItem } from "./shared/buttons";
-import { IFrame } from "./shared/IFrame";
+import { BtnItem } from "./ui/buttons";
 import { setTimeoutAsyc } from "./shared/utils";
 
 const cc = createContentController();

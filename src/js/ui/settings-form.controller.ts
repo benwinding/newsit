@@ -1,9 +1,9 @@
-import { alist } from "../browser/allowlist-manager";
-import { getCurrentTab, system } from "../browser/browser";
-import { MessageApi } from "../browser/messages";
-import { PlacementType } from "../browser/models";
-import { store } from "../browser/store.factory";
-import { debounce } from "./utils";
+import { alist } from "../shared/allowlist";
+import { getCurrentTab, system } from "../shared/browser";
+import { MessageApi } from "../shared/messages";
+import { PlacementType } from "../shared/models";
+import { store } from "../shared/store";
+import { debounce } from "../shared/utils";
 
 class SettingsFormController {
   async IsCurrentUrlBlacklisted() {

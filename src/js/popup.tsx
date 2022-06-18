@@ -1,17 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import { useApi } from "./browser/useApi";
-
-import { Header } from "./shared/header";
-import { SettingsForm } from "./shared/settings-form";
+import { useApi } from "./ui/useApi";
+import { Header } from "./ui/header";
+import { SettingsForm } from "./ui/settings-form";
 
 import { createPopupController } from "./popup.controller";
 
 const pc = createPopupController();
 
-// let version = 0;
-export function MyComp() {
+export function PopupWindow() {
   const [, fetchHn, loadingApi] = useApi<void>(async () => {
     await pc.SendCheckApiEvent();
   }, null);
@@ -33,4 +31,4 @@ export function MyComp() {
   );
 }
 
-ReactDOM.render(<MyComp />, document.getElementById("app"));
+ReactDOM.render(<PopupWindow />, document.getElementById("app"));

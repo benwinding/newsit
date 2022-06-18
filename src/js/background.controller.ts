@@ -1,9 +1,9 @@
-import { alist } from "./browser/allowlist-manager";
-import { system } from "./browser/browser";
-import { MessageApi } from "./browser/messages";
-import { MessageChannelType } from "./browser/models";
-import { store } from "./browser/store.factory";
-import { MakeLogger } from "./shared/logger.factory";
+import { alist } from "./shared/allowlist";
+import { system } from "./shared/browser";
+import { MessageApi } from "./shared/messages";
+import { MessageChannelType } from "./shared/models";
+import { store } from "./shared/store";
+import { MakeLogger } from "./shared/logger";
 
 const logger = MakeLogger('background.controller', store);
 

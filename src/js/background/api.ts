@@ -1,11 +1,11 @@
-import { ButtonResult, OtherResult } from "./models";
+import { ButtonResult, OtherResult } from "../shared/models";
 import { doUrlsMatch, stripUrl } from "./url-matcher";
 
-import { alist } from "./allowlist-manager";
-import { system } from "./browser";
-import { MakeLogger } from "../shared/logger.factory";
+import { alist } from "../shared/allowlist";
+import { system } from "../shared/browser";
+import { MakeLogger } from "../shared/logger";
 import fromNow from "fromnow";
-import { store } from "./store.factory";
+import { store } from "../shared/store";
 
 const logger = MakeLogger("api", store);
 

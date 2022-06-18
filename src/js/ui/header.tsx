@@ -1,5 +1,5 @@
 import React from "react";
-import { system } from "../browser/browser";
+import { system } from "../shared/browser";
 
 export function Header() {
   const [version, setVersion] = React.useState(null);

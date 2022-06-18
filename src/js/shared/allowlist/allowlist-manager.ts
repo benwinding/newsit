@@ -1,5 +1,5 @@
-import { MakeLogger } from "../shared/logger.factory";
-import { store } from "./store.factory";
+import { MakeLogger } from "../logger";
+import { store } from "../store";
 import {
   CheckBlacklist,
   CheckHostAllowedOnFirefox,

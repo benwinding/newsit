@@ -1,5 +1,5 @@
-import { MakeLogger } from "../shared/logger.factory";
-import { getBrowserInstance } from "./browser";
+import { MakeLogger } from "../logger";
+import { getBrowserInstance } from "../browser";
 import { IStore } from "./istore";
 import { Store } from "./store";
 

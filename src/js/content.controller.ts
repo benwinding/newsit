@@ -1,8 +1,8 @@
-import { MessageApi } from "./browser/messages";
-import { ButtonResult, PlacementType } from "./browser/models";
-import { store } from "./browser/store.factory";
-import { system } from "./browser/browser";
-import { alist } from "./browser/allowlist-manager";
+import { MessageApi } from "./shared/messages";
+import { ButtonResult, PlacementType } from "./shared/models";
+import { store } from "./shared/store";
+import { system } from "./shared/browser";
+import { alist } from "./shared/allowlist";
 import { CSSProperties } from "react";
 
 function getTitle() {

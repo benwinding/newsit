@@ -1,4 +1,4 @@
-import { ButtonResult } from "../browser/models";
+import { ButtonResult } from "./models";
 
 export function debounce<T>(
   fn: (v: T) => void,
