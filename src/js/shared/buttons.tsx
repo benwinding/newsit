@@ -180,89 +180,103 @@ function ButtonLine(props: {
   } = props;
   const menuEnabled = !menuDisabled;
   const hasLink = !!link;
+
+  const Spacer = <span style={{ width: "100%" }}></span>;
+  const DiscussionLink = <a
+    target="_blank"
+    href={link}
+    title={"click to view discussion"}
+    style={{
+      textDecoration: "underline",
+      cursor: "pointer",
+      padding: "0px 5px",
+      lineHeight: '1rem',
+    }}
+  >
+    {text}
+  </a>
+  const DiscussionImg = <img
+    src={iconSrc}
+    style={{
+      height: "18px",
+      margin: "0",
+    }}
+  />;
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: reverseLayout ? "row" : "row-reverse",
-        alignItems: "center",
-        width: "100%",
-      }}
-    >
-      {menuEnabled && (
-        <img
-          src={iconSrc}
-          style={{
-            height: "18px",
-            margin: "0",
-            padding: 0,
-            paddingLeft: "3px",
-          }}
-        />
-      )}
-      {hasLink && (
-        <a
-          target="_blank"
-          href={link}
-          title={"click to view discussion"}
-          style={{
-            textDecoration: "underline",
-            cursor: "pointer",
-            padding: "3px 5px",
-          }}
-        >
-          {text}
-        </a>
-      )}
-      {menuOpen && <span style={{ width: "100%" }}></span>}
-      {(!hasLink || menuOpen) && (
-        <a
-          target="_blank"
-          href={submitLink}
-          title={
-            (!hasLink ? "No submissions found, " : "") +
-            "click to submit to " +
-            title
-          }
-          style={{
-            textDecoration: "none",
-            cursor: "pointer",
-            padding: "3px 2px",
-          }}
-        >
-          +
-        </a>
-      )}
+    <div style={{
+      width: '100%',
+      padding: '3px',
+      boxSizing: 'border-box',
+    }}>
       <div
         style={{
-          position: "relative",
-          borderRadius: "50px",
-          width: "0",
-          height: "16px",
-          overflow: "hidden",
-          padding: `0 ${menuEnabled ? "8px" : "0"}`,
-          marginRight: menuEnabled ? "3px" : "0",
-          marginLeft: menuEnabled ? "3px" : "0",
-          transform: `rotate(${menuOpen ? "0" : "180"}deg)`,
-          backgroundColor: "#b1b1b159",
-          boxShadow: menuEnabled && "#00000047 0px 1px 4px 1px",
-          cursor: menuDisabled ? "unset" : "pointer",
+          display: "flex",
+          flexDirection: reverseLayout ? "row" : "row-reverse",
+          alignItems: "center",
+          gap: '3px',
         }}
-        onClick={() => menuEnabled && menuOpenChanged(!menuOpen)}
       >
-        <span
-          style={{
-            position: "absolute",
-            left: '50%',
-            top: '50%',
-            transform: 'translateY(-50%) translateX(-50%)',
-            height: '100%',
-            paddingTop: '40%',
-          }}
-        >
-          ^
-        </span>
+        {menuEnabled && DiscussionImg}
+        {hasLink && DiscussionLink}
+        {menuOpen && Spacer}
+        {(!hasLink || menuOpen) && <SubmitButton hasLink={hasLink} submitLink={submitLink} title={title} />}
+        <div><ExpanderButton onClick={() => menuEnabled && menuOpenChanged(!menuOpen)} menuEnabled={menuEnabled} menuOpen={menuOpen} /></div>
       </div>
     </div>
   );
+}
+
+function ExpanderButton(props: { onClick: () => void, menuEnabled: boolean, menuOpen: boolean}) {
+  return <div
+    style={{
+      position: "relative",
+      borderRadius: "50px",
+      width: "16px",
+      height: "16px",
+      transform: `rotate(${props.menuOpen ? "0" : "180"}deg)`,
+      backgroundColor: "#b1b1b159",
+      boxShadow: props.menuEnabled && "#00000047 0px 1px 4px 1px",
+      cursor: props.menuEnabled ?  "pointer" : "unset",
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+    onClick={props.onClick}
+  >
+    <span
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <svg id="i-chevron-top" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="10" height="10" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+        <path d="M30 20 L16 8 2 20" />
+      </svg>
+    </span>
+  </div>
+}
+
+function SubmitButton(props: {submitLink: string, title: string, hasLink: boolean}) {
+  return <a
+    target="_blank"
+    href={props.submitLink}
+    title={
+      (!props.hasLink ? "No submissions found, " : "") +
+      "click to submit to " +
+      props.title
+    }
+    style={{
+      textDecoration: "none",
+      cursor: "pointer",
+      padding: "3px 2px",
+      display: 'flex',
+      alignItems: 'center',
+    }}
+  >
+    <svg id="i-plus" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="12" height="12" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+      <path d="M16 2 L16 30 M2 16 L30 16" />
+    </svg>
+  </a>
 }
