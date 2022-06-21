@@ -1,6 +1,6 @@
 {
   "name": "newsit",
-  "version": "2.0.14",
+  "version": "2.1.0",
   "description": "Find Reddit or Hacker News discussions on the current page!",
   "scripts": {
     "build": "yarn build-webpack && yarn build-firefox && yarn build-chrome && yarn zip-src",
