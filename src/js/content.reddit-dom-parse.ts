@@ -2,7 +2,7 @@ import { ResultItem } from "./shared/ResultItem";
 
 export function parseRedditHtml(data: string): ResultItem[] {
   const html = document.createElement("html");
-  const cleanHTML = window.DOMPurify.sanitize(data);
+  const cleanHTML = globalThis.DOMPurify.sanitize(data);
   html.innerHTML = cleanHTML;
   const results = html.querySelectorAll(".search-result-link");
   const itemsAll = Array.from(results).map(translateRedditToItem);
