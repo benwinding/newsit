@@ -5,6 +5,7 @@ const isProd = !!process.env.IS_PRODUCTION;
 
 console.log("webpack IS_PRODUCTION=" + isProd);
 
+/** @type { import('webpack').Configuration } */
 module.exports = [
   {
     entry: {
