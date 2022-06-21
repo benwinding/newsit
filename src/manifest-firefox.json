@@ -13,7 +13,7 @@
   "web_accessible_resources": ["img/*.png"],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["*://*/*"],
       "js": [
         "vendor/purify.min.js",
         "vendor/react.min.js",
