@@ -208,6 +208,7 @@ function ButtonLine(props: {
       width: '100%',
       padding: '3px',
       boxSizing: 'border-box',
+      userSelect: 'none',
     }}>
       <div
         style={{
