@@ -109,7 +109,8 @@ class ContentController {
   }
   ListenRequestRedditDomParse() {
     return MessageApi.onEvent("request_reddit_dom_parse", async (htmlData: string) => {
-      const result = parseRedditHtml(htmlData);
+      const useNewRedditLinks = (await store.GetStorage()).useNewRedditLinks;
+      const result = parseRedditHtml(htmlData, useNewRedditLinks);
       return result;
     });
   }

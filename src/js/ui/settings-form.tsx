@@ -17,6 +17,7 @@ interface SettingsFormState {
   hasAllEnabled: boolean;
   hasDebugEnabled: boolean;
   hideWhenNoResults: boolean;
+  useNewRedditLinks: boolean;
   btnsPlacement: PlacementType;
   formBtnsSize: number;
   formZindex: number;
@@ -33,6 +34,7 @@ export class SettingsForm extends React.Component<
     hasAllEnabled: false,
     hasDebugEnabled: false,
     hideWhenNoResults: false,
+    useNewRedditLinks: false,
     btnsPlacement: "br" as PlacementType,
     formBtnsSize: 1,
     formZindex: 999,
@@ -68,6 +70,9 @@ export class SettingsForm extends React.Component<
     sfc.ListenIsEnabledChanged((v) => {
       ctx.setState({ hasAllEnabled: v });
     });
+    sfc.ListenUseNewRedditLinks((v) => {
+      ctx.setState({ useNewRedditLinks: v });
+    });
     sfc.ListenConsoleDebugChanged((v) => {
       ctx.setState({ hasDebugEnabled: v });
     });
@@ -94,6 +99,11 @@ export class SettingsForm extends React.Component<
   onAllEnabledChanged(value: boolean) {
     sfc.SetAllEnabled(value);
     this.setState({ hasAllEnabled: value });
+  }
+
+  onUseNewRedditLinksChanged(value: boolean) {
+    sfc.SetUseNewRedditLinks(value);
+    this.setState({ useNewRedditLinks: value });
   }
 
   onBtnsLocationChanged(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -130,7 +140,8 @@ export class SettingsForm extends React.Component<
       formZindex,
       blackListAlteredStr,
       blackListStr,
-      hideWhenNoResults
+      hideWhenNoResults,
+      useNewRedditLinks,
     } = this.state;
     const { isPopupPage, onClickCheck, isLoading } = this.props;
 
@@ -176,6 +187,11 @@ export class SettingsForm extends React.Component<
             value={hideWhenNoResults}
             onChange={(e) => this.onHideWhenNoResultsChanged(e)}
             title="Hide [+] When No Results"
+          />
+          <CheckBox
+            value={useNewRedditLinks}
+            onChange={(e) => this.onUseNewRedditLinksChanged(e)}
+            title="Use new Reddit links"
           />
           <label className="label mb-0">Hosts Blocked</label>
           <p style={{ color: "darkgrey", fontSize: "13px" }}>

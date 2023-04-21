@@ -1,11 +1,11 @@
 import { ResultItem } from "./shared/ResultItem";
 
-export function parseRedditHtml(data: string): ResultItem[] {
+export function parseRedditHtml(data: string, useNewRedditLinks: boolean): ResultItem[] {
   const html = document.createElement("html");
   const cleanHTML = globalThis.DOMPurify.sanitize(data);
   html.innerHTML = cleanHTML;
   const results = html.querySelectorAll(".search-result-link");
-  const itemsAll = Array.from(results).map(translateRedditToItem);
+  const itemsAll = Array.from(results).map((el: HTMLDivElement) => translateRedditToItem(el, useNewRedditLinks));
   return itemsAll;
 }
 
@@ -19,18 +19,19 @@ function querySafe<T extends HTMLElement>(
   return attrVal + "";
 }
 
-export function translateRedditToItem(el: HTMLDivElement): ResultItem {
+export function translateRedditToItem(el: HTMLDivElement, useNewRedditLinks: boolean): ResultItem {
   const url = querySafe<HTMLAnchorElement>(el, ".search-link", "href");
   const commentsText = querySafe<HTMLAnchorElement>(
     el,
     ".search-comments",
     "text"
   );
-  const commentsLink = querySafe<HTMLAnchorElement>(
+  const commentsLinkRaw = querySafe<HTMLAnchorElement>(
     el,
     ".search-comments",
     "href"
   );
+  const commentsLink = useNewRedditLinks ? commentsLinkRaw.replace("old.", "") : commentsLinkRaw;
   const postTitle = querySafe<HTMLAnchorElement>(el, ".search-title", "text");
   const postDate = querySafe<HTMLAnchorElement>(
     el,

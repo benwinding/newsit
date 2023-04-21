@@ -19,6 +19,9 @@ class SettingsFormController {
   ListenIsEnabledChanged(cb: (v: boolean) => void) {
     store.OnStorageChanged("isEnabled", cb);
   }
+  ListenUseNewRedditLinks(cb: (v: boolean) => void) {
+    store.OnStorageChanged("useNewRedditLinks", cb);
+  }
   ListenNoResultsChanged(cb: (v: boolean) => void) {
     store.OnStorageChanged('hideWhenNoResults', cb);
   }
@@ -54,6 +57,9 @@ class SettingsFormController {
   }, 300);
   SetAllEnabled = debounce((val: boolean): void => {
     store.SetStorage({ isEnabled: val });
+  }, 300);
+  SetUseNewRedditLinks = debounce((val: boolean): void => {
+    store.SetStorage({ useNewRedditLinks: val });
   }, 300);
   SetConsoleDebug = debounce((val: boolean): void => {
     store.SetStorage({ debug: val });
