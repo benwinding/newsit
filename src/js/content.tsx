@@ -14,6 +14,7 @@ interface DbState {
   isEnabled: boolean;
   hideWhenNoResults: boolean;
   shouldShow: boolean;
+  disableTargetBlank: boolean;
   size: number;
   zindex: number;
   iframeWidth: number;
@@ -28,6 +29,7 @@ class Container extends React.Component<{}, DbState> {
     isEnabled: false,
     hideWhenNoResults: false,
     shouldShow: false,
+    disableTargetBlank: false,
     size: 1,
     zindex: 999,
     iframeWidth: 100,
@@ -70,6 +72,9 @@ class Container extends React.Component<{}, DbState> {
       ctx.setState({ hideWhenNoResults: v });
       updateShouldShow();
     });
+    cc.ListenDisableTargetBlankChanged((v) => {
+      ctx.setState({ disableTargetBlank: v });
+    });
     cc.ListenIsTabBlackListedChanged((v) => {
       ctx.setState({ isBlackListed: v });
       updateShouldShow();
@@ -103,6 +108,7 @@ class Container extends React.Component<{}, DbState> {
       placement,
       placementStyles,
       hideWhenNoResults,
+      disableTargetBlank,
       shouldShow,
       zindex,
     } = this.state;
@@ -127,6 +133,7 @@ class Container extends React.Component<{}, DbState> {
             >
               <BtnGroup
                 hideWhenNoResults={hideWhenNoResults}
+                disableTargetBlank={disableTargetBlank}
                 isReversed={isReversed}
                 sizeChanged={(w, h) => this.sizeChanged(w, h)}
               />
@@ -142,6 +149,7 @@ const LOADING = "...";
 
 function BtnGroup(props: {
   hideWhenNoResults: boolean;
+  disableTargetBlank: boolean;
   isReversed: boolean;
   sizeChanged: (newWidth: number, newHeight: number) => void;
 }) {
@@ -226,6 +234,7 @@ function BtnGroup(props: {
         >
           <BtnItem
             reverseLayout={props.isReversed}
+            disableTargetBlank={props.disableTargetBlank}
             title="Reddit"
             logoUrl={redditLogo}
             submitLink={redditSubmitLink}
@@ -242,6 +251,7 @@ function BtnGroup(props: {
         >
           <BtnItem
             reverseLayout={props.isReversed}
+            disableTargetBlank={props.disableTargetBlank}
             title="Hacker News"
             logoUrl={hnLogo}
             submitLink={hnSubmitLink}

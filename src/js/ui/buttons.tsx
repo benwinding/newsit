@@ -3,13 +3,14 @@ import { ButtonResult } from "../shared/models";
 
 export function BtnItem(props: {
   reverseLayout: boolean;
+  disableTargetBlank: boolean;
   title: string;
   logoUrl: string;
   submitLink: string;
   result: ButtonResult;
   sizeChanged: () => void;
 }) {
-  const { logoUrl, title, reverseLayout, result, submitLink } = props;
+  const { logoUrl, title, reverseLayout, disableTargetBlank, result, submitLink } = props;
   const { link, text, other_results } = result;
 
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -36,6 +37,7 @@ export function BtnItem(props: {
         text={text}
         title={title}
         submitLink={submitLink}
+        disableTargetBlank={disableTargetBlank}
         menuDisabled={!other_results?.length}
         menuOpen={menuOpen}
         menuOpenChanged={(isOpen) => {
@@ -76,6 +78,7 @@ export function BtnItem(props: {
                 postUrl={r.post_url}
                 postDate={r.post_date}
                 upvotes={r.post_upvotes}
+                disableTargetBlank={disableTargetBlank}
               ></OtherResultItem>
             );
           })}
@@ -93,6 +96,7 @@ function OtherResultItem(props: {
   postUrl: string;
   postDate: string;
   upvotes: number;
+  disableTargetBlank: boolean;
 }) {
   const {
     commentsCount,
@@ -102,6 +106,7 @@ function OtherResultItem(props: {
     postUrl,
     postDate,
     upvotes,
+    disableTargetBlank,
   } = props;
 
   return (
@@ -116,7 +121,7 @@ function OtherResultItem(props: {
       <a
         href={commentsLink}
         title="Open's link to comments"
-        target="_blank"
+        target={disableTargetBlank ? "_self" : "_blank"}
         style={{
           color: "black",
           textDecoration: "underline",
@@ -142,7 +147,7 @@ function OtherResultItem(props: {
         <a
           href={commentsLink}
           title="Open's link to comments"
-          target="_blank"
+          target={disableTargetBlank ? "_self" : "_blank"}
           style={{
             fontSize: "0.7em",
             color: "black",
@@ -163,6 +168,7 @@ function ButtonLine(props: {
   title: string;
   text: string;
   reverseLayout: boolean;
+  disableTargetBlank: boolean;
   menuDisabled: boolean;
   menuOpen: boolean;
   menuOpenChanged: (isOpen: boolean) => void;
@@ -174,6 +180,7 @@ function ButtonLine(props: {
     title,
     text,
     link,
+    disableTargetBlank,
     menuDisabled,
     menuOpen,
     menuOpenChanged,
@@ -183,7 +190,7 @@ function ButtonLine(props: {
 
   const Spacer = <span style={{ width: "100%" }}></span>;
   const DiscussionLink = <a
-    target="_blank"
+    target={disableTargetBlank ? "_self" : "_blank"}
     href={link}
     title={"click to view discussion"}
     style={{
@@ -221,7 +228,7 @@ function ButtonLine(props: {
         {menuEnabled && DiscussionImg}
         {hasLink && DiscussionLink}
         {menuOpen && Spacer}
-        {(!hasLink || menuOpen) && <SubmitButton hasLink={hasLink} submitLink={submitLink} title={title} />}
+        {(!hasLink || menuOpen) && <SubmitButton hasLink={hasLink} submitLink={submitLink} title={title} disableTargetBlank={disableTargetBlank} />}
         <div><ExpanderButton onClick={() => menuEnabled && menuOpenChanged(!menuOpen)} menuEnabled={menuEnabled} menuOpen={menuOpen} /></div>
       </div>
     </div>
@@ -259,9 +266,9 @@ function ExpanderButton(props: { onClick: () => void, menuEnabled: boolean, menu
   </div>
 }
 
-function SubmitButton(props: {submitLink: string, title: string, hasLink: boolean}) {
+function SubmitButton(props: {submitLink: string, title: string, hasLink: boolean, disableTargetBlank: boolean}) {
   return <a
-    target="_blank"
+    target={props.disableTargetBlank ? "_self" : "_blank"}
     href={props.submitLink}
     title={
       (!props.hasLink ? "No submissions found, " : "") +

@@ -2,6 +2,7 @@ export const DEFAULT_STATE: RootState = {
   isEnabled: true,
   hideWhenNoResults: false,
   useNewRedditLinks: false,
+  disableTargetBlank: false,
   btnsize: 0.8,
   btnzindex: 999,
   placement: "br",
@@ -13,6 +14,7 @@ export interface RootState {
   isEnabled: boolean;
   hideWhenNoResults: boolean;
   useNewRedditLinks: boolean;
+  disableTargetBlank: boolean;
   btnsize: number;
   btnzindex: number;
   placement: PlacementType;

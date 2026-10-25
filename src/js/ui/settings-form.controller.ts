@@ -25,6 +25,9 @@ class SettingsFormController {
   ListenNoResultsChanged(cb: (v: boolean) => void) {
     store.OnStorageChanged('hideWhenNoResults', cb);
   }
+  ListenDisableTargetBlankChanged(cb: (v: boolean) => void) {
+    store.OnStorageChanged("disableTargetBlank", cb);
+  }
   ListenConsoleDebugChanged(cb: (v: boolean) => void) {
     store.OnStorageChanged("debug", cb);
   }
@@ -63,6 +66,9 @@ class SettingsFormController {
   }, 300);
   SetConsoleDebug = debounce((val: boolean): void => {
     store.SetStorage({ debug: val });
+  }, 300);
+  SetDisableTargetBlank = debounce((val: boolean): void => {
+    store.SetStorage({ disableTargetBlank: val });
   }, 300);
   SetHideWhenNoResults = debounce((val: boolean): void => {
     store.SetStorage({ hideWhenNoResults: val });
