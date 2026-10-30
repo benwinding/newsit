@@ -3,6 +3,19 @@ import { onRequestBackgroundReddit } from "./background/reddit";
 import { onRequestBackgroundHN } from "./background/hn";
 import { createBackgroundController } from "./background.controller";
 import { MakeLogger } from "./shared/logger";
+import { createLobstersClient } from "./background/lobsters";
+import { getTabUrl } from "./background/api";
+import { system } from "./shared/browser";
+
+const fetchLobsters = createLobstersClient(fetch, {
+  async load() {
+    const saved = await system.storage.local.get("lobstersCooldownUntil");
+    return typeof saved.lobstersCooldownUntil === "number" ? saved.lobstersCooldownUntil : 0;
+  },
+  async save(lobstersCooldownUntil) {
+    await system.storage.local.set({ lobstersCooldownUntil });
+  },
+});
 
 const bc = createBackgroundController();
 
@@ -21,6 +34,15 @@ bc.ListenForAllEnabledChange((isAllEnabled) => {
   bc.SetIconText(isAllEnabled);
 })
 bc.ListenForRequestApi((tabId) => {
+  store.GetStorage().then(async ({ enableLobsters }) => {
+    if (enableLobsters) {
+      const url = await getTabUrl(tabId);
+      const result = await bc.IsUrlBlackListed(url)
+        ? { text: "-", status: "Lobsters: this website is blocked." }
+        : await fetchLobsters(url);
+      await bc.SendEventToTab("result_from_lobsters", tabId, { url, result });
+    }
+  }).catch((err) => logger.log("!!!! request_lobsters", err));
   onRequestBackgroundHN(tabId)
     .then((res) => bc.SendEventToTab("result_from_hn", tabId, res))
     .catch((err) => logger.log("!!!! request_hn", err));

@@ -10,6 +10,7 @@ import { setTimeoutAsyc } from "./shared/utils";
 const cc = createContentController();
 
 interface DbState {
+  enableLobsters: boolean;
   isBlackListed: boolean;
   isEnabled: boolean;
   hideWhenNoResults: boolean;
@@ -25,6 +26,7 @@ interface DbState {
 
 class Container extends React.Component<{}, DbState> {
   state = {
+    enableLobsters: false,
     isBlackListed: false,
     isEnabled: false,
     hideWhenNoResults: false,
@@ -74,6 +76,9 @@ class Container extends React.Component<{}, DbState> {
     });
     cc.ListenDisableTargetBlankChanged((v) => {
       ctx.setState({ disableTargetBlank: v });
+    });
+    cc.ListenEnableLobstersChanged((v) => {
+      ctx.setState({ enableLobsters: v });
     });
     cc.ListenIsTabBlackListedChanged((v) => {
       ctx.setState({ isBlackListed: v });
@@ -132,6 +137,7 @@ class Container extends React.Component<{}, DbState> {
               }}
             >
               <BtnGroup
+                enableLobsters={this.state.enableLobsters}
                 hideWhenNoResults={hideWhenNoResults}
                 disableTargetBlank={disableTargetBlank}
                 isReversed={isReversed}
@@ -148,6 +154,7 @@ class Container extends React.Component<{}, DbState> {
 const LOADING = "...";
 
 function BtnGroup(props: {
+  enableLobsters: boolean;
   hideWhenNoResults: boolean;
   disableTargetBlank: boolean;
   isReversed: boolean;
@@ -155,6 +162,9 @@ function BtnGroup(props: {
 }) {
   const [reddit, setReddit] = useState({ text: LOADING } as ButtonResult);
   const [hn, setHn] = useState({ text: LOADING } as ButtonResult);
+  const [lobsters, setLobsters] = useState({ text: LOADING, status: "Checking Lobsters…" } as ButtonResult);
+  const [lobstersLogo, setLobstersLogo] = useState("");
+  const [lobstersSubmitLink, setLobstersSubmitLink] = useState("");
   const [redditLogo, setRedditLogo] = React.useState("");
   const [hnLogo, setHnLogo] = React.useState("");
   const [redditSubmitLink, setRedditSubmitLink] = React.useState("");
@@ -171,7 +181,11 @@ function BtnGroup(props: {
     const unsubReddit = cc.ListenResultsReddit(async (res) => {
       mounted && setReddit(res);
     });
-    cc.GetLogoUrls().then(({ reddit, hn }) => {
+    const unsubLobsters = cc.ListenResultsLobsters(async (res) => {
+      mounted && setLobsters(res);
+    });
+    cc.GetLogoUrls().then(({ reddit, hn, lobsters }) => {
+      mounted && setLobstersLogo(lobsters);
       mounted && setRedditLogo(reddit);
       mounted && setHnLogo(hn);
     });
@@ -180,19 +194,22 @@ function BtnGroup(props: {
         return;
       }
       setHnSubmitLink(cc.GetHnSubmitLink());
+      setLobstersSubmitLink(cc.GetLobstersSubmitLink());
       setRedditSubmitLink(cc.GetRedditSubmitLink());
     }
     // Wait a bit then try and read titles again (JS webapps sometimes renders the page title).
     const setSubmitLinksAfterAppRender = () => setTimeout(setSubmitLinks, 2000);
     setSubmitLinks();
     setSubmitLinksAfterAppRender();
+    setLobsters({ text: LOADING, status: "Checking Lobsters…" });
     cc.SendCheckApiEvent();
     return () => {
       mounted = false;
       unsubHn();
       unsubReddit();
+      unsubLobsters();
     };
-  }, []);
+  }, [props.enableLobsters]);
 
   async function notifySizeChanged() {
     await setTimeoutAsyc(10);
@@ -203,7 +220,7 @@ function BtnGroup(props: {
 
   useEffect(() => {
     notifySizeChanged();
-  }, [hn, reddit]);
+  }, [hn, reddit, lobsters]);
 
   const onButtonSizeChanged = () => {
     notifySizeChanged();
@@ -214,6 +231,7 @@ function BtnGroup(props: {
 
   const shouldShowHn = hasHn || !props.hideWhenNoResults;
   const shouldShowReddit = hasReddit || !props.hideWhenNoResults;
+  const shouldShowLobsters = props.enableLobsters && (!!lobsters.link || !!lobsters.status || !props.hideWhenNoResults);
 
   return (
     <div
@@ -239,6 +257,23 @@ function BtnGroup(props: {
             logoUrl={redditLogo}
             submitLink={redditSubmitLink}
             result={reddit}
+            sizeChanged={onButtonSizeChanged}
+          />
+        </div>
+      )}
+      {shouldShowLobsters && (
+        <div style={{ backgroundColor: "#AC130D" }}>
+          <BtnItem
+            reverseLayout={props.isReversed}
+            disableTargetBlank={props.disableTargetBlank}
+            title="Lobsters"
+            onRetry={() => {
+              setLobsters({ text: LOADING, status: "Checking Lobsters…" });
+              cc.SendCheckApiEvent();
+            }}
+            logoUrl={lobstersLogo}
+            submitLink={lobstersSubmitLink}
+            result={lobsters}
             sizeChanged={onButtonSizeChanged}
           />
         </div>

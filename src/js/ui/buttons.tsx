@@ -9,15 +9,42 @@ export function BtnItem(props: {
   submitLink: string;
   result: ButtonResult;
   sizeChanged: () => void;
+  onRetry?: () => void;
 }) {
   const { logoUrl, title, reverseLayout, disableTargetBlank, result, submitLink } = props;
   const { link, text, other_results } = result;
 
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [now, setNow] = React.useState(Date.now());
+  React.useEffect(() => {
+    if (!result.retryAt) return;
+    setNow(Date.now());
+    const timer = setInterval(() => {
+      const current = Date.now();
+      setNow(current);
+      if (current >= result.retryAt) clearInterval(timer);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [result.retryAt]);
+  const remaining = Math.max(0, Math.ceil(((result.retryAt || 0) - now) / 1000));
 
   React.useEffect(() => {
     props.sizeChanged();
-  }, [menuOpen]);
+  }, [menuOpen, result.status, remaining]);
+
+  if (result.status) {
+    return <div role="status" style={{ padding: "3px 6px", fontFamily: "monospace", whiteSpace: "nowrap" }}>
+      {result.status}
+      {result.retryAt && <>
+        <span> {remaining > 0 ? `Try again in ${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, "0")}.` : "Ready to retry."}</span>
+        {props.onRetry && <button
+          disabled={remaining > 0}
+          onClick={() => { if (Date.now() >= result.retryAt) props.onRetry(); }}
+          style={{ marginLeft: "6px" }}
+        >Retry</button>}
+      </>}
+    </div>;
+  }
 
   return (
     <div

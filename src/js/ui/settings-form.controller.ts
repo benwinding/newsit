@@ -28,6 +28,12 @@ class SettingsFormController {
   ListenDisableTargetBlankChanged(cb: (v: boolean) => void) {
     store.OnStorageChanged("disableTargetBlank", cb);
   }
+  ListenEnableLobstersChanged(cb: (v: boolean) => void) {
+    store.OnStorageChanged("enableLobsters", cb);
+  }
+  SetEnableLobsters(val: boolean) {
+    return store.SetStorage({ enableLobsters: val });
+  }
   ListenConsoleDebugChanged(cb: (v: boolean) => void) {
     store.OnStorageChanged("debug", cb);
   }

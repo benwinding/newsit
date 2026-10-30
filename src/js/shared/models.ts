@@ -3,6 +3,7 @@ export const DEFAULT_STATE: RootState = {
   hideWhenNoResults: false,
   useNewRedditLinks: false,
   disableTargetBlank: false,
+  enableLobsters: false,
   btnsize: 0.8,
   btnzindex: 999,
   placement: "br",
@@ -15,6 +16,7 @@ export interface RootState {
   hideWhenNoResults: boolean;
   useNewRedditLinks: boolean;
   disableTargetBlank: boolean;
+  enableLobsters: boolean;
   btnsize: number;
   btnzindex: number;
   placement: PlacementType;
@@ -24,6 +26,8 @@ export interface RootState {
 
 export interface ButtonResult {
   text: string;
+  status?: string;
+  retryAt?: number;
   link?: string;
   other_results?: OtherResult[];
 }
@@ -53,4 +57,5 @@ export type MessageChannelType =
   | "request_api"
   | "request_reddit_dom_parse"
   | "result_from_hn"
+  | "result_from_lobsters"
   | "result_from_reddit";

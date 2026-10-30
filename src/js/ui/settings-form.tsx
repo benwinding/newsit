@@ -19,6 +19,7 @@ interface SettingsFormState {
   hideWhenNoResults: boolean;
   useNewRedditLinks: boolean;
   disableTargetBlank: boolean;
+  enableLobsters: boolean;
   btnsPlacement: PlacementType;
   formBtnsSize: number;
   formZindex: number;
@@ -37,6 +38,7 @@ export class SettingsForm extends React.Component<
     hideWhenNoResults: false,
     useNewRedditLinks: false,
     disableTargetBlank: false,
+    enableLobsters: false,
     btnsPlacement: "br" as PlacementType,
     formBtnsSize: 1,
     formZindex: 999,
@@ -77,6 +79,9 @@ export class SettingsForm extends React.Component<
     });
     sfc.ListenDisableTargetBlankChanged((v) => {
       ctx.setState({ disableTargetBlank: v });
+    });
+    sfc.ListenEnableLobstersChanged((v) => {
+      ctx.setState({ enableLobsters: v });
     });
     sfc.ListenConsoleDebugChanged((v) => {
       ctx.setState({ hasDebugEnabled: v });
@@ -208,6 +213,14 @@ export class SettingsForm extends React.Component<
             value={disableTargetBlank}
             onChange={(e) => this.onDisableTargetBlankChanged(e)}
             title="Open links in current tab"
+          />
+          <CheckBox
+            value={this.state.enableLobsters}
+            onChange={(enableLobsters) => {
+              sfc.SetEnableLobsters(enableLobsters);
+              this.setState({ enableLobsters });
+            }}
+            title="Enable lobste.rs"
           />
           <label className="label mb-0">Hosts Blocked</label>
           <p style={{ color: "darkgrey", fontSize: "13px" }}>

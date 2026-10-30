@@ -61,6 +61,9 @@ class ContentController {
     const link = encodeURI(document.location.href);
     return `https://news.ycombinator.com/submitlink?t=${title}&u=${link}`;
   }
+  GetLobstersSubmitLink(): string {
+    return `https://lobste.rs/stories/new?url=${encodeURIComponent(document.location.href)}&title=${encodeURIComponent(getTitle())}`;
+  }
   SendCheckApiEvent() {
     return MessageApi.emitEvent("request_api");
   }
@@ -68,6 +71,7 @@ class ContentController {
     return {
       reddit: system.runtime.getURL("./img/reddit.png"),
       hn: system.runtime.getURL("./img/hn.png"),
+      lobsters: system.runtime.getURL("./img/lobsters.png"),
     };
   }
   ListenPlacementChanged(cb: (v: PlacementType) => void) {
@@ -88,6 +92,9 @@ class ContentController {
   ListenDisableTargetBlankChanged(cb: (v: boolean) => void) {
     store.OnStorageChanged("disableTargetBlank", cb);
   }
+  ListenEnableLobstersChanged(cb: (v: boolean) => void) {
+    store.OnStorageChanged("enableLobsters", cb);
+  }
   ListenIsTabBlackListedChanged(cb: (isBlackListed: boolean) => void) {
     MessageApi.onEvent("tab_url_changed", async () => {
       const isBlacklisted = await this.GetIsCurrentUrlBlackListed();
@@ -100,6 +107,11 @@ class ContentController {
   }
   ListenResultsHn(cb: (hosts: ButtonResult) => Promise<void>) {
     return MessageApi.onEvent("result_from_hn", cb);
+  }
+  ListenResultsLobsters(cb: (result: ButtonResult) => Promise<void>) {
+    return MessageApi.onEvent("result_from_lobsters", async (data: { url: string; result: ButtonResult }) => {
+      if (data.url === document.location.href) await cb(data.result);
+    });
   }
   ListenResultsReddit(cb: (hosts: ButtonResult) => Promise<void>) {
     return MessageApi.onEvent("result_from_reddit", cb);

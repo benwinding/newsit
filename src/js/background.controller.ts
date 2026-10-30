@@ -23,7 +23,11 @@ class BackgroundController {
   }
   ListenForRequestApi(cb: (tabId: number) => void) {
     MessageApi.onEvent("request_api", async (_, sender) => {
-      return cb(sender.tab.id);
+      const tabId = sender?.tab?.id;
+      if (tabId === undefined) {
+        return;
+      }
+      return cb(tabId);
     });
   }
   ListenTabChange(cb: (tabId: any, tabUrl: any) => Promise<void>) {
