@@ -1,6 +1,6 @@
 # Newsit
 
-Find the discussion around the page you're looking at. Newsit can find the top voted Reddit or Hacker News discussion!
+Find the discussion around the page you're looking at. Newsit can find the top voted discussions in Reddit, Hacker News, and Lobsters!
 
 - [Chrome Extension](https://chrome.google.com/webstore/detail/newsit-hacker-news-and-re/nngjdplpkehilhcinpccdbkjaknkkifl)
 - [Firefox Extension](https://addons.mozilla.org/en-GB/firefox/addon/newsit-hnews-and-reddit-links/)
