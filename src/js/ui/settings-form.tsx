@@ -18,6 +18,8 @@ interface SettingsFormState {
   hasDebugEnabled: boolean;
   hideWhenNoResults: boolean;
   useNewRedditLinks: boolean;
+  disableTargetBlank: boolean;
+  enableLobsters: boolean;
   btnsPlacement: PlacementType;
   formBtnsSize: number;
   formZindex: number;
@@ -35,6 +37,8 @@ export class SettingsForm extends React.Component<
     hasDebugEnabled: false,
     hideWhenNoResults: false,
     useNewRedditLinks: false,
+    disableTargetBlank: false,
+    enableLobsters: false,
     btnsPlacement: "br" as PlacementType,
     formBtnsSize: 1,
     formZindex: 999,
@@ -73,6 +77,12 @@ export class SettingsForm extends React.Component<
     sfc.ListenUseNewRedditLinks((v) => {
       ctx.setState({ useNewRedditLinks: v });
     });
+    sfc.ListenDisableTargetBlankChanged((v) => {
+      ctx.setState({ disableTargetBlank: v });
+    });
+    sfc.ListenEnableLobstersChanged((v) => {
+      ctx.setState({ enableLobsters: v });
+    });
     sfc.ListenConsoleDebugChanged((v) => {
       ctx.setState({ hasDebugEnabled: v });
     });
@@ -84,6 +94,11 @@ export class SettingsForm extends React.Component<
   onConsoleDebugChanged(isEnabled: boolean) {
     sfc.SetConsoleDebug(isEnabled);
     this.setState({ hasDebugEnabled: isEnabled });
+  }
+
+  onDisableTargetBlankChanged(isDisabled: boolean) {
+    sfc.SetDisableTargetBlank(isDisabled);
+    this.setState({ disableTargetBlank: isDisabled });
   }
 
   onHideWhenNoResultsChanged(isEnabled: boolean) {
@@ -142,6 +157,7 @@ export class SettingsForm extends React.Component<
       blackListStr,
       hideWhenNoResults,
       useNewRedditLinks,
+      disableTargetBlank,
     } = this.state;
     const { isPopupPage, onClickCheck, isLoading } = this.props;
 
@@ -192,6 +208,19 @@ export class SettingsForm extends React.Component<
             value={useNewRedditLinks}
             onChange={(e) => this.onUseNewRedditLinksChanged(e)}
             title="Use new Reddit links"
+          />
+          <CheckBox
+            value={disableTargetBlank}
+            onChange={(e) => this.onDisableTargetBlankChanged(e)}
+            title="Open links in current tab"
+          />
+          <CheckBox
+            value={this.state.enableLobsters}
+            onChange={(enableLobsters) => {
+              sfc.SetEnableLobsters(enableLobsters);
+              this.setState({ enableLobsters });
+            }}
+            title="Enable lobste.rs"
           />
           <label className="label mb-0">Hosts Blocked</label>
           <p style={{ color: "darkgrey", fontSize: "13px" }}>
